@@ -22,12 +22,12 @@ document.querySelectorAll("nav ul > li.relative > button").forEach((button) => {
   });
 });
 
-//Close dropdown
+// Close dropdowns if clicking outside
 document.addEventListener("click", (e) => {
   const nav = document.querySelector("nav");
   if (!nav.contains(e.target)) {
     document
-      .querySelectorAll("nav ul > li.relative > bsutton")
+      .querySelectorAll("nav ul > li.relative > button")
       .forEach((btn) => {
         btn.setAttribute("aria-expanded", "false");
         const menu = document.getElementById(btn.id.replace("Btn", "Menu"));

@@ -1,0 +1,42 @@
+.btn-search-container {
+  display: inline-flex;
+  padding: 11px 38px 11px 48px;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 879px;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+button.custom-btn {
+  border-radius: 8px;
+  background: #2dc653;
+  display: flex;
+  width: 163px;
+  height: 37px;
+  padding: 8px 16px;
+  align-items: center;
+  gap: 4px;
+  color: white;
+  font-weight: normal;
+  font-size: 14px;
+  justify-content: center;
+  transition: background-color 0.2s;
+  text-align: center;
+  font-family: Poppins;
+  font-style: normal;
+  line-height: 150%; /* 21px */
+}
+button.custom-btn:hover {
+  background: #27b04a;
+}
+/* Modal backdrop - when pop up form opens, color sa background */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
