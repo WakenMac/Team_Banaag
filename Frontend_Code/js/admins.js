@@ -10,6 +10,7 @@ async function initialize(){
   setupDropdown("propertiesBtn", "propertiesMenu");
 
   // Prepares the contents of the admin table
+  await dbhandler.testPresence();
   await prepareAdminTable();
 }
 
@@ -51,7 +52,6 @@ const tbody = document.querySelector("tbody");
 async function openModal() {
   addAdminModal.classList.remove("hidden");
   addAdminModal.classList.add("flex");
-  await dbhandler.testPresence();
 }
 
 function closeModal() {
