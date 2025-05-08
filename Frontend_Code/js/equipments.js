@@ -37,8 +37,10 @@ setupDropdown("propertiesBtn", "propertiesMenu");
 const addEquipmentBtn = document.getElementById("addEquipmentBtn");
 const addEquipmentModal = document.getElementById("addEquipmentModal");
 const addEquipmentForm = document.getElementById("addEquipmentForm");
-const modalBackdrop = document.getElementById("modalBackdrop");
-const cancelBtn = document.getElementById("cancelBtn");
+const modalBackdropEquipment = document.getElementById(
+  "modalBackdropEquipment"
+);
+const cancelEquipmentBtn = document.getElementById("cancelEquipmentBtn");
 const tbody = document.querySelector("tbody");
 
 function openEquipmentModal() {
@@ -53,8 +55,8 @@ function closeEquipmentModal() {
 }
 
 addEquipmentBtn.addEventListener("click", openEquipmentModal);
-cancelBtn.addEventListener("click", closeEquipmentModal);
-modalBackdrop.addEventListener("click", closeEquipmentModal);
+cancelEquipmentBtn.addEventListener("click", closeEquipmentModal);
+modalBackdropEquipment.addEventListener("click", closeEquipmentModal);
 
 addEquipmentForm.addEventListener("submit", (e) => {
   e.preventDefault();
