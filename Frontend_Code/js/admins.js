@@ -1,3 +1,18 @@
+import * as dbhandler from '../../Backend_Code/DBHandlers/mainHandler.js';
+
+// Initialize the tables
+initialize();
+
+async function initialize(){
+  setupDropdown("masterlistBtn", "masterlistMenu");
+  setupDropdown("consumablesBtn", "consumablesMenu");
+  setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
+  setupDropdown("propertiesBtn", "propertiesMenu");
+
+  // Prepares the contents of the admin table
+  await prepareAdminTable();
+}
+
 // Dropdown toggle logic
 function setupDropdown(buttonId, menuId) {
   const btn = document.getElementById(buttonId);
@@ -25,11 +40,6 @@ function setupDropdown(buttonId, menuId) {
   });
 }
 
-setupDropdown("masterlistBtn", "masterlistMenu");
-setupDropdown("consumablesBtn", "consumablesMenu");
-setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
-setupDropdown("propertiesBtn", "propertiesMenu");
-
 // Modal logic
 const addAdminBtn = document.getElementById("addAdminBtn");
 const addAdminModal = document.getElementById("addAdminModal");
@@ -38,9 +48,10 @@ const cancelBtn = document.getElementById("cancelBtn");
 const addEquipmentForm = document.getElementById("addAdminForm");
 const tbody = document.querySelector("tbody");
 
-function openModal() {
+async function openModal() {
   addAdminModal.classList.remove("hidden");
   addAdminModal.classList.add("flex");
+  await dbhandler.testPresence();
 }
 
 function closeModal() {
@@ -53,7 +64,7 @@ addAdminBtn.addEventListener("click", openModal);
 cancelBtn.addEventListener("click", closeModal);
 modalBackdrop.addEventListener("click", closeModal);
 
-addEquipmentForm.addEventListener("submit", (e) => {
+addEquipmentForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const adminId = addEquipmentForm.adminId.value.trim();
@@ -66,6 +77,52 @@ addEquipmentForm.addEventListener("submit", (e) => {
     return;
   }
 
+  let result = await dbhandler.addAdminRecord(adminId, firstName, middleName, lastName, 'randomPassword');
+  
+  if (result.includes('ERROR')){
+    alert(result);
+  } else {
+    createNewAdminRow(adminId, firstName, middleName, lastName, 'randomPassword');
+    console.log(result);
+  }
+
+  dbhandler.testPresence();
+  closeModal();
+});
+
+// Optional: Add delete functionality for dynamically added rows
+tbody.addEventListener("click", async (e) => {
+  if (
+    e.target.closest("button") &&
+    e.target.closest("button").getAttribute("aria-label") === "Delete admin"
+  ) {
+
+    const row = e.target.closest("tr");
+    const id = row.querySelectorAll("td")[0].textContent; // Gets the admin ID from the row
+
+    if (row) {
+      let result = await dbhandler.removeAdminRecordByAdminId(id)
+      console.log(result);
+      if (result.includes('ERROR'))
+          alert(result);
+
+      row.remove();
+    }
+  }
+});
+
+// =====================================================================================================
+// FRONT-END RELATED METHODS
+
+/**
+ * Method to create a new admin row to the front end table.
+ * 
+ * @param {*} adminId New ID of the admin (User Defined)
+ * @param {*} firstName First name of the admin
+ * @param {*} middleName Middle name of the admin
+ * @param {*} lastName Last name of the admin
+ */
+async function createNewAdminRow(adminId, firstName, middleName, lastName){
   // Create new row
   const tr = document.createElement("tr");
 
@@ -85,18 +142,30 @@ addEquipmentForm.addEventListener("submit", (e) => {
       `;
 
   tbody.appendChild(tr);
-  closeModal();
-});
+}
 
-// Optional: Add delete functionality for dynamically added rows
-tbody.addEventListener("click", (e) => {
-  if (
-    e.target.closest("button") &&
-    e.target.closest("button").getAttribute("aria-label") === "Delete admin"
-  ) {
-    const row = e.target.closest("tr");
-    if (row) {
-      row.remove();
+// =====================================================================================================
+// BACKEND-RELATED METHODS
+
+async function prepareAdminTable(){
+  try {
+    let data = await dbhandler.getAllAdmins();
+
+    if (data.length == 0){
+      console.log("Admins table has no records.");
+      return;
     }
+
+    for (let i = 0; i < data.length; i++){
+      createNewAdminRow(
+        data[i]['Admin ID'],
+        data[i]['First Name'],
+        data[i]['Middle Name'],
+        data[i]['Last Name']
+      );
+    }
+
+  } catch (error){
+      console.error(error);
   }
-});
+}

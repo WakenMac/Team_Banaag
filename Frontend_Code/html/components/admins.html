@@ -41,6 +41,7 @@
         </div>
         <div class="border-l border-black/40 h-10 ml-4"></div>
       </div>
+      
       <!-- Right side: Navigation Links -->
       <ul class="flex space-x-8 text-[13px] font-normal text-black">
         <li>
@@ -149,7 +150,7 @@
             <li role="none">
               <a
                 class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/equipments.html"
+                href="../../Frontend_Code/html/components/equipments.html"
                 role="menuitem"
                 tabindex="-1"
               >
@@ -178,6 +179,7 @@
             </li>
           </ul>
         </li>
+        
         <li class="relative">
           <button
             aria-expanded="false"
@@ -426,6 +428,8 @@
         </form>
       </div>
     </div>
-    <script src="/Frontend_Code/js/admins.js"></script>
+    <!-- Script to access the supabase API -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="/Frontend_Code/js/admins.js"></script>
   </body>
 </html>
