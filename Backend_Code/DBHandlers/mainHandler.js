@@ -38,7 +38,7 @@ export async function getAllAdmins(){
 
 /**
  * Method to get all of the records on the Admin table
- * @param {Text} adminId Primary key of the Admin table used to find specific records
+ * @param {string} adminId Primary key of the Admin table used to find specific records
  * @returns A record consisting of 4 columns (Admin ID, First Name, Middle Name, Last Name)
  */
 export async function getAdminRecordByAdminID(adminId){
@@ -69,9 +69,9 @@ export async function getAdminRecordByAdminID(adminId){
 
 /**
  * Method to get a record on the Admin table based on their name
- * @param {Text} fName First name of the admin
- * @param {Text} mName Middle name of the admin
- * @param {Text} lName Last name of the admin
+ * @param {string} fName First name of the admin
+ * @param {string} mName Middle name of the admin
+ * @param {string} lName Last name of the admin
  * @returns A record consisting of 4 columns (Admin ID, First Name, Middle Name, Last Name)
  */
 export async function getAdminRecordByName(fName, mName, lName){
@@ -102,12 +102,12 @@ export async function getAdminRecordByName(fName, mName, lName){
 
 /**
  * Adds a new record to the Admin table
- * @param {Text} adminId User-defined primary key of the Admin table
- * @param {Text} adminPassword Password of the admin to be using the database
- * @param {Text} fName First name of the admin
- * @param {Text} mName Middle name of the admin
- * @param {Text} lName Last name of the admin
- * @returns A text containing the status of the newly added record (Success or Error)
+ * @param {string} adminId User-defined primary key of the Admin table
+ * @param {string} adminPassword Password of the admin to be using the database
+ * @param {string} fName First name of the admin
+ * @param {string} mName Middle name of the admin
+ * @param {string} lName Last name of the admin
+ * @returns A string containing the status of the newly added record (Success or Error)
  */
 export async function addAdminRecord(adminId, fName, mName, lName, adminPassword){
     try{
@@ -141,8 +141,8 @@ export async function addAdminRecord(adminId, fName, mName, lName, adminPassword
 
 /**
  * Updates the password of a record in the Admin table based on the adminId
- * @param {Text} adminId User-defined primary key of the Admin table
- * @param {Text} adminPassword Password of the admin to be using the database
+ * @param {string} adminId User-defined primary key of the Admin table
+ * @param {string} adminPassword Password of the admin to be using the database
  * @returns A string containing the status of the updated record (Success or Error)
  */
 export async function updateAdminRecordPassword(adminId, adminPassword){
@@ -172,11 +172,11 @@ export async function updateAdminRecordPassword(adminId, adminPassword){
 
 /**
  * Updates most of the attributes of an Admin record based on their adminId
- * @param {Text} adminId User-defined primary key of the Admin table
- * @param {Text} adminPassword Password of the admin to be using the database
- * @param {Text} fName First name of the admin
- * @param {Text} mName Middle name of the admin
- * @param {Text} lName Last name of the admin
+ * @param {string} adminId User-defined primary key of the Admin table
+ * @param {string} adminPassword Password of the admin to be using the database
+ * @param {string} fName First name of the admin
+ * @param {string} mName Middle name of the admin
+ * @param {string} lName Last name of the admin
  * @returns A string containing the status of the updated record (Success or Error)
  */
 export async function updateAdminRecord(adminId, fName, mName, lName, adminPassword){
@@ -210,7 +210,7 @@ export async function updateAdminRecord(adminId, fName, mName, lName, adminPassw
 
 /**
  * Removes a record from the Admin table, whose admin has not made any transaction yet.
- * @param {Text} adminId User-defined primary key of the Admin table
+ * @param {string} adminId User-defined primary key of the Admin table
  * @returns A string containing the status of the deleted record (Success or Error)
  */
 export async function removeAdminRecordByAdminId(adminId){
@@ -310,7 +310,7 @@ export async function getAllLocationRecords(){
 /**
  * Method to get all of the records on the location table
  * @param {integer} locationId The primary key of the location table
- * @returns A record consisting of 4 columns (Location ID, Location Name)
+ * @returns A record consisting of 2 columns (Location ID, Location Name)
  */
 export async function getLocationRecordByLocationId(locationId){
     try{
@@ -342,19 +342,19 @@ export async function getLocationRecordByLocationId(locationId){
 /**
  * Method to get the  record of the location table
  * @param {integer} locationId The primary key of the location table
- * @returns A record consisting of 4 columns (Location ID, Location Name)
+ * @returns A record consisting of 2 columns (Location ID, Location Name)
  */
 export async function getLocationRecordByName(locationName){
     try{
         const [ sLocationName ] = converter('string', locationName);
 
         if (typeof sLocationId !== 'string'){
-            console.error("PARAMETER ERROR: get_location_record_by_name's locationName parameter must be a string.")
+            console.error("PARAMETER ERROR: add_location_record's locationName parameter must be a string.")
             return null;
         }
         
 
-        const {data, error: supabaseError} = await supabaseClient.rpc('get_location_record_by_name', {
+        const {data, error: supabaseError} = await supabaseClient.rpc('add_location_record', {
             input_location_name : sLocationName
         });
         
@@ -371,6 +371,11 @@ export async function getLocationRecordByName(locationName){
     }
 }
 
+/**
+ * Method to add a record to the location table
+ * @param {string} locationName The primary key of the location table
+ * @returns A string containing the status of the added record (Success or Error)
+ */
 export async function addLocationRecord(locationName){
     try{
         const [ sLocationName ] = converter('string', locationName);
@@ -397,6 +402,143 @@ export async function addLocationRecord(locationName){
         return null;
     }
 }
+
+/**
+ * Method to update a record to the location table
+ * @param {int} locationId The primary key of the location table
+ * @param {string} locationName The name to be changed in the location table based on the location id
+ * @returns A string containing the status of the updated record (Success or Error)
+ */
+export async function updateLocationRecordName(locationId = 0, locationName = ''){
+    try{
+        const [ sLocationName ] = converter('string', locationName);
+        const [ iLocationId ] = converter('int', locationId)
+
+        if (typeof iLocationId !== 'number'){
+            console.error("PARAMETER ERROR: update_location_record_name's locationId parameter must be a positive integer.")
+            return null;
+        } else if (typeof sLocationName !== 'string'){
+            console.error("PARAMETER ERROR: update_location_record_name's locationName parameter must be a string.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_location_record_name', {
+            input_location_id : iLocationId,
+            input_location_name : sLocationName
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, error.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", error)
+        return null;
+    }
+}
+
+/**
+ * Method to remove a record to the location table
+ * @param {int} locationId The primary key of the location table
+ * @returns A string containing the status of the deleted record (Success or Error)
+ */
+export async function removeLocationRecordByLocationId(locationId = 0){
+    try{
+        const [ iLocationId ] = converter('int', locationId)
+
+        if (typeof iLocationId !== 'number'){
+            console.error("PARAMETER ERROR: update_location_record_name's locationId parameter must be a positive integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('remove_location_record_by_location_id', {
+            input_location_id : iLocationId,
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, error.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", error)
+        return null;
+    }
+}
+
+/**
+ * Method to return the number of times a specific location record (based on location id) is referenced in different 
+ * item_type tables (Chemicals, Consumable Items, Equipments, Apparatus, Glassware)
+ * 
+ * @param {int} locationId The primary key of the location table
+ * @returns The number of times a specific location is referenced by specific item ids
+ */
+export async function getLocationReferencesByLocationId(locationId = 0){
+    try{
+        const [ iLocationId ] = converter('int', locationId)
+
+        if (typeof iLocationId !== 'number'){
+            console.error("PARAMETER ERROR: update_location_record_name's locationId parameter must be a positive integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_location_references_by_location_id', {
+            input_location_id : iLocationId,
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, error.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", error)
+        return null;
+    }
+}
+
+/**
+ * Method to determine if a location exists based on its id
+ * @param {int} locationId The primary key of the location table
+ * @returns The number of times a specific location is referenced by specific item ids
+ */
+export async function locationExists(locationId = 0){
+    try{
+        const [ iLocationId ] = converter('int', locationId)
+
+        if (typeof iLocationId !== 'number'){
+            console.error("PARAMETER ERROR: update_location_record_name's locationId parameter must be a positive integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('location_exists', {
+            input_location_id : iLocationId,
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, error.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", error)
+        return null;
+    }
+}
+
+// ======================================================================================================================================
+// Methods for Unit Type
+
+// TODO: To be implemented later.
 
 // ======================================================================================================================================
 // Methods for Restocks
