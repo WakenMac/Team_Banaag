@@ -64,7 +64,7 @@ addAdminBtn.addEventListener("click", openModal);
 cancelBtn.addEventListener("click", closeModal);
 modalBackdrop.addEventListener("click", closeModal);
 
-addEquipmentForm.addEventListener("submit", (e) => {
+addEquipmentForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const adminId = addEquipmentForm.adminId.value.trim();
@@ -77,20 +77,35 @@ addEquipmentForm.addEventListener("submit", (e) => {
     return;
   }
 
-  createNewAdminRow(adminId, firstName, middleName, lastName);
-  // dbhandler.addAdminRecord();
+  let result = await dbhandler.addAdminRecord(adminId, firstName, middleName, lastName, 'randomPassword');
+  
+  if (result.includes('ERROR')){
+    alert(result);
+  } else {
+    createNewAdminRow(adminId, firstName, middleName, lastName, 'randomPassword');
+    console.log(result);
+  }
+
   dbhandler.testPresence();
   closeModal();
 });
 
 // Optional: Add delete functionality for dynamically added rows
-tbody.addEventListener("click", (e) => {
+tbody.addEventListener("click", async (e) => {
   if (
     e.target.closest("button") &&
     e.target.closest("button").getAttribute("aria-label") === "Delete admin"
   ) {
+
     const row = e.target.closest("tr");
+    const id = row.querySelectorAll("td")[0].textContent; // Gets the admin ID from the row
+
     if (row) {
+      let result = await dbhandler.removeAdminRecordByAdminId(id)
+      console.log(result);
+      if (result.includes('ERROR'))
+          alert(result);
+
       row.remove();
     }
   }
@@ -136,7 +151,7 @@ async function prepareAdminTable(){
   try {
     let data = await dbhandler.getAllAdmins();
 
-    if (data.length = 0){
+    if (data.length == 0){
       console.log("Admins table has no records.");
       return;
     }
