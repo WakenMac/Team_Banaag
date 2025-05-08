@@ -593,7 +593,7 @@ export async function getRestocksRecordByRestockID(restockID = 0){
  * @param {...*} objectArray The array of objects to be converted
  */
 export function converter(condition = '', ...objectArray){
-    if (!condition in ('string', 'int', 'bigint', 'float')){
+    if (!condition === 'string' || !condition === 'int' || !condition === 'bigint' || !condition === 'float'){
         throw new Error('Kindly specify the condition for this method')
     }
 
@@ -612,6 +612,6 @@ export function converter(condition = '', ...objectArray){
 
     }
 
-    console.log(stringArray);
-    return stringArray;
+    console.log(newArray);
+    return newArray;
 }
