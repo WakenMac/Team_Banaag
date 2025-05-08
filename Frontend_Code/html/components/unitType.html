@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!-- NOTE: and # sa href kay mostly placeholders lang, and will be replaced with actual source path for that specific function -->
 <!-- USED TAILWIND -->
+<!-- Tesing VSCODE Git lang hehe -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -81,7 +82,7 @@
             <li role="none">
               <a
                 class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="#"
+                href=""
                 role="menuitem"
                 tabindex="-1"
               >
@@ -133,7 +134,7 @@
           <button
             aria-expanded="false"
             aria-haspopup="true"
-            class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none"
+            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
             id="nonconsumablesBtn"
             type="button"
           >
@@ -169,11 +170,11 @@
             <li role="none">
               <a
                 class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/glassware.html"
+                href="/Frontend_Code/html/components/location.html"
                 role="menuitem"
                 tabindex="-1"
               >
-                Glassware
+                Location
               </a>
             </li>
           </ul>
@@ -182,7 +183,7 @@
           <button
             aria-expanded="false"
             aria-haspopup="true"
-            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
+            class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none"
             id="propertiesBtn"
             type="button"
           >
@@ -191,7 +192,7 @@
           </button>
           <ul
             aria-labelledby="propertiesBtn"
-            class="absolute left-0 top-full mt-1 w-40 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+            class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
             id="propertiesMenu"
             role="menu"
           >
@@ -218,13 +219,28 @@
           </ul>
         </li>
         <li>
-          <a class="hover:underline" href="#"> Restocks </a>
+          <a
+            class="hover:underline"
+            href="/Frontend_Code/html/components/restocks.html"
+          >
+            Restocks
+          </a>
         </li>
         <li>
-          <a class="hover:underline" href="#"> Transactions </a>
+          <a
+            class="hover:underline"
+            href="/Frontend_Code/html/components/transactions.html"
+          >
+            Transactions
+          </a>
         </li>
         <li>
-          <a class="hover:underline" href="#"> Statistics </a>
+          <a
+            class="hover:underline"
+            href="/Frontend_Code/html/components/statistics.html"
+          >
+            Statistics
+          </a>
         </li>
       </ul>
     </nav>
@@ -237,17 +253,17 @@
           type="search"
         />
         <button
-          aria-controls="addApparatusModal"
+          aria-controls="addUnitTypeModal"
           aria-haspopup="dialog"
           class="custom-btn ml-4"
-          id="addApparatusBtn"
+          id="addUnitTypeBtn"
           type="button"
         >
-          Add Apparatus
+          Add unit type
         </button>
       </div>
       <h2 class="font-semibold text-gray-900 text-sm mb-3">
-        Non-consumables - Apparatus
+        Properties - Unit Type
       </h2>
       <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
         <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -257,37 +273,13 @@
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Item ID
+                Unit Type ID
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
                 Name
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Unit
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Location
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Brand
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Quantity
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
@@ -299,24 +291,18 @@
             <tr>
               <td class="px-6 py-4 whitespace-nowrap text-gray-900">1</td>
               <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                ItemName
+                UnitType 1
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Unit</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                Stock Room
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Brand</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">5</td>
 
               <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
                 <button
-                  aria-label="Edit equipment"
+                  aria-label="Edit unit type"
                   class="text-yellow-400 hover:text-yellow-500"
                 >
                   <i class="fas fa-pencil-alt"> </i>
                 </button>
                 <button
-                  aria-label="Delete apparatus"
+                  aria-label="Delete unit type"
                   class="text-red-600 hover:text-red-700"
                 >
                   <i class="fas fa-trash-alt"> </i>
@@ -333,105 +319,43 @@
       aria-labelledby="modalTitle"
       aria-modal="true"
       class="fixed inset-0 z-50 hidden items-center justify-center"
-      id="addApparatusModal"
+      id="addUnitTypeModal"
       role="dialog"
     >
       <div
         class="modal-backdrop fixed inset-0 bg-black opacity-50"
-        id="modalBackdropApparatus"
+        id="modalBackdropUnitType"
       ></div>
       <div
         class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
       >
         <h3 class="text-lg font-semibold text-gray-900 mb-4" id="modalTitle">
-          Add Apparatus
+          Add Unit Type
         </h3>
-        <form class="space-y-4" id="addApparatusForm">
+        <form class="space-y-4" id="addUnitTypeForm">
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="apparatusId"
+              for="unitTypeId"
             >
-              Item ID
+              Unit Type ID
             </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="apparatusId"
-              name="apparatusId"
-              required=""
-              type="text"
-            />
+            <input class="w-full rounded-md border border-gray-300 px-3 py-2
+            focus:outline-none focus:ring-2 focus:ring-[#2ca14a]
+            focus:border-transparent" id="unitTypeId" name="unitTypeId""
+            required="" type="text" />
           </div>
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="apparatusName"
+              for="unitTypeName"
             >
               Name
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="apparatusName"
-              name="apparatusName"
-              required=""
-              type="text"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="apparatusUnit"
-            >
-              Unit
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="apparatusUnit"
-              name="apparatusUnit"
-              type="text"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="apparatusLocation"
-            >
-              Location
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="apparatusLocation"
-              name="apparatusLocation"
-              required=""
-              type="text"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="apparatusBrand"
-            >
-              Brand
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="apparatusBrand"
-              name="apparatusBrand"
-              required=""
-              type="text"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="apparatusQuantity"
-            >
-              Quantity
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="apparatusQuantity"
-              name="apparatusQuantity"
+              id="unitTypeName"
+              name="unitTypeName"
               required=""
               type="text"
             />
@@ -439,7 +363,7 @@
           <div class="flex justify-end space-x-3 pt-4">
             <button
               class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-              id="cancelApparatusBtn"
+              id="cancelBtn"
               type="button"
             >
               Cancel
@@ -454,6 +378,6 @@
         </form>
       </div>
     </div>
-    <script src="/Frontend_Code/js/apparatus.js"></script>
+    <script src="/Frontend_Code/js/unitType.js"></script>
   </body>
 </html>
