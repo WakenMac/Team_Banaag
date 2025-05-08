@@ -1,4 +1,7 @@
-// Dropdown toggle logic
+/*
+ * This part of the code is for equipment html. most specifically, the modal form.
+ */
+
 function setupDropdown(buttonId, menuId) {
   const btn = document.getElementById(buttonId);
   const menu = document.getElementById(menuId);
@@ -33,25 +36,25 @@ setupDropdown("propertiesBtn", "propertiesMenu");
 // Modal logic
 const addEquipmentBtn = document.getElementById("addEquipmentBtn");
 const addEquipmentModal = document.getElementById("addEquipmentModal");
+const addEquipmentForm = document.getElementById("addEquipmentForm");
 const modalBackdrop = document.getElementById("modalBackdrop");
 const cancelBtn = document.getElementById("cancelBtn");
-const addEquipmentForm = document.getElementById("addEquipmentForm");
 const tbody = document.querySelector("tbody");
 
-function openModal() {
+function openEquipmentModal() {
   addEquipmentModal.classList.remove("hidden");
   addEquipmentModal.classList.add("flex");
 }
 
-function closeModal() {
+function closeEquipmentModal() {
   addEquipmentModal.classList.add("hidden");
   addEquipmentModal.classList.remove("flex");
   addEquipmentForm.reset();
 }
 
-addEquipmentBtn.addEventListener("click", openModal);
-cancelBtn.addEventListener("click", closeModal);
-modalBackdrop.addEventListener("click", closeModal);
+addEquipmentBtn.addEventListener("click", openEquipmentModal);
+cancelBtn.addEventListener("click", closeEquipmentModal);
+modalBackdrop.addEventListener("click", closeEquipmentModal);
 
 addEquipmentForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -96,7 +99,7 @@ addEquipmentForm.addEventListener("submit", (e) => {
         `;
 
   tbody.appendChild(tr);
-  closeModal();
+  closeEquipmentModal();
 });
 
 // Optional: Add delete functionality for dynamically added rows
