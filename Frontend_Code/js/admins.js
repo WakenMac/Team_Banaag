@@ -35,7 +35,7 @@ const addAdminBtn = document.getElementById("addAdminBtn");
 const addAdminModal = document.getElementById("addAdminModal");
 const modalBackdrop = document.getElementById("modalBackdrop");
 const cancelBtn = document.getElementById("cancelBtn");
-const addAdminForm = document.getElementById("addAdminForm");
+const addEquipmentForm = document.getElementById("addAdminForm");
 const tbody = document.querySelector("tbody");
 
 function openModal() {
@@ -46,20 +46,20 @@ function openModal() {
 function closeModal() {
   addAdminModal.classList.add("hidden");
   addAdminModal.classList.remove("flex");
-  addAdminForm.reset();
+  addEquipmentForm.reset();
 }
 
 addAdminBtn.addEventListener("click", openModal);
 cancelBtn.addEventListener("click", closeModal);
 modalBackdrop.addEventListener("click", closeModal);
 
-addAdminForm.addEventListener("submit", (e) => {
+addEquipmentForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const adminId = addAdminForm.adminId.value.trim();
-  const firstName = addAdminForm.firstName.value.trim();
-  const middleName = addAdminForm.middleName.value.trim();
-  const lastName = addAdminForm.lastName.value.trim();
+  const adminId = addEquipmentForm.adminId.value.trim();
+  const firstName = addEquipmentForm.firstName.value.trim();
+  const middleName = addEquipmentForm.middleName.value.trim();
+  const lastName = addEquipmentForm.lastName.value.trim();
 
   if (!adminId || !firstName || !lastName) {
     alert("Please fill in all required fields.");
