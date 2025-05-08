@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!-- NOTE: and # sa href kay mostly placeholders lang, and will be replaced with actual source path for that specific function -->
 <!-- USED TAILWIND -->
+<!-- Tesing VSCODE Git lang hehe -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -41,7 +42,6 @@
         </div>
         <div class="border-l border-black/40 h-10 ml-4"></div>
       </div>
-      
       <!-- Right side: Navigation Links -->
       <ul class="flex space-x-8 text-[13px] font-normal text-black">
         <li>
@@ -56,7 +56,7 @@
           <button
             aria-expanded="false"
             aria-haspopup="true"
-            class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none"
+            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
             id="masterlistBtn"
             type="button"
           >
@@ -72,7 +72,7 @@
             <li role="none">
               <a
                 class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="#"
+                href="/Frontend_Code/html/components/admins.html"
                 role="menuitem"
                 tabindex="-1"
               >
@@ -82,7 +82,7 @@
             <li role="none">
               <a
                 class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="#"
+                href=""
                 role="menuitem"
                 tabindex="-1"
               >
@@ -134,7 +134,7 @@
           <button
             aria-expanded="false"
             aria-haspopup="true"
-            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
+            class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none"
             id="nonconsumablesBtn"
             type="button"
           >
@@ -238,17 +238,17 @@
           type="search"
         />
         <button
-          aria-controls="addAdminModal"
+          aria-controls="addEquipmentModal"
           aria-haspopup="dialog"
           class="custom-btn ml-4"
-          id="addAdminBtn"
+          id="addEquipmentBtn"
           type="button"
         >
-          Add Admin
+          Add Equipment
         </button>
       </div>
       <h2 class="font-semibold text-gray-900 text-sm mb-3">
-        Masterlist - Admins
+        Non-consumables - Equipment
       </h2>
       <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
         <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -258,25 +258,37 @@
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Admin ID
+                Item ID
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                First Name
+                Name
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Middle Name
+                Unit
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Last Name
+                Location
+              </th>
+              <th
+                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                scope="col"
+              >
+                Brand
+              </th>
+              <th
+                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                scope="col"
+              >
+                Quantity
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
@@ -286,25 +298,26 @@
           </thead>
           <tbody class="bg-white">
             <tr>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Admin</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">1</td>
               <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                First name
+                ItemName
               </td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Unit</td>
               <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                MiddleName
+                Stock Room
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                Last Name
-              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Brand</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">5</td>
+
               <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
                 <button
-                  aria-label="Edit admin"
+                  aria-label="Edit equipment"
                   class="text-yellow-400 hover:text-yellow-500"
                 >
                   <i class="fas fa-pencil-alt"> </i>
                 </button>
                 <button
-                  aria-label="Delete admin"
+                  aria-label="Delete equipment"
                   class="text-red-600 hover:text-red-700"
                 >
                   <i class="fas fa-trash-alt"> </i>
@@ -321,31 +334,31 @@
       aria-labelledby="modalTitle"
       aria-modal="true"
       class="fixed inset-0 z-50 hidden items-center justify-center"
-      id="addAdminModal"
+      id="addEquipmentModal"
       role="dialog"
     >
       <div
         class="modal-backdrop fixed inset-0 bg-black opacity-50"
-        id="modalBackdrop"
+        id="modalBackdropEquipment"
       ></div>
       <div
         class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
       >
         <h3 class="text-lg font-semibold text-gray-900 mb-4" id="modalTitle">
-          Add Admin
+          Add Equipment
         </h3>
-        <form class="space-y-4" id="addAdminForm">
+        <form class="space-y-4" id="addEquipmentForm">
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="adminId"
+              for="equipmentId"
             >
-              Admin ID
+              Item ID
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="adminId"
-              name="adminId"
+              id="equipmentId"
+              name="equipmentId"
               required=""
               type="text"
             />
@@ -353,14 +366,14 @@
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="firstName"
+              for="equipmentName"
             >
-              First Name
+              Name
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="firstName"
-              name="firstName"
+              id="equipmentName"
+              name="equipmentName"
               required=""
               type="text"
             />
@@ -368,28 +381,58 @@
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="middleName"
+              for="equipmentUnit"
             >
-              Middle Name
+              Unit
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="middleName"
-              name="middleName"
+              id="equipmentUnit"
+              name="equipmentUnit"
               type="text"
             />
           </div>
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="lastName"
+              for="equipmentLocation"
             >
-              Last Name
+              Location
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="lastName"
-              name="lastName"
+              id="equipmentLocation"
+              name="equipmentLocation"
+              required=""
+              type="text"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="equipmentBrand"
+            >
+              Brand
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="equipmentBrand"
+              name="equipmentBrand"
+              required=""
+              type="text"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="equipmentQuantity"
+            >
+              Quantity
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="equipmentQuantity"
+              name="equipmentQuantity"
               required=""
               type="text"
             />
@@ -397,7 +440,7 @@
           <div class="flex justify-end space-x-3 pt-4">
             <button
               class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-              id="cancelBtn"
+              id="cancelEquipmentBtn"
               type="button"
             >
               Cancel
@@ -412,8 +455,6 @@
         </form>
       </div>
     </div>
-    <!-- Script to access the supabase API -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module" src="/Frontend_Code/js/admins.js"></script>
+    <script src="/Frontend_Code/js/equipments.js"></script>
   </body>
 </html>
