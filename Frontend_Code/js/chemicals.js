@@ -1,5 +1,5 @@
 /**
- * CARES - CAS Automated Resource and Equipment System
+ * CARES - Centralized Resource and Equipment System
  * Chemicals Management Module
  *
  * This module handles the management of chemicals in the inventory system.
