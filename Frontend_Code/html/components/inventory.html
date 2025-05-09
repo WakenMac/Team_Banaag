@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <!-- NOTE: and # sa href kay mostly placeholders lang, and will be replaced with actual source path for that specific function -->
 <!-- USED TAILWIND -->
-<!-- Testing VSCODE Git lang hehe -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -34,7 +33,7 @@
         <div class="flex flex-col leading-tight">
           <span class="font-semibold text-black text-sm"> CARES. </span>
           <span class="text-[9px] font-semibold text-black/80 tracking-tight">
-            CAS AUTOMATED RESOURCE
+            CENTRALIZED ADMINISTRATIVE RESOURCE
           </span>
           <span class="text-[9px] font-semibold text-black/80 tracking-tight">
             AND EQUIPMENT SYSTEM
@@ -42,6 +41,7 @@
         </div>
         <div class="border-l border-black/40 h-10 ml-4"></div>
       </div>
+
       <!-- Right side: Navigation Links -->
       <ul class="flex space-x-8 text-[13px] font-normal text-black">
         <li>
@@ -56,7 +56,7 @@
           <button
             aria-expanded="false"
             aria-haspopup="true"
-            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
+            class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none"
             id="masterlistBtn"
             type="button"
           >
@@ -134,7 +134,7 @@
           <button
             aria-expanded="false"
             aria-haspopup="true"
-            class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none"
+            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
             id="nonconsumablesBtn"
             type="button"
           >
@@ -179,6 +179,7 @@
             </li>
           </ul>
         </li>
+
         <li class="relative">
           <button
             aria-expanded="false"
@@ -219,13 +220,28 @@
           </ul>
         </li>
         <li>
-          <a class="hover:underline" href="#"> Restocks </a>
+          <a
+            class="hover:underline"
+            href="/Frontend_Code/html/components/restocks.html"
+          >
+            Restocks
+          </a>
         </li>
         <li>
-          <a class="hover:underline" href="#"> Transactions </a>
+          <a
+            class="hover:underline"
+            href="/Frontend_Code/html/components/transactions.html"
+          >
+            Transactions
+          </a>
         </li>
         <li>
-          <a class="hover:underline" href="#"> Statistics </a>
+          <a
+            class="hover:underline"
+            href="/Frontend_Code/html/components/statistics.html"
+          >
+            Statistics
+          </a>
         </li>
       </ul>
     </nav>
@@ -237,18 +253,9 @@
           placeholder="Search..."
           type="search"
         />
-        <button
-          aria-controls="addEquipmentModal"
-          aria-haspopup="dialog"
-          class="custom-btn ml-4"
-          id="addEquipmentBtn"
-          type="button"
-        >
-          Add Equipment
-        </button>
       </div>
       <h2 class="font-semibold text-gray-900 text-sm mb-3">
-        Non-consumables - Equipment
+        Masterlist - Inventory
       </h2>
       <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
         <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -264,31 +271,13 @@
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Name
+                Item Name
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Unit
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Location
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Brand
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Quantity
+                Overall Quantity
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
@@ -297,165 +286,14 @@
             </tr>
           </thead>
           <tbody class="bg-white">
-            <tr>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">1</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                ItemName
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Unit</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                Stock Room
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Brand</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">5</td>
-
-              <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
-                <button
-                  aria-label="Edit equipment"
-                  class="text-yellow-400 hover:text-yellow-500"
-                >
-                  <i class="fas fa-pencil-alt"> </i>
-                </button>
-                <button
-                  aria-label="Delete equipment"
-                  class="text-red-600 hover:text-red-700"
-                >
-                  <i class="fas fa-trash-alt"> </i>
-                </button>
-              </td>
-            </tr>
+            <!-- Sample data row -->
           </tbody>
         </table>
       </div>
     </main>
 
-    <!-- Modal -->
-    <div
-      aria-labelledby="modalTitle"
-      aria-modal="true"
-      class="fixed inset-0 z-50 hidden items-center justify-center"
-      id="addEquipmentModal"
-      role="dialog"
-    >
-      <div
-        class="modal-backdrop fixed inset-0 bg-black opacity-50"
-        id="modalBackdropEquipment"
-      ></div>
-      <div
-        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
-      >
-        <h3 class="text-lg font-semibold text-gray-900 mb-4" id="modalTitle">
-          Add Equipment
-        </h3>
-        <form class="space-y-4" id="addEquipmentForm">
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="equipmentId"
-            >
-              Item ID
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="equipmentId"
-              name="equipmentId"
-              required=""
-              type="text"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="equipmentName"
-            >
-              Name
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="equipmentName"
-              name="equipmentName"
-              required=""
-              type="text"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="equipmentUnit"
-            >
-              Unit
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="equipmentUnit"
-              name="equipmentUnit"
-              type="text"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="equipmentLocation"
-            >
-              Location
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="equipmentLocation"
-              name="equipmentLocation"
-              required=""
-              type="text"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="equipmentBrand"
-            >
-              Brand
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="equipmentBrand"
-              name="equipmentBrand"
-              required=""
-              type="text"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="equipmentQuantity"
-            >
-              Quantity
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="equipmentQuantity"
-              name="equipmentQuantity"
-              required=""
-              type="text"
-            />
-          </div>
-          <div class="flex justify-end space-x-3 pt-4">
-            <button
-              class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-              id="cancelEquipmentBtn"
-              type="button"
-            >
-              Cancel
-            </button>
-            <button
-              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
-              type="submit"
-            >
-              Save
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <!-- Script to access the supabase API -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module" src="/Frontend_Code/js/equipments.js"></script>
+    <script type="module" src="/Frontend_Code/js/inventory.js"></script>
   </body>
 </html>
