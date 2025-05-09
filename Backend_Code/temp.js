@@ -130,7 +130,8 @@ export async function addItemMasterListRecord(itemName, itemType){
  * @param {string} unitTypeName The name to be changed in the unit type table based on the unit type id
  * @returns A string containing the status of the updated record (Success or Error)
  */
-export async function updateItemMasterListRecord(unitTypeId = 0, unitTypeName = ''){
+export async function updateItemMasterListRecord
+(unitTypeId = 0, unitTypeName = ''){
     try{
         const [ sUnitTypeName ] = converter('string', unitTypeName);
         const [ iUnitTypeId ] = converter('int', unitTypeId)
