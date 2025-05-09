@@ -9,6 +9,8 @@ const cancelBtn = document.getElementById("cancelBtn");
 const addUnitTypeForm = document.getElementById("addUnitTypeForm");
 const tbody = document.querySelector("tbody");
 
+console.log(addUnitTypeBtn);
+
 // Initialize table components
 await initialize();
 
@@ -84,12 +86,12 @@ addUnitTypeForm.addEventListener("submit", async (e) => {
   } else if (result.includes('ERROR')){
       alert(result)
   } else {
-      let newUnitTypeId = result.slice(46, result.length - 1);
+      console.log(result);
+      let newUnitTypeId = result.slice(47, result.length - 1);
       createNewUnitTypeRow(newUnitTypeId, unitTypeName);
       closeModal();
   }
   
-
 });
 
 // Optional: Add delete functionality for dynamically added rows
@@ -146,3 +148,24 @@ function createNewUnitTypeRow(unitTypeId, unitTypeName){
 
 // ===============================================================================================
 // BACK END-RELATED METHODS
+
+async function prepareUnitTypeTable(){
+  try{
+    let data = await dbhandler.getAllUnitTypeRecords();
+
+    if (data.length == 0){
+      console.error('Unit type table has no records.')
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++){
+      createNewUnitTypeRow(
+        data[i]['Unit Type ID'],
+        data[i]['Name'] 
+      )
+    }
+
+  } catch (generalError){
+      console.error(generalError);
+  }
+}
