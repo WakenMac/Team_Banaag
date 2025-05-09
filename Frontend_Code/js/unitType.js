@@ -1,5 +1,5 @@
 // import modules
-import * as dbhandler from '../../Backend_Code/mainHandler.js';
+import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
 // Initialize components & Modal logic
 const addUnitTypeBtn = document.getElementById("addUnitTypeBtn");
@@ -14,7 +14,7 @@ console.log(addUnitTypeBtn);
 // Initialize table components
 await initialize();
 
-async function initialize(){
+async function initialize() {
   setupDropdown("masterlistBtn", "masterlistMenu");
   setupDropdown("consumablesBtn", "consumablesMenu");
   setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
@@ -80,38 +80,40 @@ addUnitTypeForm.addEventListener("submit", async (e) => {
 
   let result = await dbhandler.addUnitTypeRecord(unitTypeName);
 
-  if (result == null){
-    alert(`The mainHandler.addUnitTypeRecord() DOESN'T return a status statement.`)
+  if (result == null) {
+    alert(
+      `The mainHandler.addUnitTypeRecord() DOESN'T return a status statement.`
+    );
     closeModal();
-  } else if (result.includes('ERROR')){
-      alert(result)
+  } else if (result.includes("ERROR")) {
+    alert(result);
   } else {
       console.log(result);
       let newUnitTypeId = result.slice(47, result.length - 1);
       createNewUnitTypeRow(newUnitTypeId, unitTypeName);
       closeModal();
   }
-  
 });
 
-// Optional: Add delete functionality for dynamically added rows
+// Add delete functionality for dynamically added rows
 tbody.addEventListener("click", async (e) => {
   if (
     e.target.closest("button") &&
     e.target.closest("button").getAttribute("aria-label") === "Delete unit type"
   ) {
     const row = e.target.closest("tr");
-    const unitTypeId = row.querySelectorAll('td')[0].textContent;
+    const unitTypeId = row.querySelectorAll("td")[0].textContent;
 
     if (row) {
       let result = await dbhandler.removeUnitTypeRecordByUnitTypeId(unitTypeId);
 
       if (result == null)
-          alert(`The mainHandler.removeUnitTypeRecordByUnitTypeId() DOESN'T return a status statement.`)
-      else if (result.includes('ERROR'))
-        alert(result)
+        alert(
+          `The mainHandler.removeUnitTypeRecordByUnitTypeId() DOESN'T return a status statement.`
+        );
+      else if (result.includes("ERROR")) alert(result);
       else {
-        console.log(result)
+        console.log(result);
         row.remove();
       }
     }
@@ -124,9 +126,9 @@ tbody.addEventListener("click", async (e) => {
 /**
  * Method to add a new row to the table
  * @param {int} unitTypeId Primary key of the unitType table
- * @param {string} unitTypeName Name of the unitType to be added 
+ * @param {string} unitTypeName Name of the unitType to be added
  */
-function createNewUnitTypeRow(unitTypeId, unitTypeName){
+function createNewUnitTypeRow(unitTypeId, unitTypeName) {
   // Create new row
   const tr = document.createElement("tr");
   tr.innerHTML = `
@@ -140,6 +142,15 @@ function createNewUnitTypeRow(unitTypeId, unitTypeName){
                   <button aria-label="Delete unit type" class="text-red-600 hover:text-red-700">
                     <i class="fas fa-trash-alt"></i>
                   </button>
+                   <button aria-label="Add remarks" class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100" data-chemical-id="${chemicalId}">
+                      <i class="fas fa-comment-alt text-[14px]"></i>
+                    </button>
+                    <button aria-label="Edit unit type" class="text-yellow-400 hover:text-yellow-500">
+                      <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button aria-label="Delete unit type" class="text-red-600 hover:text-red-700">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
                 </td>
               `;
 

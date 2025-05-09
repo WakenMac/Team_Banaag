@@ -314,7 +314,74 @@
       </div>
     </main>
 
-    <!-- Modal -->
+    <!-- Edit Modal-->
+    <div
+      aria-labelledby="modalTitle"
+      aria-modal="true"
+      class="fixed inset-0 z-50 hidden items-center justify-center"
+      id="editUnitTypeModal"
+      role="dialog"
+    >
+      <div
+        class="modal-backdrop fixed inset-0 bg-black opacity-50"
+        id="modalBackdropUnitType"
+      ></div>
+      <div
+        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+      >
+        <h3 class="text-lg font-semibold text-gray-900 mb-4" id="modalTitle">
+          Edit Unit Type
+        </h3>
+        <form class="space-y-4" id="editUnitTypeForm">
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="editUnitTypeId"
+            >
+              Unit Type ID
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="editUnitTypeId"
+              name="editUnitTypeId"
+              required
+              type="text"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="editUnitTypeName"
+            >
+              Name
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="editUnitTypeName"
+              name="editUnitTypeName"
+              required
+              type="text"
+            />
+          </div>
+          <div class="flex justify-end space-x-3 pt-4">
+            <button
+              class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+              id="cancelBtnEditUnitType"
+              type="button"
+            >
+              Cancel
+            </button>
+            <button
+              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
+              type="submit"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- Add Modal -->
     <div
       aria-labelledby="modalTitle"
       aria-modal="true"
@@ -349,14 +416,14 @@
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="unitTypeName"
+              for="editUnitTypeName"
             >
               Name
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="unitTypeName"
-              name="unitTypeName"
+              id="editUnitTypeName"
+              name="editUnitTypeName"
               required=""
               type="text"
             />
