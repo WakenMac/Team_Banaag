@@ -1,3 +1,28 @@
+// import modules
+import * as dbhandler from '../../Backend_Code/mainHandler.js';
+
+// Initialize components & Modal logic
+const addUnitTypeBtn = document.getElementById("addUnitTypeBtn");
+const addUnitTypeModal = document.getElementById("addUnitTypeModal");
+const modalBackdropUnitType = document.getElementById("modalBackdropUnitType");
+const cancelBtn = document.getElementById("cancelBtn");
+const addUnitTypeForm = document.getElementById("addUnitTypeForm");
+const tbody = document.querySelector("tbody");
+
+// Initialize table components
+await initialize();
+
+async function initialize(){
+  setupDropdown("masterlistBtn", "masterlistMenu");
+  setupDropdown("consumablesBtn", "consumablesMenu");
+  setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
+  setupDropdown("propertiesBtn", "propertiesMenu");
+
+  // Prepares the contents of the admin table
+  await dbhandler.testPresence();
+  await prepareUnitTypeTable();
+}
+
 // Dropdown toggle logic
 function setupDropdown(buttonId, menuId) {
   const btn = document.getElementById(buttonId);
@@ -25,19 +50,6 @@ function setupDropdown(buttonId, menuId) {
   });
 }
 
-setupDropdown("masterlistBtn", "masterlistMenu");
-setupDropdown("consumablesBtn", "consumablesMenu");
-setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
-setupDropdown("propertiesBtn", "propertiesMenu");
-
-// Modal logic
-const addUnitTypeBtn = document.getElementById("addUnitTypeBtn");
-const addUnitTypeModal = document.getElementById("addUnitTypeModal");
-const modalBackdropUnitType = document.getElementById("modalBackdropUnitType");
-const cancelBtn = document.getElementById("cancelBtn");
-const addUnitTypeForm = document.getElementById("addUnitTypeForm");
-const tbody = document.querySelector("tbody");
-
 function openModal() {
   addUnitTypeModal.classList.remove("hidden");
   addUnitTypeModal.classList.add("flex");
@@ -53,7 +65,7 @@ addUnitTypeBtn.addEventListener("click", openModal);
 cancelBtn.addEventListener("click", closeModal);
 modalBackdropUnitType.addEventListener("click", closeModal);
 
-addUnitTypeForm.addEventListener("submit", (e) => {
+addUnitTypeForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const unitTypeId = addUnitTypeForm.unitTypeId.value.trim();
@@ -64,9 +76,57 @@ addUnitTypeForm.addEventListener("submit", (e) => {
     return;
   }
 
+  let result = await dbhandler.addUnitTypeRecord(unitTypeName);
+
+  if (result == null){
+    alert(`The mainHandler.addUnitTypeRecord() DOESN'T return a status statement.`)
+    closeModal();
+  } else if (result.includes('ERROR')){
+      alert(result)
+  } else {
+      let newUnitTypeId = result.slice(46, result.length - 1);
+      createNewUnitTypeRow(newUnitTypeId, unitTypeName);
+      closeModal();
+  }
+  
+
+});
+
+// Optional: Add delete functionality for dynamically added rows
+tbody.addEventListener("click", async (e) => {
+  if (
+    e.target.closest("button") &&
+    e.target.closest("button").getAttribute("aria-label") === "Delete unit type"
+  ) {
+    const row = e.target.closest("tr");
+    const unitTypeId = row.querySelectorAll('td')[0].textContent;
+
+    if (row) {
+      let result = await dbhandler.removeUnitTypeRecordByUnitTypeId(unitTypeId);
+
+      if (result == null)
+          alert(`The mainHandler.removeUnitTypeRecordByUnitTypeId() DOESN'T return a status statement.`)
+      else if (result.includes('ERROR'))
+        alert(result)
+      else {
+        console.log(result)
+        row.remove();
+      }
+    }
+  }
+});
+
+// ===============================================================================================
+// FRONT END-RELATED METHODS
+
+/**
+ * Method to add a new row to the table
+ * @param {int} unitTypeId Primary key of the unitType table
+ * @param {string} unitTypeName Name of the unitType to be added 
+ */
+function createNewUnitTypeRow(unitTypeId, unitTypeName){
   // Create new row
   const tr = document.createElement("tr");
-
   tr.innerHTML = `
                 <td class="px-6 py-4 whitespace-nowrap text-gray-900">${unitTypeId}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-gray-900">${unitTypeName}</td>
@@ -82,18 +142,7 @@ addUnitTypeForm.addEventListener("submit", (e) => {
               `;
 
   tbody.appendChild(tr);
-  closeModal();
-});
+}
 
-// Optional: Add delete functionality for dynamically added rows
-tbody.addEventListener("click", (e) => {
-  if (
-    e.target.closest("button") &&
-    e.target.closest("button").getAttribute("aria-label") === "Delete unit type"
-  ) {
-    const row = e.target.closest("tr");
-    if (row) {
-      row.remove();
-    }
-  }
-});
+// ===============================================================================================
+// BACK END-RELATED METHODS
