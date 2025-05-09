@@ -9,8 +9,6 @@ const cancelBtn = document.getElementById("cancelBtn");
 const addUnitTypeForm = document.getElementById("addUnitTypeForm");
 const tbody = document.querySelector("tbody");
 
-console.log(addUnitTypeBtn);
-
 // Initialize table components
 await initialize();
 
@@ -81,9 +79,7 @@ addUnitTypeForm.addEventListener("submit", async (e) => {
   let result = await dbhandler.addUnitTypeRecord(unitTypeName);
 
   if (result == null) {
-    alert(
-      `The mainHandler.addUnitTypeRecord() DOESN'T return a status statement.`
-    );
+    alert(`The mainHandler.addUnitTypeRecord() DOESN'T return a status statement.`);
     closeModal();
   } else if (result.includes("ERROR")) {
     alert(result);
@@ -141,16 +137,6 @@ function createNewUnitTypeRow(unitTypeId, unitTypeName) {
                   </button>
                   <button aria-label="Delete unit type" class="text-red-600 hover:text-red-700">
                     <i class="fas fa-trash-alt"></i>
-                  </button>
-                   <button aria-label="Add remarks" class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100" data-chemical-id="${chemicalId}">
-                      <i class="fas fa-comment-alt text-[14px]"></i>
-                    </button>
-                    <button aria-label="Edit unit type" class="text-yellow-400 hover:text-yellow-500">
-                      <i class="fas fa-pencil-alt"></i>
-                    </button>
-                    <button aria-label="Delete unit type" class="text-red-600 hover:text-red-700">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
                 </td>
               `;
 
