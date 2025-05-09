@@ -5,11 +5,11 @@
 
 /**
  * Method to get all of the records on the unit type table
- * @returns A record consisting of 2 columns (Unit Type ID, Name)
+ * @returns A record consisting of 4 columns (Item ID, Name, Type, Quantity)
  */
 export async function getAllItemMasterListRecords(){
     try{
-        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_unit_type_records');
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_item_master_list_records');
         
         if (supabaseError){
             console.error(`Supabase Error:`, supabaseError.message);
@@ -25,21 +25,21 @@ export async function getAllItemMasterListRecords(){
 }
 
 /**
- * Method to get all of the records on the location table
- * @param {integer} unitTypeId The primary key of the location table
- * @returns A record consisting of 2 columns (Unit Type ID, Name)
+ * Method to get a record from the item master list table based on the item id
+ * @param {integer} itemId The primary key of the item master list table
+ * @returns A record consisting of 4 columns (Item ID, Name, Type, Quantity)
  */
-export async function getUnitTypeRecordByUnitTypeId(unitTypeId){
+export async function getItemMasterListRecordByItemID(itemId){
     try{
-        const [ iUnitTypeId ] = converter('int', unitTypeId);
+        const [ iItemId ] = converter('int', itemId);
 
-        if (typeof iUnitTypeId !== 'number' || iUnitTypeId < 1){
-            console.error("PARAMETER ERROR: getUnitTypeRecordByUnitTypeId's unitTypeId parameter must be a positive non-zero integer.")
+        if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: get_item_master_list_record_by_item_id's unitTypeId parameter must be a positive non-zero integer.")
             return null;
         }
 
-        const {data, error: supabaseError} = await supabaseClient.rpc('get_unit_type_record_by_unit_type_id', {
-            input_unit_type_id : iUnitTypeId
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_item_master_list_record_by_item_id', {
+            input_item_id : iItemId
         });
         
         if (supabaseError){
@@ -56,21 +56,21 @@ export async function getUnitTypeRecordByUnitTypeId(unitTypeId){
 }
 
 /**
- * Method to get a record from the unit type table via the unit type name
- * @param {integer} unitTypeName The name of the unit type to find in the table
+ * Method to get a record from the item master list table via the item's name
+ * @param {string} itemName The name of the item to find in the table
  * @returns A record consisting of 2 columns (Location ID, Location Name)
  */
-export async function getUnitTypeRecordByName(unitTypeName){
+export async function getItemMasterListRecordByName(itemName){
     try{
-        const [ sUnitTypeName ] = converter('string', unitTypeName);
+        const [ sItemName ] = converter('string', itemName);
 
-        if (typeof sUnitTypeName !== 'string'){
-            console.error("PARAMETER ERROR: getUnitTypeRecordByName's unitTypeName parameter must be a string.")
+        if (typeof sItemName !== 'string'){
+            console.error("PARAMETER ERROR: getItemMasterListRecordByName's unitTypeName parameter must be a string.")
             return null;
         }
 
-        const {data, error: supabaseError} = await supabaseClient.rpc('get_unit_type_record_by_name', {
-            input_unit_type_name : sUnitTypeName
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_item_master_list_record_by_name', {
+            input_item_name : sItemName
         });
         
         if (supabaseError){
@@ -87,21 +87,28 @@ export async function getUnitTypeRecordByName(unitTypeName){
 }
 
 /**
- * Method to add a record to the unit type table
- * @param {string} unitTypeName The name of the unit type to be added 
+ * Method to add a record to the item master list table
+ * @param {string} itemName The name of the item to be added 
+ * @param {string} itemType The type of item to be added (Chemicals, Consumable Items, Glasswares, Lab Apparatus, Lab Equipment) 
  * @returns A string containing the status of the added record (Success or Error). Moreover, this returns the ID of the newly added row
  */
-export async function addUnitTypeRecord(unitTypeName){
+export async function addItemMasterListRecord(itemName, itemType){
     try{
-        const [ sUnitTypeName ] = converter('string', unitTypeName);
+        const [ sItemName, sItemType ] = converter('string', itemName, itemType);
 
-        if (typeof sUnitTypeName !== 'string'){
-            console.error("PARAMETER ERROR: addUnitTypeRecord's unitTypeName parameter must be a string.")
+        if (typeof sItemName !== 'string' || typeof sItemType !== 'string'){
+            console.error("PARAMETER ERROR: addItemMasterListRecord's parameters must be a string.")
             return null;
         }
 
-        const {data, error: supabaseError} = await supabaseClient.rpc('add_unit_type_record', {
-            input_unit_type_name : sUnitTypeName
+        if (itemType !== 'Chemicals' || itemType !== 'Consumable Items' || itemType !== 'Glasswares' || itemType !== 'Lab Apparatus' || itemType !== 'Lab Equipment'){
+            console.error("PARAMETER ERROR: addItemMasterListRecord's itemType selected must be either: Chemicals, Consumable Items, Glasswares, Lab Apparatus, or Lab Equipment.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('add_item_master_list_record', {
+            input_item_name : sItemName,
+            input_item_type : sItemType
         });
         
         if (supabaseError){
@@ -123,7 +130,7 @@ export async function addUnitTypeRecord(unitTypeName){
  * @param {string} unitTypeName The name to be changed in the unit type table based on the unit type id
  * @returns A string containing the status of the updated record (Success or Error)
  */
-export async function updateUnitTypeRecordName(unitTypeId = 0, unitTypeName = ''){
+export async function updateItemMasterListRecord(unitTypeId = 0, unitTypeName = ''){
     try{
         const [ sUnitTypeName ] = converter('string', unitTypeName);
         const [ iUnitTypeId ] = converter('int', unitTypeId)
