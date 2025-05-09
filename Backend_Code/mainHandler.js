@@ -238,50 +238,6 @@ export async function removeAdminRecordByAdminId(adminId){
 }
 
 // ======================================================================================================================================
-// Methods for Item Master List
-
-export async function getAllItems(){
-    try{
-        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_item_master_list_records')
-        
-        if (supabaseError){
-            console.error(`Supabase Error:`, supabaseError.message);
-            return null;
-        }
-        
-        return data;
-        
-    } catch (generalError) {
-        console.error("General error", generalError)
-        return null;
-    }
-}
-
-export async function getItemMasterListByItemID(item_id = 0){
-    try{
-        if (typeof item_id !== "number"){
-            console.error("PARAMETER ERROR: getItemMasterListByID's item_id parameter must be a positive integer from 1 onwards.")
-            return;
-        }
-        
-        const {data, error: supabaseError} = await supabaseClient.rpc('get_item_master_list_record_by_item_id', {
-            input_item_id : item_id
-        });
-        
-        if (supabaseError){
-            console.error(`Supabase Error:`, supabaseError.message);
-            return null;
-        }
-        
-        return data;
-        
-    } catch (generalError) {
-        console.error("General error", generalError)
-        return null;
-    }
-}
-
-// ======================================================================================================================================
 // Methods for location
 
 /**
@@ -687,8 +643,6 @@ export async function updateUnitTypeRecordName(unitTypeId = 0, unitTypeName = ''
     }
 }
 
-// TODO: Implement removeUnitTypeRecord
-
 /**
  * Method to remove a record to the location table
  * @param {int} unitTypeId The primary key of the unit type table
@@ -784,6 +738,53 @@ export async function unitTypeExists(locationId = 0){
     }
 }
 
+// ======================================================================================================================================
+// Methods for Item Master List
+
+/**
+ * Method to get all of the records from the item master list table
+ * @returns A record consisting of 3 columns (Item ID, Name, Quantity)
+ */
+export async function getAllItemMasterListRecords(){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_item_master_list_records')
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+export async function getItemMasterListByItemID(item_id = 0){
+    try{
+        if (typeof item_id !== "number"){
+            console.error("PARAMETER ERROR: getItemMasterListByID's item_id parameter must be a positive integer from 1 onwards.")
+            return;
+        }
+        
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_item_master_list_record_by_item_id', {
+            input_item_id : item_id
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
 
 // ======================================================================================================================================
 // Methods for Restocks
