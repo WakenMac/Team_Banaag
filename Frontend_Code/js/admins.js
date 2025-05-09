@@ -1,4 +1,12 @@
-import * as dbhandler from '../../Backend_Code/DBHandlers/mainHandler.js';
+import * as dbhandler from '../../Backend_Code/mainHandler.js';
+
+// Modal logic
+const addAdminBtn = document.getElementById("addAdminBtn");
+const addAdminModal = document.getElementById("addAdminModal");
+const modalBackdrop = document.getElementById("modalBackdrop");
+const cancelBtn = document.getElementById("cancelBtn");
+const addEquipmentForm = document.getElementById("addAdminForm");
+const tbody = document.querySelector("tbody");
 
 // Initialize the tables
 initialize();
@@ -40,14 +48,6 @@ function setupDropdown(buttonId, menuId) {
     }
   });
 }
-
-// Modal logic
-const addAdminBtn = document.getElementById("addAdminBtn");
-const addAdminModal = document.getElementById("addAdminModal");
-const modalBackdrop = document.getElementById("modalBackdrop");
-const cancelBtn = document.getElementById("cancelBtn");
-const addEquipmentForm = document.getElementById("addAdminForm");
-const tbody = document.querySelector("tbody");
 
 async function openModal() {
   addAdminModal.classList.remove("hidden");
@@ -96,17 +96,18 @@ tbody.addEventListener("click", async (e) => {
     e.target.closest("button") &&
     e.target.closest("button").getAttribute("aria-label") === "Delete admin"
   ) {
-
     const row = e.target.closest("tr");
     const id = row.querySelectorAll("td")[0].textContent; // Gets the admin ID from the row
-
+    
     if (row) {
-      let result = await dbhandler.removeAdminRecordByAdminId(id)
-      console.log(result);
+      let result = await dbhandler.removeAdminRecordByAdminId(id) 
+      
       if (result.includes('ERROR'))
           alert(result);
-
-      row.remove();
+      else{
+        console.log(result);
+        row.remove();
+      }
     }
   }
 });
