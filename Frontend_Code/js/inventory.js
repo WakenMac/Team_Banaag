@@ -14,7 +14,7 @@
 import * as dbhandler from '../../Backend_Code/mainHandler.js';
 
 // Place the DOM accessing here please, thankies -Waks
-
+const tbody = document.getElementById('itemMasterListTableBody');
 
 // Initialize table components
 await initialize();
@@ -27,7 +27,7 @@ async function initialize(){
   setupDropdown("propertiesBtn", "propertiesMenu");
 
   await dbhandler.testPresence();
-  // await prepareItemMasterListTable(); I've comment this temporarily to prevent errors due to lack of DOM elements
+  await prepareItemMasterListTable();
 }
 
 /**
