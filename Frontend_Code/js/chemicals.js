@@ -284,10 +284,13 @@ editChemicalForm.addEventListener("submit", async (e) => {
   const editChemicalBarCode = document
     .getElementById("editChemicalBarCode")
     .value.trim();
+  const remarks = document.querySelector(
+    `button[data-chemical-id="${editChemicalId}"]`
+  ).getAttribute("data-remarks");
 
   let result = await dbhandler.updateChemicalsRecordByAll(
     editChemicalId, editChemicalName, editChemicalLocation, editChemicalUnit, editChemicalBrand, editChemicalContainerSize, editChemicalBarCode, 
-    editChemicalCASNo, editChemicalMSDS
+    editChemicalCASNo, editChemicalMSDS, remarks
   )
 
   if (result == null)
@@ -296,7 +299,7 @@ editChemicalForm.addEventListener("submit", async (e) => {
     alert(result);
   } else {
     updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit, editChemicalLocation, editChemicalBrand,
-      initialQuantity, editChemicalContainerSize, editChemicalCASNo, editChemicalMSDS, editChemicalBarCode);
+      initialQuantity, editChemicalCASNo, editChemicalMSDS, editChemicalBarCode);
     console.log(result);
     closeEditModal();
   }
@@ -393,9 +396,9 @@ addChemicalsForm.addEventListener("submit", async (e) => {
       chemicalUnit,
       chemicalLocation,
       chemicalBrand,
-      0,
-      chemicalContainerSize,
-      0,
+      '0 ' + chemicalUnit,
+      chemicalContainerSize  + ' ' + chemicalUnit,
+      '0 ' + chemicalUnit,
       chemicalCASNo,
       chemicalMSDS,
       chemicalBarCode
@@ -696,17 +699,14 @@ async function createNewRemarks(remarks, chemicalId){
 }
 
 
-function updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit, editChemicalLocation, editChemicalBrand, editChemicalQuantity,
-  editChemicalContainerSize, editChemicalCASNo, editChemicalMSDS, editChemicalBarCode
+function updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit, editChemicalLocation, editChemicalBrand, 
+  editChemicalQuantity, editChemicalCASNo, editChemicalMSDS, editChemicalBarCode
 ){
   const rows = chemicalsTableBody.querySelectorAll("tr");
 
   rows.forEach((row) => {
     if (row.children[0].textContent === editChemicalId) {
       let originalUnit = row.children[2].textContent;
-
-      console.log(row.children[5].textContent);
-      console.log(editChemicalContainerSize);
 
       row.children[1].textContent = editChemicalName;
       row.children[2].textContent = editChemicalUnit;

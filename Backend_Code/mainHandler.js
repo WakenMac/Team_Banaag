@@ -741,14 +741,11 @@ export async function unitTypeExists(locationId = 0){
 // ======================================================================================================================================
 // Methods for Item Master List
 
-// ======================================================================================================================================
-// Methods for Unit Type
-
 /**
  * Method to get all of the records on the unit type table
  * @returns A record consisting of 4 columns (Item ID, Name, Type, Quantity)
  */
-export async function getAllItemMasterListRecords(){
+export async function   getAllItemMasterListRecords(){
     try{
         const {data, error: supabaseError} = await supabaseClient.rpc('get_all_item_master_list_records');
         
@@ -1346,6 +1343,10 @@ export async function updateChemicalRemarkByItemId(itemId, remarks = ''){
     }
 }
 
+// ======================================================================================================================================
+// Methods for Glasswares
+
+// TODO: Implement the functions for glasswares
 
 // ======================================================================================================================================
 // Methods for Restocks
