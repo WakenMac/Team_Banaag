@@ -440,7 +440,7 @@
               required
             >
               <option value="" disabled selected class="placeholder-option">
-                Select Unit
+                - Select Unit -
               </option>
               <!-- Options will be populated dynamically from the database -->
               <!-- Options are now added dynamically through Unit Type CRUD -->
@@ -586,14 +586,6 @@
             />
             <span class="font-black text-3xl text-black">Add Chemical</span>
           </div>
-          <button
-            type="button"
-            aria-label="Close"
-            id="closeAddChemicalModalBtn"
-            class="text-black text-3xl font-light hover:text-gray-600 focus:outline-none"
-          >
-            &times;
-          </button>
         </div>
         <form class="space-y-4" id="addChemicalsForm">
           <div>
@@ -609,7 +601,7 @@
               name="chemicalName"
               required=""
               type="text"
-              placeholder="Enter chemical name"
+              placeholder="e.g. Acetic Acid"
             />
           </div>
           <div>
@@ -626,7 +618,7 @@
               required
             >
               <option value="" disabled selected class="placeholder-option">
-                Select Unit
+                - Select Unit -
               </option>
               <!-- Options will be populated dynamically from the database -->
               <!-- ~The dynamic options have been implemented~  -->
@@ -646,7 +638,7 @@
               required
             >
               <option value="" disabled selected class="placeholder-option">
-                Select Location
+                - Select Location -
               </option>
               <!-- Options will be populated dynamically from the database -->
               <!-- ~The dynamic options have been implemented~  -->
@@ -665,7 +657,7 @@
               name="chemicalBrand"
               required=""
               type="text"
-              placeholder="Enter brand (N/A if no brand)"
+              placeholder="e.g. Merck (N/A if not applicable)"
             />
           </div>
           <div>
@@ -681,7 +673,7 @@
               name="chemicalContainerSize"
               required=""
               type="text"
-              placeholder="Enter container size"
+              placeholder="e.g. 500 mL"
             />
           </div>
           <div>
@@ -696,7 +688,7 @@
               id="chemicalCASNo"
               name="chemicalCASNo"
               type="number"
-              placeholder="Enter CAS number"
+              placeholder="e.g. 64-19-7"
             />
           </div>
           <div>
@@ -711,7 +703,7 @@
               id="chemicalMSDS"
               name="chemicalMSDS"
               rows="3"
-              placeholder="Enter MSDS"
+              placeholder="e.g. idk unsay porma"
             />
           </div>
           <div>
@@ -726,7 +718,7 @@
               id="chemicalBarCode"
               name="chemicalBarCode"
               type="text"
-              placeholder="Enter bar code"
+              placeholder="e.g. 1234567890123"
             />
           </div>
           <div class="flex justify-end space-x-3 pt-4">

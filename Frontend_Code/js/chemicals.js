@@ -15,7 +15,6 @@ import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
 // Initialize Compoenents
 
-// Dropdown elements
 const addChemicalLocation = document.getElementById("chemicalLocation");
 const addChemicalUnit = document.getElementById("chemicalUnit");
 const editChemicalLocation = document.getElementById("editChemicalLocation");
@@ -32,7 +31,7 @@ const remarksForm = document.getElementById("remarksForm");
 const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
 const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
 
-// Get references to the Edit Modal and Add Modal
+// Edit Chemicals Functionality
 const editChemicalModal = document.getElementById("editChemicalModal");
 const editChemicalForm = document.getElementById("editChemicalForm");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
@@ -49,7 +48,7 @@ const closeAddChemicalModalBtn = document.getElementById(
   "closeAddChemicalModalBtn"
 );
 
-// Delete Chemical Modal Functionality
+// Delete Chemical Functionality
 const deleteChemicalModal = document.getElementById("deleteChemicalModal");
 const modalBackdropDeleteChemical = document.getElementById(
   "modalBackdropDeleteChemical"
@@ -330,8 +329,6 @@ function closeAddModal() {
 addChemicalsBtn.addEventListener("click", openAddModal);
 cancelBtn.addEventListener("click", closeAddModal);
 modalBackdropAddChemical.addEventListener("click", closeAddModal);
-if (closeAddChemicalModalBtn)
-  closeAddChemicalModalBtn.addEventListener("click", closeAddModal);
 
 /**
  * Handles the submission of new chemical data
