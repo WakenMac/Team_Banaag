@@ -221,6 +221,8 @@ addChemicalsForm.addEventListener("submit", (e) => {
   const chemicalLocation = addChemicalsForm.chemicalLocation.value.trim();
   const chemicalBrand = addChemicalsForm.chemicalBrand.value.trim();
   const chemicalQuantity = addChemicalsForm.chemicalQuantity.value.trim();
+  const chemicalContainerSize =
+    addChemicalsForm.chemicalContainerSize.value.trim();
   const chemicalCASNo = addChemicalsForm.chemicalCASNo.value.trim();
   const chemicalMSDS = addChemicalsForm.chemicalMSDS.value.trim();
   const chemicalBarCode = addChemicalsForm.chemicalBarCode.value.trim();
@@ -231,7 +233,8 @@ addChemicalsForm.addEventListener("submit", (e) => {
     !chemicalUnit ||
     !chemicalLocation ||
     !chemicalBrand ||
-    !chemicalQuantity
+    !chemicalQuantity ||
+    !chemicalContainerSize
   ) {
     alert("Please fill in all required fields.");
     return;
@@ -245,8 +248,9 @@ addChemicalsForm.addEventListener("submit", (e) => {
   <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalLocation}</td>
   <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalBrand}</td>
   <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalQuantity}</td>
+  <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalContainerSize}</td>
   <td class="px-6 py-4 whitespace-nowrap text-right space-x-3 flex items-center justify-end">
-    <button aria-label="Info" class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100" 
+    <button aria-label="Info" class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
       data-cas="${chemicalCASNo}"
       data-msd="${chemicalMSDS}"
       data-barcode="${chemicalBarCode}">

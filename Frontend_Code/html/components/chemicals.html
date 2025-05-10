@@ -219,7 +219,7 @@
             <li role="none">
               <a
                 class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="#"
+                href="/Frontend_Code/html/components/unitType.html"
                 role="menuitem"
                 tabindex="-1"
               >
@@ -293,7 +293,7 @@
           id="addChemicalsBtn"
           type="button"
         >
-          Add Chemicals
+          Add Chemical
         </button>
       </div>
       <h2 class="font-semibold text-gray-900 text-sm mb-3 mt-4">
@@ -337,7 +337,19 @@
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Quantity
+                Initial Quantity
+              </th>
+              <th
+                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                scope="col"
+              >
+                Container Size
+              </th>
+              <th
+                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                scope="col"
+              >
+                Remaining Quantity
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
@@ -372,7 +384,7 @@
           class="text-lg font-semibold text-gray-900 mb-4"
           id="editModalTitle"
         >
-          Edit Chemicals
+          Edit Chemical
         </h3>
         <form class="space-y-4" id="editChemicalForm">
           <div>
@@ -556,7 +568,7 @@
         class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
       >
         <h3 class="text-lg font-semibold text-gray-900 mb-4" id="modalTitle">
-          Add Chemicals
+          Add Chemical
         </h3>
         <form class="space-y-4" id="addChemicalsForm">
           <div>
@@ -658,6 +670,22 @@
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
               id="chemicalQuantity"
               name="chemicalQuantity"
+              required=""
+              type="text"
+              placeholder="Enter quantity"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="chemicalContainerSize"
+            >
+              Container Size
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="chemicalContainerSize"
+              name="chemicalContainerSize"
               required=""
               type="text"
               placeholder="Enter quantity"
