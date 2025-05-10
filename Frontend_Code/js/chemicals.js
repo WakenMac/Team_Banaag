@@ -91,6 +91,14 @@ function populateEditForm(row) {
 
   function setSelectValue(selectId, value) {
     const select = document.getElementById(selectId);
+    console.log(
+      "Setting",
+      selectId,
+      "to",
+      value,
+      "Options:",
+      [...select.options].map((o) => o.value)
+    );
     if ([...select.options].some((opt) => opt.value === value)) {
       select.value = value;
     } else {
@@ -104,26 +112,21 @@ function populateEditForm(row) {
     }
   }
 
-  setSelectValue("editChemicalUnit", cells[2].textContent);
-  setSelectValue("editChemicalLocation", cells[3].textContent);
+  setSelectValue("editChemicalUnit", cells[2].textContent.trim());
+  setSelectValue("editChemicalLocation", cells[3].textContent.trim());
   document.getElementById("editChemicalBrand").value = cells[4].textContent;
   document.getElementById("editChemicalQuantity").value = cells[5].textContent;
+  document.getElementById("editChemicalContainerSize").value =
+    cells[6].textContent;
 
+  const infoBtn = row.querySelector('button[aria-label="Info"]');
   let cas = "",
     msd = "",
     barcode = "";
-  if (cells.length > 8) {
-    cas = cells[6]?.textContent || "";
-    msd = cells[7]?.textContent || "";
-    barcode = cells[8]?.textContent || "";
-  } else {
-    // Find the info button in the last cell
-    const infoBtn = row.querySelector('button[aria-label="Info"]');
-    if (infoBtn) {
-      cas = infoBtn.getAttribute("data-cas") || "";
-      msd = infoBtn.getAttribute("data-msd") || "";
-      barcode = infoBtn.getAttribute("data-barcode") || "";
-    }
+  if (infoBtn) {
+    cas = infoBtn.getAttribute("data-cas") || "";
+    msd = infoBtn.getAttribute("data-msd") || "";
+    barcode = infoBtn.getAttribute("data-barcode") || "";
   }
   document.getElementById("editChemicalCASNo").value = cas;
   document.getElementById("editChemicalMSDS").value = msd;
@@ -135,21 +138,15 @@ function populateEditForm(row) {
 editChemicalForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const editChemicalId = document.getElementById("editChemicalId").value.trim();
-  const editChemicalName = document
-    .getElementById("editChemicalName")
-    .value.trim();
-  const editChemicalUnit = document
-    .getElementById("editChemicalUnit")
-    .value.trim();
-  const editChemicalLocation = document
-    .getElementById("editChemicalLocation")
-    .value.trim();
-  const editChemicalBrand = document
-    .getElementById("editChemicalBrand")
-    .value.trim();
-  const editChemicalQuantity = document
-    .getElementById("editChemicalQuantity")
-    .value.trim();
+  const editChemicalName = document.getElementById("editChemicalName").value.trim();
+  const editChemicalUnit = document.getElementById("editChemicalUnit").value.trim();
+  const editChemicalLocation = document.getElementById("editChemicalLocation").value.trim();
+  const editChemicalBrand = document.getElementById("editChemicalBrand").value.trim();
+  const editChemicalQuantity = document.getElementById("editChemicalQuantity").value.trim();
+  const editChemicalContainerSize = document.getElementById("editChemicalContainerSize").value.trim();
+  const editChemicalCASNo = document.getElementById("editChemicalCASNo").value.trim();
+  const editChemicalMSDS = document.getElementById("editChemicalMSDS").value.trim();
+  const editChemicalBarCode = document.getElementById("editChemicalBarCode").value.trim();
 
   const rows = chemicalsTableBody.querySelectorAll("tr");
   rows.forEach((row) => {
@@ -159,6 +156,13 @@ editChemicalForm.addEventListener("submit", (e) => {
       row.children[3].textContent = editChemicalLocation;
       row.children[4].textContent = editChemicalBrand;
       row.children[5].textContent = editChemicalQuantity;
+      row.children[6].textContent = editChemicalContainerSize;
+      const infoBtn = row.querySelector('button[aria-label="Info"]');
+      if (infoBtn) {
+        infoBtn.setAttribute("data-cas", editChemicalCASNo);
+        infoBtn.setAttribute("data-msd", editChemicalMSDS);
+        infoBtn.setAttribute("data-barcode", editChemicalBarCode);
+      }
     }
   });
 
@@ -185,7 +189,9 @@ const cancelBtn = document.getElementById("cancelBtn");
 const modalBackdropAddChemical = document.getElementById(
   "modalBackdropAddChemical"
 );
-const closeAddChemicalModalBtn = document.getElementById("closeAddChemicalModalBtn");
+const closeAddChemicalModalBtn = document.getElementById(
+  "closeAddChemicalModalBtn"
+);
 
 /**
  * Opens the add chemicals modal
@@ -207,7 +213,8 @@ function closeAddModal() {
 addChemicalsBtn.addEventListener("click", openAddModal);
 cancelBtn.addEventListener("click", closeAddModal);
 modalBackdropAddChemical.addEventListener("click", closeAddModal);
-if (closeAddChemicalModalBtn) closeAddChemicalModalBtn.addEventListener("click", closeAddModal);
+if (closeAddChemicalModalBtn)
+  closeAddChemicalModalBtn.addEventListener("click", closeAddModal);
 
 /**
  * Handles the submission of new chemical data
