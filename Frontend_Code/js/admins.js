@@ -7,11 +7,24 @@ const modalBackdrop = document.getElementById("modalBackdrop");
 const cancelBtn = document.getElementById("cancelBtn");
 const addEquipmentForm = document.getElementById("addAdminForm");
 const tbody = document.querySelector("tbody");
+const addAdminError = document.getElementById("addAdminError"); // for error message
+
+// Edit and Delete Admin Modal logic
+const editAdminModal = document.getElementById("editAdminModal");
+const editAdminForm = document.getElementById("editAdminForm");
+const cancelEditAdminBtn = document.getElementById("cancelEditAdminBtn");
+const modalBackdropEditAdmin = document.getElementById("modalBackdropEditAdmin");
+const deleteAdminModal = document.getElementById("deleteAdminModal");
+const modalBackdropDeleteAdmin = document.getElementById("modalBackdropDeleteAdmin");
+const cancelDeleteAdminBtn = document.getElementById("cancelDeleteAdminBtn");
+const confirmDeleteAdminBtn = document.getElementById("confirmDeleteAdminBtn");
+let adminRowToEdit = null;
+let adminRowToDelete = null;
 
 // Initialize the tables
 initialize();
 
-async function initialize(){
+async function initialize() {
   setupDropdown("masterlistBtn", "masterlistMenu");
   setupDropdown("consumablesBtn", "consumablesMenu");
   setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
@@ -72,22 +85,37 @@ addEquipmentForm.addEventListener("submit", async (e) => {
   const middleName = addEquipmentForm.middleName.value.trim();
   const lastName = addEquipmentForm.lastName.value.trim();
 
+  addAdminError.classList.add("hidden");
+  addAdminError.textContent = "";
   if (!adminId || !firstName || !lastName) {
-    alert("Please fill in all required fields.");
+    addAdminError.textContent = "Please fill in all required fields.";
+    addAdminError.classList.remove("hidden");
     return;
   }
 
   let result = await dbhandler.addAdminRecord(adminId, firstName, middleName, lastName, 'randomPassword');
-  
-  if (result.includes('ERROR')){
-    alert(result);
+
+  if (result.includes('ERROR')) {
+    addAdminError.textContent = result.replace(/^ERROR:\s*/i, '');
+    addAdminError.classList.remove("hidden");
+    return;
   } else {
     createNewAdminRow(adminId, firstName, middleName, lastName, 'randomPassword');
     console.log(result);
+    addAdminError.classList.add("hidden");
+    addAdminError.textContent = "";
   }
 
   dbhandler.testPresence();
   closeModal();
+});
+
+// Hide error message when user starts typing in any input
+[...addEquipmentForm.querySelectorAll('input')].forEach(input => {
+  input.addEventListener('input', () => {
+    addAdminError.classList.add('hidden');
+    addAdminError.textContent = '';
+  });
 });
 
 // Optional: Add delete functionality for dynamically added rows
@@ -97,17 +125,8 @@ tbody.addEventListener("click", async (e) => {
     e.target.closest("button").getAttribute("aria-label") === "Delete admin"
   ) {
     const row = e.target.closest("tr");
-    const id = row.querySelectorAll("td")[0].textContent; // Gets the admin ID from the row
-    
     if (row) {
-      let result = await dbhandler.removeAdminRecordByAdminId(id) 
-      
-      if (result.includes('ERROR'))
-          alert(result);
-      else{
-        console.log(result);
-        row.remove();
-      }
+      openDeleteAdminModal(row);
     }
   }
 });
@@ -123,7 +142,7 @@ tbody.addEventListener("click", async (e) => {
  * @param {*} middleName Middle name of the admin
  * @param {*} lastName Last name of the admin
  */
-async function createNewAdminRow(adminId, firstName, middleName, lastName){
+async function createNewAdminRow(adminId, firstName, middleName, lastName) {
   // Create new row
   const tr = document.createElement("tr");
 
@@ -148,16 +167,16 @@ async function createNewAdminRow(adminId, firstName, middleName, lastName){
 // =====================================================================================================
 // BACKEND-RELATED METHODS
 
-async function prepareAdminTable(){
+async function prepareAdminTable() {
   try {
     let data = await dbhandler.getAllAdmins();
 
-    if (data.length == 0){
+    if (data.length == 0) {
       console.log("Admins table has no records.");
       return;
     }
 
-    for (let i = 0; i < data.length; i++){
+    for (let i = 0; i < data.length; i++) {
       createNewAdminRow(
         data[i]['Admin ID'],
         data[i]['First Name'],
@@ -166,7 +185,118 @@ async function prepareAdminTable(){
       );
     }
 
-  } catch (error){
-      console.error(error);
+  } catch (error) {
+    console.error(error);
   }
 }
+
+function openEditAdminModal(row) {
+  adminRowToEdit = row;
+  const cells = row.children;
+  document.getElementById("editAdminId").value = cells[0].textContent;
+  document.getElementById("editFirstName").value = cells[1].textContent;
+  document.getElementById("editMiddleName").value = cells[2].textContent;
+  document.getElementById("editLastName").value = cells[3].textContent;
+  editAdminModal.classList.remove("hidden");
+  editAdminModal.classList.add("flex");
+}
+
+function closeEditAdminModal() {
+  editAdminModal.classList.add("hidden");
+  editAdminModal.classList.remove("flex");
+  editAdminForm.reset();
+  adminRowToEdit = null;
+}
+
+function openDeleteAdminModal(row) {
+  adminRowToDelete = row;
+  deleteAdminModal.classList.remove("hidden");
+  deleteAdminModal.classList.add("flex");
+}
+
+function closeDeleteAdminModal() {
+  deleteAdminModal.classList.add("hidden");
+  deleteAdminModal.classList.remove("flex");
+  adminRowToDelete = null;
+}
+
+// Edit button click
+tbody.addEventListener("click", (e) => {
+  if (
+    e.target.closest("button") &&
+    e.target.closest("button").getAttribute("aria-label") === "Edit admin"
+  ) {
+    const row = e.target.closest("tr");
+    openEditAdminModal(row);
+  }
+});
+
+// Edit modal close
+cancelEditAdminBtn.addEventListener("click", closeEditAdminModal);
+modalBackdropEditAdmin.addEventListener("click", closeEditAdminModal);
+
+// Delete modal close
+cancelDeleteAdminBtn.addEventListener("click", closeDeleteAdminModal);
+modalBackdropDeleteAdmin.addEventListener("click", closeDeleteAdminModal);
+
+// Edit form submit
+editAdminForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const adminId = document.getElementById("editAdminId").value.trim();
+  const firstName = document.getElementById("editFirstName").value.trim();
+  const middleName = document.getElementById("editMiddleName").value.trim();
+  const lastName = document.getElementById("editLastName").value.trim();
+  let editAdminError = document.getElementById("editAdminError");
+  if (!editAdminError) {
+    editAdminError = document.createElement("div");
+    editAdminError.id = "editAdminError";
+    editAdminError.className = "mb-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded px-3 py-2";
+    editAdminForm.prepend(editAdminError);
+  }
+  editAdminError.classList.add("hidden");
+  editAdminError.textContent = "";
+  if (!adminId || !firstName || !lastName) {
+    editAdminError.textContent = "Please fill in all required fields.";
+    editAdminError.classList.remove("hidden");
+    return;
+  }
+  // Check for duplicate Admin ID (except for the current row)
+  const rows = tbody.querySelectorAll("tr");
+  for (const row of rows) {
+    if (row !== adminRowToEdit && row.children[0].textContent === adminId) {
+      editAdminError.textContent = "Admin ID is already in use.";
+      editAdminError.classList.remove("hidden");
+      return;
+    }
+  }
+  let result = await dbhandler.updateAdminRecord(adminId, firstName, middleName, lastName);
+  if (result && result.includes("ERROR")) {
+    editAdminError.textContent = result.replace(/^ERROR:\s*/i, '');
+    editAdminError.classList.remove("hidden");
+    return;
+  }
+  // Update the row in the table
+  if (adminRowToEdit) {
+    adminRowToEdit.children[0].textContent = adminId;
+    adminRowToEdit.children[1].textContent = firstName;
+    adminRowToEdit.children[2].textContent = middleName;
+    adminRowToEdit.children[3].textContent = lastName;
+  }
+  editAdminError.classList.add("hidden");
+  editAdminError.textContent = "";
+  closeEditAdminModal();
+});
+
+// Delete confirm
+confirmDeleteAdminBtn.addEventListener("click", async () => {
+  if (adminRowToDelete) {
+    const adminId = adminRowToDelete.children[0].textContent;
+    let result = await dbhandler.removeAdminRecordByAdminId(adminId);
+    if (result && result.includes("ERROR")) {
+      alert(result);
+      return;
+    }
+    adminRowToDelete.remove();
+    closeDeleteAdminModal();
+  }
+});

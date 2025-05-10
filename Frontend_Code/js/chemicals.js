@@ -11,14 +11,11 @@
  * - Displaying chemical information in info (tooltip)
  */
 
-import * as dbhandler from '../../Backend_Code/mainHandler.js';
+import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
 // Initialize Compoenents
 
-// Get references to the Edit Modal and Add Modal
-const editChemicalModal = document.getElementById("editChemicalModal");
-const editChemicalForm = document.getElementById("editChemicalForm");
-const cancelEditBtn = document.getElementById("cancelEditBtn");
+
 
 // Dropdown elements
 const addChemicalLocation = document.getElementById("chemicalLocation");
@@ -26,7 +23,9 @@ const addChemicalUnit = document.getElementById("chemicalUnit");
 const editChemicalLocation = document.getElementById("editChemicalLocation");
 const editChemicalUnit = document.getElementById("editChemicalUnit");
 
-const modalBackdropEditChemical = document.getElementById("modalBackdropEditChemical");
+const modalBackdropEditChemical = document.getElementById(
+  "modalBackdropEditChemical"
+);
 const chemicalsTableBody = document.getElementById("chemicalsTableBody");
 
 // Remarks Modal Functionality
@@ -35,17 +34,39 @@ const remarksForm = document.getElementById("remarksForm");
 const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
 const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
 
-/* Add Chemicals Functionality */
+// Get references to the Edit Modal and Add Modal
+const editChemicalModal = document.getElementById("editChemicalModal");
+const editChemicalForm = document.getElementById("editChemicalForm");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+// Add Chemicals Functionality
 const addChemicalsBtn = document.getElementById("addChemicalsBtn");
 const addChemicalsModal = document.getElementById("addChemicalsModal");
 const addChemicalsForm = document.getElementById("addChemicalsForm");
 const cancelBtn = document.getElementById("cancelBtn");
-const modalBackdropAddChemical = document.getElementById("modalBackdropAddChemical");
-const closeAddChemicalModalBtn = document.getElementById("closeAddChemicalModalBtn");
+const modalBackdropAddChemical = document.getElementById(
+  "modalBackdropAddChemical"
+);
+const closeAddChemicalModalBtn = document.getElementById(
+  "closeAddChemicalModalBtn"
+);
+
+// Delete Chemical Modal Functionality
+const deleteChemicalModal = document.getElementById("deleteChemicalModal");
+const modalBackdropDeleteChemical = document.getElementById(
+  "modalBackdropDeleteChemical"
+);
+const cancelDeleteChemicalBtn = document.getElementById(
+  "cancelDeleteChemicalBtn"
+);
+const confirmDeleteChemicalBtn = document.getElementById(
+  "confirmDeleteChemicalBtn"
+);
+let chemicalRowToDelete = null;
 
 await initialize();
 
-async function initialize(){
+async function initialize() {
   cancelEditBtn.addEventListener("click", closeEditModal);
   modalBackdropEditChemical.addEventListener("click", closeEditModal);
 
@@ -56,7 +77,31 @@ async function initialize(){
   setupDropdown("propertiesBtn", "propertiesMenu");
 
   // Test chemical label
-  createNewChemicalRow(-1, 'Corola', 'Box(es)', 'General Santos', 'Toyota', '30', '1000', '1000');
+  createNewChemicalRow(
+    -1,
+    "Corola",
+    "Box(es)",
+    "General Santos",
+    "Toyota",
+    "30",
+    "1000",
+    "1000"
+  );
+
+  // Test q hehe - dave
+  createNewChemicalRow(
+    0,
+    "ChemName",
+    "ChemUnit",
+    "General Santos",
+    "Well",
+    "49",
+    "5000",
+    "N/A",
+    "N/A",
+    "N/A"
+  );
+
 
   await dbhandler.testPresence();
   await prepareChemicalsTable();
@@ -128,38 +173,29 @@ function closeEditModal() {
  */
 function populateEditForm(row) {
   const cells = row.children;
+  console.log("Row cells:", cells);
 
-  document.getElementById("editChemicalId").value = cells[0].textContent;
-  document.getElementById("editChemicalName").value = cells[1].textContent;
+  const fieldMap = [
+    { id: "editChemicalId", idx: 0 },
+    { id: "editChemicalName", idx: 1 },
+    { id: "editChemicalUnit", idx: 2 },
+    { id: "editChemicalLocation", idx: 3 },
+    { id: "editChemicalBrand", idx: 4 },
+    { id: "editChemicalContainerSize", idx: 6 },
+  ];
 
-  function setSelectValue(selectId, value) {
-    const select = document.getElementById(selectId); // Get the dropdown element
-    console.log(
-      "Setting",
-      selectId,
-      "to",
-      value,
-      "Options:",
-      [...select.options].map((o) => o.value)
-    ); // Prints out the options
-    if ([...select.options].some((opt) => opt.value === value)) { // Geths the calue of each option
-      select.value = value;
-    } else {
-      const observer = new MutationObserver(() => {
-        if ([...select.options].some((opt) => opt.value === value)) {
-          select.value = value;
-          observer.disconnect();
-        }
-      });
-      observer.observe(select, { childList: true });
+  for (const { id, idx } of fieldMap) {
+    const el = document.getElementById(id);
+    if (!el) {
+      console.error(`Element with id '${id}' not found in modal!`);
+      continue;
     }
+    if (!cells[idx]) {
+      console.error(`Table cell index ${idx} not found in row!`);
+      continue;
+    }
+    el.value = cells[idx].textContent;
   }
-
-  setSelectValue("editChemicalUnit", cells[2].textContent.trim());
-  setSelectValue("editChemicalLocation", cells[3].textContent.trim());
-  document.getElementById("editChemicalBrand").value = cells[4].textContent;
-  document.getElementById("editChemicalQuantity").value = cells[5].textContent;
-  document.getElementById("editChemicalContainerSize").value = cells[6].textContent;
 
   const infoBtn = row.querySelector('button[aria-label="Info"]');
   let cas = "",
@@ -170,9 +206,15 @@ function populateEditForm(row) {
     msd = infoBtn.getAttribute("data-msd") || "";
     barcode = infoBtn.getAttribute("data-barcode") || "";
   }
-  document.getElementById("editChemicalCASNo").value = cas;
-  document.getElementById("editChemicalMSDS").value = msd;
-  document.getElementById("editChemicalBarCode").value = barcode;
+  const casField = document.getElementById("editChemicalCASNo");
+  const msdsField = document.getElementById("editChemicalMSDS");
+  const barcodeField = document.getElementById("editChemicalBarCode");
+  if (!casField) console.error("editChemicalCASNo input not found!");
+  if (!msdsField) console.error("editChemicalMSDS input not found!");
+  if (!barcodeField) console.error("editChemicalBarCode input not found!");
+  if (casField) casField.value = cas;
+  if (msdsField) msdsField.value = msd;
+  if (barcodeField) barcodeField.value = barcode;
   openEditModal();
 }
 
@@ -182,15 +224,30 @@ function populateEditForm(row) {
 editChemicalForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const editChemicalId = document.getElementById("editChemicalId").value.trim();
-  const editChemicalName = document.getElementById("editChemicalName").value.trim();
-  const editChemicalUnit = document.getElementById("editChemicalUnit").value.trim();
-  const editChemicalLocation = document.getElementById("editChemicalLocation").value.trim();
-  const editChemicalBrand = document.getElementById("editChemicalBrand").value.trim();
-  const editChemicalQuantity = document.getElementById("editChemicalQuantity").value.trim();
-  const editChemicalContainerSize = document.getElementById("editChemicalContainerSize").value.trim();
-  const editChemicalCASNo = document.getElementById("editChemicalCASNo").value.trim();
-  const editChemicalMSDS = document.getElementById("editChemicalMSDS").value.trim();
-  const editChemicalBarCode = document.getElementById("editChemicalBarCode").value.trim();
+  const editChemicalName = document
+    .getElementById("editChemicalName")
+    .value.trim();
+  const editChemicalUnit = document
+    .getElementById("editChemicalUnit")
+    .value.trim();
+  const editChemicalLocation = document
+    .getElementById("editChemicalLocation")
+    .value.trim();
+  const editChemicalBrand = document
+    .getElementById("editChemicalBrand")
+    .value.trim();
+  const editChemicalContainerSize = document
+    .getElementById("editChemicalContainerSize")
+    .value.trim();
+  const editChemicalCASNo = document
+    .getElementById("editChemicalCASNo")
+    .value.trim();
+  const editChemicalMSDS = document
+    .getElementById("editChemicalMSDS")
+    .value.trim();
+  const editChemicalBarCode = document
+    .getElementById("editChemicalBarCode")
+    .value.trim();
 
   const rows = chemicalsTableBody.querySelectorAll("tr");
   rows.forEach((row) => {
@@ -199,7 +256,6 @@ editChemicalForm.addEventListener("submit", async (e) => {
       row.children[2].textContent = editChemicalUnit;
       row.children[3].textContent = editChemicalLocation;
       row.children[4].textContent = editChemicalBrand;
-      row.children[5].textContent = editChemicalQuantity;
       row.children[6].textContent = editChemicalContainerSize;
       const infoBtn = row.querySelector('button[aria-label="Info"]');
       if (infoBtn) {
@@ -256,13 +312,13 @@ if (closeAddChemicalModalBtn)
 addChemicalsForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const chemicalId = addChemicalsForm.chemicalId.value.trim();
+  // const chemicalId = addChemicalsForm.chemicalId.value.trim();
   const chemicalName = addChemicalsForm.chemicalName.value.trim();
   const chemicalUnit = addChemicalsForm.chemicalUnit.value.trim();
   const chemicalLocation = addChemicalsForm.chemicalLocation.value.trim();
   const chemicalBrand = addChemicalsForm.chemicalBrand.value.trim();
-  const chemicalQuantity = addChemicalsForm.chemicalQuantity.value.trim();
-  const chemicalContainerSize = addChemicalsForm.chemicalContainerSize.value.trim();
+  const chemicalContainerSize =
+    addChemicalsForm.chemicalContainerSize.value.trim();
   const chemicalCASNo = addChemicalsForm.chemicalCASNo.value.trim();
   const chemicalMSDS = addChemicalsForm.chemicalMSDS.value.trim();
   const chemicalBarCode = addChemicalsForm.chemicalBarCode.value.trim();
@@ -282,21 +338,41 @@ addChemicalsForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  let result = await dbhandler.addChemicalsRecord(chemicalName, chemicalLocation, chemicalUnit, chemicalBrand, chemicalContainerSize, 
-    chemicalBarCode, chemicalCASNo, chemicalMSDS);
-  
+  let result = await dbhandler.addChemicalsRecord(
+    chemicalName,
+    chemicalLocation,
+    chemicalUnit,
+    chemicalBrand,
+    chemicalContainerSize,
+    chemicalBarCode,
+    chemicalCASNo,
+    chemicalMSDS
+  );
+
   if (result == null) {
-    alert(`The mainHandler.addChemicalsRecord() DOESN'T return a status statement.`);
+    alert(
+      `The mainHandler.addChemicalsRecord() DOESN'T return a status statement.`
+    );
   } else if (result.includes("ERROR")) {
-      alert(result);
+    alert(result);
   } else {
     console.log(result);
     let newItemId = result.slice(46, result.length - 1);
-    createNewChemicalRow(newItemId, chemicalName, chemicalUnit, chemicalLocation, chemicalBrand, 0, chemicalContainerSize, 0, 
-    chemicalCASNo, chemicalMSDS, chemicalBarCode);
+    createNewChemicalRow(
+      newItemId,
+      chemicalName,
+      chemicalUnit,
+      chemicalLocation,
+      chemicalBrand,
+      0,
+      chemicalContainerSize,
+      0,
+      chemicalCASNo,
+      chemicalMSDS,
+      chemicalBarCode
+    );
     closeAddModal();
   }
-
 });
 
 // Handle Delete Buttons
@@ -306,11 +382,41 @@ chemicalsTableBody.addEventListener("click", (e) => {
     e.target.closest("button").getAttribute("aria-label") === "Delete chemical"
   ) {
     const row = e.target.closest("tr");
-    if (row) {
-      row.remove();
-    }
+    openDeleteChemicalModal(row);
   }
 });
+
+
+function openDeleteChemicalModal(row) {
+  chemicalRowToDelete = row;
+  deleteChemicalModal.classList.remove("hidden");
+  deleteChemicalModal.classList.add("flex");
+}
+
+function closeDeleteChemicalModal() {
+  deleteChemicalModal.classList.add("hidden");
+  deleteChemicalModal.classList.remove("flex");
+  chemicalRowToDelete = null;
+}
+
+// Delete confirm
+confirmDeleteChemicalBtn.addEventListener("click", async () => {
+  if (chemicalRowToDelete) {
+    const chemicalId = chemicalRowToDelete.children[0].textContent;
+    let result = await dbhandler.removeChemicalRecordByChemicalId(chemicalId);
+    if (result && result.includes("ERROR")) {
+      alert(result);
+      return;
+    }
+    chemicalRowToDelete.remove();
+    closeDeleteChemicalModal();
+  }
+});
+
+// Add event listeners for closing the delete modal
+cancelDeleteChemicalBtn.addEventListener("click", closeDeleteChemicalModal);
+modalBackdropDeleteChemical.addEventListener("click", closeDeleteChemicalModal);
+
 
 //=================================================================================================================================
 // Tooltip Functionality
@@ -318,7 +424,7 @@ chemicalsTableBody.addEventListener("click", (e) => {
 /**
  * Tooltip Functionality for Info buttons
  * Displays additional chemical information when hovering over the info button
- * Shows CAS No., MSD, and Barcode information
+ * Shows CAS No., MSDS, and Barcode information
  */
 chemicalsTableBody.addEventListener("mouseover", function (e) {
   const btn = e.target.closest('button[aria-label="Info"]');
@@ -353,9 +459,8 @@ chemicalsTableBody.addEventListener("mouseover", function (e) {
 
   // Position the tooltip
   const rect = btn.getBoundingClientRect();
-  tooltip.style.left = `${
-    rect.left + window.scrollX + rect.width / 2 - tooltip.offsetWidth / 2
-  }px`;
+  tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - tooltip.offsetWidth / 2
+    }px`;
   tooltip.style.top = `${rect.bottom + window.scrollY + 8}px`;
 
   // Remove tooltip on mouseout
@@ -455,18 +560,18 @@ remarksForm.addEventListener("submit", (e) => {
  * @param {string} chemicalBarCode            Barcode of the chemical to be added
  */
 function createNewChemicalRow(
-    chemicalId, 
-    chemicalName, 
-    chemicalUnit, 
-    chemicalLocation, 
-    chemicalBrand, 
-    chemicalInitialQuantity, 
-    chemicalContainerSize,
-    chemicalRemainingQuantity,
-    chemicalCASNo = 'N/A',
-    chemicalMSDS = 'N/A',
-    chemicalBarCode = 'N/A'
-  ) {
+  chemicalId,
+  chemicalName,
+  chemicalUnit,
+  chemicalLocation,
+  chemicalBrand,
+  chemicalInitialQuantity,
+  chemicalContainerSize,
+  chemicalRemainingQuantity,
+  chemicalCASNo = "N/A",
+  chemicalMSDS = "N/A",
+  chemicalBarCode = "N/A"
+) {
   // Create new row
   const tr = document.createElement("tr");
   tr.innerHTML = `
@@ -553,9 +658,9 @@ async function prepareChemicalsTable() {
         data[i]["Initial Qty."],
         data[i]["Container Size"],
         data[i]["Remaining Qty."],
-        (data[i]["CAS No"] || 'N/A'),
-        (data[i]["MSDS"] || 'N/A'),
-        (data[i]["Barcode"] || 'N/A')
+        data[i]["CAS No"] || "N/A",
+        data[i]["MSDS"] || "N/A",
+        data[i]["Barcode"] || "N/A"
       );
     }
   } catch (generalError) {
@@ -564,7 +669,7 @@ async function prepareChemicalsTable() {
 }
 
 /**
- * Gets all of the unit type records from the database then proceeds to populate them (using the unit_type_name) 
+ * Gets all of the unit type records from the database then proceeds to populate them (using the unit_type_name)
  *  to the addChemicalUnit html dropdown element
  * @void Returns nothing.
  */
@@ -578,7 +683,7 @@ async function prepareUnitTypeDropdown() {
     }
 
     for (let i = 0; i < data.length; i++) {
-      createNewUnitTypeRow(data[i]['Name']);
+      createNewUnitTypeRow(data[i]["Name"]);
     }
   } catch (generalError) {
     console.error(generalError);
@@ -586,7 +691,7 @@ async function prepareUnitTypeDropdown() {
 }
 
 /**
- * Gets all of the location records from the database then proceeds to populate them (using the location_name) 
+ * Gets all of the location records from the database then proceeds to populate them (using the location_name)
  *  to the addChemicalLocation html dropdown element
  * @void Returns nothing.
  */
@@ -600,7 +705,7 @@ async function prepareLocationDropdown() {
     }
 
     for (let i = 0; i < data.length; i++) {
-      createNewLocationRow(data[i]['Name']);
+      createNewLocationRow(data[i]["Name"]);
     }
   } catch (generalError) {
     console.error(generalError);

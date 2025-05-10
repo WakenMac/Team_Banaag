@@ -7,6 +7,7 @@ const addUnitTypeModal = document.getElementById("addUnitTypeModal");
 const modalBackdropUnitType = document.getElementById("modalBackdropUnitType");
 const cancelBtn = document.getElementById("cancelBtn");
 const addUnitTypeForm = document.getElementById("addUnitTypeForm");
+const addUnitTypeError = document.getElementById("addUnitTypeError"); // for error message
 const tbody = document.querySelector("tbody");
 
 // Initialize modals for editing
@@ -16,6 +17,14 @@ const cancelBtnEditUnitType = document.getElementById("cancelBtnEditUnitType");
 const modalBackdropEditUnitType = document.getElementById(
   "modalBackdropEditUnitType"
 );
+
+// Delete Confirmation Modal
+const deleteUnitTypeModal = document.getElementById("deleteUnitTypeModal");
+const modalBackdropDeleteUnitType = document.getElementById("modalBackdropDeleteUnitType");
+const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+let unitTypeToDelete = null;
+let rowToDelete = null;
 
 // Initialize table components
 await initialize();
@@ -152,26 +161,38 @@ addUnitTypeForm.addEventListener("submit", async (e) => {
   const unitTypeId = document.getElementById("unitTypeId").value.trim();
   const unitTypeName = document.getElementById("unitTypeName").value.trim();
 
+  addUnitTypeError.classList.add("hidden");
+  addUnitTypeError.textContent = "";
   if (!unitTypeId || !unitTypeName) {
-    alert("Please fill in all required fields.");
+    addUnitTypeError.textContent = "Please fill in all required fields.";
+    addUnitTypeError.classList.remove("hidden");
     return;
   }
 
   let result = await dbhandler.addUnitTypeRecord(unitTypeName);
 
   if (result == null) {
-    alert(
-      `The mainHandler.addUnitTypeRecord() DOESN'T return a status statement.`
-    );
-    closeModal();
+    addUnitTypeError.textContent = `Something went wrong. Please try again.`;
+    addUnitTypeError.classList.remove("hidden");
+    return;
   } else if (result.includes("ERROR")) {
-      alert(result);
+    addUnitTypeError.textContent = result.replace(/^ERROR:\s*/i, '');
+    addUnitTypeError.classList.remove("hidden");
+    return;
   } else {
     console.log(result);
     let newUnitTypeId = result.slice(47, result.length - 1);
     createNewUnitTypeRow(newUnitTypeId, unitTypeName);
+    addUnitTypeError.classList.add("hidden");
+    addUnitTypeError.textContent = "";
     closeModal();
   }
+});
+
+// Hide error message when user starts typing in the name input
+document.getElementById('unitTypeName').addEventListener('input', () => {
+  addUnitTypeError.classList.add('hidden');
+  addUnitTypeError.textContent = '';
 });
 
 // Add delete functionality for dynamically added rows
@@ -182,21 +203,7 @@ tbody.addEventListener("click", async (e) => {
   ) {
     const row = e.target.closest("tr");
     const unitTypeId = row.querySelectorAll("td")[0].textContent;
-
-    if (row) {
-      let result = await dbhandler.removeUnitTypeRecordByUnitTypeId(unitTypeId);
-
-      if (result == null) 
-        alert(
-          `The mainHandler.removeUnitTypeRecordByUnitTypeId() DOESN'T return a status statement.`
-        );
-      else if (result.includes("ERROR")) 
-        alert(result);
-      else {
-        console.log(result);
-        row.remove();
-      }
-    }
+    openDeleteModal(unitTypeId, row);
   }
 });
 
@@ -246,3 +253,35 @@ async function prepareUnitTypeTable() {
     console.error(generalError);
   }
 }
+
+function openDeleteModal(unitTypeId, row) {
+  unitTypeToDelete = unitTypeId;
+  rowToDelete = row;
+  deleteUnitTypeModal.classList.remove("hidden");
+  deleteUnitTypeModal.classList.add("flex");
+}
+
+function closeDeleteModal() {
+  deleteUnitTypeModal.classList.add("hidden");
+  deleteUnitTypeModal.classList.remove("flex");
+  unitTypeToDelete = null;
+  rowToDelete = null;
+}
+
+cancelDeleteBtn.addEventListener("click", closeDeleteModal);
+modalBackdropDeleteUnitType.addEventListener("click", closeDeleteModal);
+
+confirmDeleteBtn.addEventListener("click", async () => {
+  if (unitTypeToDelete && rowToDelete) {
+    let result = await dbhandler.removeUnitTypeRecordByUnitTypeId(unitTypeToDelete);
+    if (result == null) {
+      alert(`The mainHandler.removeUnitTypeRecordByUnitTypeId() DOESN'T return a status statement.`);
+    } else if (result.includes("ERROR")) {
+      alert(result);
+    } else {
+      console.log(result);
+      rowToDelete.remove();
+    }
+    closeDeleteModal();
+  }
+});
