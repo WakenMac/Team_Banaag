@@ -11,6 +11,63 @@
  * - Displaying chemical information in info (tooltip)
  */
 
+import * as dbhandler from '../../Backend_Code/mainHandler.js';
+
+// Initialize Compoenents
+
+// Get references to the Edit Modal and Add Modal
+const editChemicalModal = document.getElementById("editChemicalModal");
+const editChemicalForm = document.getElementById("editChemicalForm");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+// Dropdown elements
+const addChemicalLocation = document.getElementById("chemicalLocation");
+const addChemicalUnit = document.getElementById("chemicalUnit");
+const editChemicalLocation = document.getElementById("editChemicalLocation");
+const editChemicalUnit = document.getElementById("editChemicalUnit");
+
+const modalBackdropEditChemical = document.getElementById("modalBackdropEditChemical");
+const chemicalsTableBody = document.getElementById("chemicalsTableBody");
+
+// Remarks Modal Functionality
+const remarksModal = document.getElementById("remarksModal");
+const remarksForm = document.getElementById("remarksForm");
+const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
+const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
+
+/* Add Chemicals Functionality */
+const addChemicalsBtn = document.getElementById("addChemicalsBtn");
+const addChemicalsModal = document.getElementById("addChemicalsModal");
+const addChemicalsForm = document.getElementById("addChemicalsForm");
+const cancelBtn = document.getElementById("cancelBtn");
+const modalBackdropAddChemical = document.getElementById("modalBackdropAddChemical");
+const closeAddChemicalModalBtn = document.getElementById("closeAddChemicalModalBtn");
+
+await initialize();
+
+async function initialize(){
+  cancelEditBtn.addEventListener("click", closeEditModal);
+  modalBackdropEditChemical.addEventListener("click", closeEditModal);
+
+  // Initialize dropdown menus
+  setupDropdown("masterlistBtn", "masterlistMenu");
+  setupDropdown("consumablesBtn", "consumablesMenu");
+  setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
+  setupDropdown("propertiesBtn", "propertiesMenu");
+
+  // Test chemical label
+  createNewChemicalRow(-1, 'Corola', 'Box(es)', 'General Santos', 'Toyota', '30', '1000', '1000');
+
+  await dbhandler.testPresence();
+  await prepareChemicalsTable();
+
+  await prepareUnitTypeDropdown();
+  await prepareLocationDropdown();
+}
+
+//=======================================================================================================================================
+// FRONT END-RELATED METHODS (LOGIC &  REACTIVITY)
+
 /**
  * Sets up dropdown menu functionality for navigation items
  * @param {string} buttonId - The ID of the dropdown button
@@ -42,22 +99,10 @@ function setupDropdown(buttonId, menuId) {
   });
 }
 
-// Initialize dropdown menus
-setupDropdown("masterlistBtn", "masterlistMenu");
-setupDropdown("consumablesBtn", "consumablesMenu");
-setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
-setupDropdown("propertiesBtn", "propertiesMenu");
+//=================================================================================================================================
+// CRUD Modals
 
 /* Edit and Add Chemicals Functionality */
-
-// Get references to the Edit Modal and Add Modal
-const editChemicalModal = document.getElementById("editChemicalModal");
-const editChemicalForm = document.getElementById("editChemicalForm");
-const cancelEditBtn = document.getElementById("cancelEditBtn");
-const modalBackdropEditChemical = document.getElementById(
-  "modalBackdropEditChemical"
-);
-const chemicalsTableBody = document.getElementById("chemicalsTableBody");
 
 /**
  * Opens the edit modal and populates it with chemical data
@@ -77,20 +122,18 @@ function closeEditModal() {
   editChemicalForm.reset();
 }
 
-cancelEditBtn.addEventListener("click", closeEditModal);
-modalBackdropEditChemical.addEventListener("click", closeEditModal);
-
 /**
  * Populates the edit form with data from the selected chemical
  * @param {HTMLElement} row - The table row containing chemical data
  */
 function populateEditForm(row) {
   const cells = row.children;
+
   document.getElementById("editChemicalId").value = cells[0].textContent;
   document.getElementById("editChemicalName").value = cells[1].textContent;
 
   function setSelectValue(selectId, value) {
-    const select = document.getElementById(selectId);
+    const select = document.getElementById(selectId); // Get the dropdown element
     console.log(
       "Setting",
       selectId,
@@ -98,8 +141,8 @@ function populateEditForm(row) {
       value,
       "Options:",
       [...select.options].map((o) => o.value)
-    );
-    if ([...select.options].some((opt) => opt.value === value)) {
+    ); // Prints out the options
+    if ([...select.options].some((opt) => opt.value === value)) { // Geths the calue of each option
       select.value = value;
     } else {
       const observer = new MutationObserver(() => {
@@ -116,8 +159,7 @@ function populateEditForm(row) {
   setSelectValue("editChemicalLocation", cells[3].textContent.trim());
   document.getElementById("editChemicalBrand").value = cells[4].textContent;
   document.getElementById("editChemicalQuantity").value = cells[5].textContent;
-  document.getElementById("editChemicalContainerSize").value =
-    cells[6].textContent;
+  document.getElementById("editChemicalContainerSize").value = cells[6].textContent;
 
   const infoBtn = row.querySelector('button[aria-label="Info"]');
   let cas = "",
@@ -134,8 +176,10 @@ function populateEditForm(row) {
   openEditModal();
 }
 
+// TODO: Implement the edit portion for the database
+
 // Handle Edit Form Submission
-editChemicalForm.addEventListener("submit", (e) => {
+editChemicalForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const editChemicalId = document.getElementById("editChemicalId").value.trim();
   const editChemicalName = document.getElementById("editChemicalName").value.trim();
@@ -181,18 +225,6 @@ chemicalsTableBody.addEventListener("click", (e) => {
   }
 });
 
-/* Add Chemicals Functionality */
-const addChemicalsBtn = document.getElementById("addChemicalsBtn");
-const addChemicalsModal = document.getElementById("addChemicalsModal");
-const addChemicalsForm = document.getElementById("addChemicalsForm");
-const cancelBtn = document.getElementById("cancelBtn");
-const modalBackdropAddChemical = document.getElementById(
-  "modalBackdropAddChemical"
-);
-const closeAddChemicalModalBtn = document.getElementById(
-  "closeAddChemicalModalBtn"
-);
-
 /**
  * Opens the add chemicals modal
  */
@@ -221,7 +253,7 @@ if (closeAddChemicalModalBtn)
  * Creates a new row in the table with the chemical information
  * Includes functionality for remarks and additional chemical details
  */
-addChemicalsForm.addEventListener("submit", (e) => {
+addChemicalsForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const chemicalId = addChemicalsForm.chemicalId.value.trim();
@@ -230,56 +262,41 @@ addChemicalsForm.addEventListener("submit", (e) => {
   const chemicalLocation = addChemicalsForm.chemicalLocation.value.trim();
   const chemicalBrand = addChemicalsForm.chemicalBrand.value.trim();
   const chemicalQuantity = addChemicalsForm.chemicalQuantity.value.trim();
-  const chemicalContainerSize =
-    addChemicalsForm.chemicalContainerSize.value.trim();
+  const chemicalContainerSize = addChemicalsForm.chemicalContainerSize.value.trim();
   const chemicalCASNo = addChemicalsForm.chemicalCASNo.value.trim();
   const chemicalMSDS = addChemicalsForm.chemicalMSDS.value.trim();
   const chemicalBarCode = addChemicalsForm.chemicalBarCode.value.trim();
-  const chemicalRemainingQuantity = ""; // placeholder for the remaining quantity, idk basig sa backend siya na part hehe
 
+  // Conditions that are commented are to be removed~
+  // Hindi ko lang muna tinanggal just in case may changes na gagawin - Waks
   if (
-    !chemicalId ||
+    // !chemicalId ||
     !chemicalName ||
     !chemicalUnit ||
     !chemicalLocation ||
     !chemicalBrand ||
-    !chemicalQuantity ||
+    // !chemicalQuantity ||
     !chemicalContainerSize
   ) {
     alert("Please fill in all required fields.");
     return;
   }
 
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-  <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalId}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalName}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalUnit}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalLocation}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalBrand}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalQuantity}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalContainerSize}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalRemainingQuantity}</td>
-  <td class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3">
-    <button aria-label="Info" class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
-      data-cas="${chemicalCASNo}"
-      data-msd="${chemicalMSDS}"
-      data-barcode="${chemicalBarCode}">
-      <i class="fas fa-info text-[14px]"></i>
-    </button>
-    <button aria-label="Add remarks" class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100" data-chemical-id="${chemicalId}">
-      <i class="fas fa-comment-alt text-[14px]"></i>
-    </button>
-    <button aria-label="Edit chemical" class="text-yellow-400 hover:text-yellow-500">
-      <i class="fas fa-pencil-alt"></i>
-    </button>
-    <button aria-label="Delete chemical" class="text-red-600 hover:text-red-700">
-      <i class="fas fa-trash-alt"></i>
-    </button>
-  </td>
-  `;
-  chemicalsTableBody.appendChild(tr);
-  closeAddModal();
+  let result = await dbhandler.addChemicalsRecord(chemicalName, chemicalLocation, chemicalUnit, chemicalBrand, chemicalContainerSize, 
+    chemicalBarCode, chemicalCASNo, chemicalMSDS);
+  
+  if (result == null) {
+    alert(`The mainHandler.addChemicalsRecord() DOESN'T return a status statement.`);
+  } else if (result.includes("ERROR")) {
+      alert(result);
+  } else {
+    console.log(result);
+    let newItemId = result.slice(46, result.length - 1);
+    createNewChemicalRow(newItemId, chemicalName, chemicalUnit, chemicalLocation, chemicalBrand, 0, chemicalContainerSize, 0, 
+    chemicalCASNo, chemicalMSDS, chemicalBarCode);
+    closeAddModal();
+  }
+
 });
 
 // Handle Delete Buttons
@@ -294,6 +311,9 @@ chemicalsTableBody.addEventListener("click", (e) => {
     }
   }
 });
+
+//=================================================================================================================================
+// Tooltip Functionality
 
 /**
  * Tooltip Functionality for Info buttons
@@ -345,12 +365,6 @@ chemicalsTableBody.addEventListener("mouseover", function (e) {
   });
 });
 
-// Remarks Modal Functionality
-const remarksModal = document.getElementById("remarksModal");
-const remarksForm = document.getElementById("remarksForm");
-const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
-const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
-
 /**
  * Opens the remarks modal and populates it with existing remarks if any
  * @param {string} chemicalId - The ID of the chemical to add/edit remarks for
@@ -371,6 +385,9 @@ function openRemarksModal(chemicalId) {
     document.getElementById("remarksText").value = "";
   }
 }
+
+//=================================================================================================================================
+// Remarks Modals
 
 /**
  * Closes the remarks modal and resets the form
@@ -420,3 +437,172 @@ remarksForm.addEventListener("submit", (e) => {
 
   closeRemarksModal();
 });
+
+// ===============================================================================================
+// FRONT END-RELATED METHODS
+
+/**
+ * Method to add a new row to the Chemicals Table
+ * @param {int} chemicalId                    Primary key of the Chemicals table
+ * @param {string} chemicalName               Name of the chemical to be added
+ * @param {string} chemicalUnit               Unit Type of the chemical (e.g. Millimeters, Grams)
+ * @param {string} chemicalLocation           Location where the chemical will be stored
+ * @param {string} chemicalBrand              Brand of the chemical to be added
+ * @param {float} chemicalInitialQuantity    Initial quantity of the chemical
+ * @param {float} chemicalRemainingQuantity  Remaining quantity of the chemical
+ * @param {string} chemicalCASNo              CAS number of the chemical to be added
+ * @param {string} chemicalMSDS               MSDS of the chemical to be added
+ * @param {string} chemicalBarCode            Barcode of the chemical to be added
+ */
+function createNewChemicalRow(
+    chemicalId, 
+    chemicalName, 
+    chemicalUnit, 
+    chemicalLocation, 
+    chemicalBrand, 
+    chemicalInitialQuantity, 
+    chemicalContainerSize,
+    chemicalRemainingQuantity,
+    chemicalCASNo = 'N/A',
+    chemicalMSDS = 'N/A',
+    chemicalBarCode = 'N/A'
+  ) {
+  // Create new row
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalId}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalName}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalUnit}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalLocation}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalBrand}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalInitialQuantity} ${chemicalUnit}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalContainerSize} ${chemicalUnit}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalRemainingQuantity} ${chemicalUnit}</td>
+    <td class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3">
+      <button aria-label="Info" class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
+        data-cas="${chemicalCASNo}"
+        data-msd="${chemicalMSDS}"
+        data-barcode="${chemicalBarCode}">
+        <i class="fas fa-info text-[14px]"></i>
+      </button>
+      <button aria-label="Add remarks" class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100" data-chemical-id="${chemicalId}">
+        <i class="fas fa-comment-alt text-[14px]"></i>
+      </button>
+      <button aria-label="Edit chemical" class="text-yellow-400 hover:text-yellow-500">
+        <i class="fas fa-pencil-alt"></i>
+      </button>
+      <button aria-label="Delete chemical" class="text-red-600 hover:text-red-700">
+        <i class="fas fa-trash-alt"></i>
+      </button>
+    </td>
+    `;
+  chemicalsTableBody.appendChild(tr);
+}
+
+/**
+ * Method to add a new unit to the addChemicalUnit and editChemicalUnit dropdown element
+ * @param {string} unitTypeName Name of the unit type to be added
+ */
+function createNewUnitTypeRow(unitTypeName) {
+  const tr1 = document.createElement("tr");
+  const tr2 = document.createElement("tr");
+  tr1.innerHTML = `<option value="${unitTypeName}">${unitTypeName}</option>`;
+  tr2.innerHTML = `<option value="${unitTypeName}">${unitTypeName}</option>`;
+  addChemicalUnit.appendChild(tr1);
+  editChemicalUnit.appendChild(tr2);
+}
+
+/**
+ * Method to add a new unit to the addChemicalLocation and editChemicalLocation dropdown element
+ * @param {string} locationName Name of the location to be added to the dropdown
+ */
+function createNewLocationRow(locationName) {
+  const tr1 = document.createElement("tr");
+  const tr2 = document.createElement("tr");
+
+  tr1.innerHTML = `<option value="${locationName}">${locationName}</option>`;
+  tr2.innerHTML = `<option value="${locationName}">${locationName}</option>`;
+
+  addChemicalLocation.appendChild(tr1);
+  editChemicalLocation.appendChild(tr2);
+}
+
+// ===============================================================================================
+// BACK END-RELATED METHODS
+
+/**
+ * Gets all of the chemical records from the database then proceeds to populate them to the table
+ * @void Returns nothing.
+ */
+async function prepareChemicalsTable() {
+  try {
+    let data = await dbhandler.getAllChemicalRecords();
+
+    if (data.length == 0) {
+      console.error("Chemical table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      createNewChemicalRow(
+        data[i]["Chemical ID"],
+        data[i]["Name"],
+        data[i]["Unit"],
+        data[i]["Location"],
+        data[i]["Brand"],
+        data[i]["Initial Qty."],
+        data[i]["Container Size"],
+        data[i]["Remaining Qty."],
+        (data[i]["CAS No"] || 'N/A'),
+        (data[i]["MSDS"] || 'N/A'),
+        (data[i]["Barcode"] || 'N/A')
+      );
+    }
+  } catch (generalError) {
+    console.error(generalError);
+  }
+}
+
+/**
+ * Gets all of the unit type records from the database then proceeds to populate them (using the unit_type_name) 
+ *  to the addChemicalUnit html dropdown element
+ * @void Returns nothing.
+ */
+async function prepareUnitTypeDropdown() {
+  try {
+    let data = await dbhandler.getAllUnitTypeRecords();
+
+    if (data.length == 0) {
+      console.error("Unit type table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      createNewUnitTypeRow(data[i]['Name']);
+    }
+  } catch (generalError) {
+    console.error(generalError);
+  }
+}
+
+/**
+ * Gets all of the location records from the database then proceeds to populate them (using the location_name) 
+ *  to the addChemicalLocation html dropdown element
+ * @void Returns nothing.
+ */
+async function prepareLocationDropdown() {
+  try {
+    let data = await dbhandler.getAllLocationRecords();
+
+    if (data.length == 0) {
+      console.error("Unit type table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      createNewLocationRow(data[i]['Name']);
+    }
+  } catch (generalError) {
+    console.error(generalError);
+  }
+}
