@@ -7,12 +7,13 @@ const addLocationModal = document.getElementById("addLocationModal");
 const modalBackdropLocation = document.getElementById("modalBackdropLocation");
 const cancelBtn = document.getElementById("cancelBtn");
 const addLocationForm = document.getElementById("addLocationForm");
+const addLocationError = document.getElementById("addLocationError");
 const tbody = document.querySelector("tbody");
 
 // Initialize table components
 await initialize();
 
-async function initialize(){
+async function initialize() {
   setupDropdown("masterlistBtn", "masterlistMenu");
   setupDropdown("consumablesBtn", "consumablesMenu");
   setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
@@ -71,24 +72,38 @@ addLocationForm.addEventListener("submit", async (e) => {
   const locationId = addLocationForm.locationId.value.trim();
   const locationName = addLocationForm.locationName.value.trim();
 
+  addLocationError.classList.add("hidden");
+  addLocationError.textContent = "";
   if (!locationId || !locationName) {
-    alert("Please fill in all required fields.");
+    addLocationError.textContent = "Please fill in all required fields.";
+    addLocationError.classList.remove("hidden");
     return;
   }
 
   // Performs the query in the database
   let result = await dbhandler.addLocationRecord(locationName);
 
-  if (result == null)
-      alert(`The mainHandler.addLocationRecord() DOESN'T return a status statement.`)
-  else if (result.includes('ERROR')){
-    alert(result);
+  if (result == null) {
+    addLocationError.textContent = `Something went wrong. Please try again.`;
+    addLocationError.classList.remove("hidden");
+    return;
+  } else if (result.includes('ERROR')) {
+    addLocationError.textContent = result.replace(/^ERROR:\s*/i, '');
+    addLocationError.classList.remove("hidden");
+    return;
   } else {
     let correctLocationId = result.slice(46, result.length - 1)
     createNewLocationRow(correctLocationId, locationName)
+    addLocationError.classList.add("hidden");
+    addLocationError.textContent = "";
     closeModal();
   }
+});
 
+// Hide error message when user starts typing in the name input
+document.getElementById('locationName').addEventListener('input', () => {
+  addLocationError.classList.add('hidden');
+  addLocationError.textContent = '';
 });
 
 // Optional: Add delete functionality for dynamically added rows
@@ -104,7 +119,7 @@ tbody.addEventListener("click", async (e) => {
       let result = await dbhandler.removeLocationRecordByLocationId(locationId);
 
       if (result == null)
-          alert(`The mainHandler.removeLocationByLocationId() DOESN'T return a status statement.`)
+        alert(`The mainHandler.removeLocationByLocationId() DOESN'T return a status statement.`)
       else if (result.includes('ERROR'))
         alert(result)
       else {
@@ -123,7 +138,7 @@ tbody.addEventListener("click", async (e) => {
  * @param {int} locationId 
  * @param {string} locationName 
  */
-function createNewLocationRow(locationId, locationName){
+function createNewLocationRow(locationId, locationName) {
   const tr = document.createElement("tr");
 
   tr.innerHTML = `
@@ -146,23 +161,23 @@ function createNewLocationRow(locationId, locationName){
 // ===============================================================================================
 // BACK END-RELATED METHODS
 
-async function prepareLocationTable(){
-  try{
+async function prepareLocationTable() {
+  try {
     let data = await dbhandler.getAllLocationRecords();
 
-    if (data.length == 0){
+    if (data.length == 0) {
       console.error('Location table has no records.')
       return;
     }
 
-    for (let i = 0; i < data.length; i++){
+    for (let i = 0; i < data.length; i++) {
       createNewLocationRow(
         data[i]['Location ID'],
-        data[i]['Name'] 
+        data[i]['Name']
       )
     }
 
-  } catch (generalError){
-      console.error(generalError);
+  } catch (generalError) {
+    console.error(generalError);
   }
 }

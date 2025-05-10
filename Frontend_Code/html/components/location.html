@@ -3,385 +3,315 @@
 <!-- USED TAILWIND -->
 <!-- Tesing VSCODE Git lang hehe -->
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <title>CARES | CAS Automated Resource and Equipment System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&amp;display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/Frontend_Code/css/admin.css" />
-  </head>
-  <body class="bg-[#f3f7f7] min-h-screen">
-    <nav
-      class="flex items-center justify-between px-4 md:px-8 lg:px-12 h-20 border-b border-gray-300 bg-[#f3f7f7]"
-    >
-      <!-- Left side: Logo and Title -->
-      <div class="flex items-center space-x-3">
-        <img
-          alt="CARES logo with green and yellow colors, circular emblem with text"
-          class="w-12 h-12 object-contain"
-          height="48"
-          src="/Frontend_Code/images/cas_logo.png"
-          width="48"
-        />
-        <div class="flex flex-col leading-tight">
-          <span class="font-semibold text-black text-sm"> CARES. </span>
-          <span class="text-[9px] font-semibold text-black/80 tracking-tight">
-            CENTRALIZED RESOURCE
-          </span>
-          <span class="text-[9px] font-semibold text-black/80 tracking-tight">
-            AND EQUIPMENT SYSTEM
-          </span>
-        </div>
-        <div class="border-l border-black/40 h-10 ml-4"></div>
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>CARES | CAS Automated Resource and Equipment System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/Frontend_Code/css/admin.css" />
+</head>
+
+<body class="bg-[#f3f7f7] min-h-screen">
+  <nav class="flex items-center justify-between px-4 md:px-8 lg:px-12 h-20 border-b border-gray-300 bg-[#f3f7f7]">
+    <!-- Left side: Logo and Title -->
+    <a href="/Frontend_Code/html/main.html" class="flex items-center space-x-3 group">
+      <img alt="CAS Lab logo with green and yellow colors, circular emblem with text"
+        class="w-12 h-12 object-contain transition-transform" height="48" src="/Frontend_Code/images/cas_logo.png"
+        width="48" />
+      <div class="flex flex-col leading-tight">
+        <span class="font-semibold text-black text-sm"> CARES. </span>
+        <span class="text-[9px] font-semibold text-black/80 tracking-tight">
+          CENTRALIZED RESOURCE
+        </span>
+        <span class="text-[9px] font-semibold text-black/80 tracking-tight">
+          AND EQUIPMENT SYSTEM
+        </span>
       </div>
-      <!-- Right side: Navigation Links -->
-      <ul class="flex space-x-8 text-[13px] font-normal text-black">
-        <li>
-          <a
-            class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]"
-            href="/Frontend_Code/html/main.html"
-          >
-            Dashboard
-          </a>
-        </li>
-        <li class="relative">
+      <div class="border-l border-black/40 h-10 ml-4"></div>
+    </a>
+    <!-- Right side: Navigation Links -->
+    <ul class="flex space-x-8 text-[13px] font-normal text-black">
+      <li>
+        <a class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]"
+          href="/Frontend_Code/html/main.html">
+          Dashboard
+        </a>
+      </li>
+      <li class="relative">
+        <button aria-expanded="false" aria-haspopup="true"
+          class="inline-flex items-center cursor-pointer select-none focus:outline-none" id="masterlistBtn"
+          type="button">
+          Masterlist
+          <i class="fas fa-chevron-down ml-1 text-xs"> </i>
+        </button>
+        <ul aria-labelledby="masterlistBtn"
+          class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+          id="masterlistMenu" role="menu">
+          <li role="none">
+            <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+              href="/Frontend_Code/html/components/admins.html" role="menuitem" tabindex="-1">
+              Admins
+            </a>
+          </li>
+          <li role="none">
+            <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+              href="/Frontend_Code/html/components/inventory.html" role="menuitem" tabindex="-1">
+              Inventory
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="relative">
+        <button aria-expanded="false" aria-haspopup="true"
+          class="inline-flex items-center cursor-pointer select-none focus:outline-none" id="consumablesBtn"
+          type="button">
+          Consumables
+          <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+        </button>
+        <ul aria-labelledby="consumablesBtn"
+          class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+          id="consumablesMenu" role="menu">
+          <li role="none">
+            <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+              href="/Frontend_Code/html/components/chemicals.html" role="menuitem" tabindex="-1">
+              Chemicals
+            </a>
+          </li>
+          <li role="none">
+            <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+              href="/Frontend_Code/html/components/items.html" role="menuitem" tabindex="-1">
+              Items
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="relative">
+        <button aria-expanded="false" aria-haspopup="true"
+          class="inline-flex items-center cursor-pointer select-none focus:outline-none" id="nonconsumablesBtn"
+          type="button">
+          Non-consumables
+          <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+        </button>
+        <ul aria-labelledby="nonconsumablesBtn"
+          class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+          id="nonconsumablesMenu" role="menu">
+          <li role="none">
+            <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+              href="/Frontend_Code/html/components/equipments.html" role="menuitem" tabindex="-1">
+              Equipment
+            </a>
+          </li>
+          <li role="none">
+            <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+              href="/Frontend_Code/html/components/apparatus.html" role="menuitem" tabindex="-1">
+              Apparatus
+            </a>
+          </li>
+          <li role="none">
+            <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+              href="/Frontend_Code/html/components/glassware.html" role="menuitem" tabindex="-1">
+              Glassware
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="relative">
+        <button aria-expanded="false" aria-haspopup="true"
+          class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none"
+          id="propertiesBtn" type="button">
+          Properties
+          <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+        </button>
+        <ul aria-labelledby="propertiesBtn"
+          class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+          id="propertiesMenu" role="menu">
+          <li role="none">
+            <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+              href="/Frontend_Code/html/components/unitType.html" role="menuitem" tabindex="-1">
+              Unit Type
+            </a>
+          </li>
+          <li role="none">
+            <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white" href="#" role="menuitem"
+              tabindex="-1">
+              Location
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a class="hover:underline" href="/Frontend_Code/html/components/restocks.html">
+          Restocks
+        </a>
+      </li>
+      <li>
+        <a class="hover:underline" href="/Frontend_Code/html/components/transactions.html">
+          Transactions
+        </a>
+      </li>
+      <li>
+        <a class="hover:underline" href="/Frontend_Code/html/components/statistics.html">
+          Statistics
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 mt-6">
+    <div class="flex justify-between items-center w-full">
+      <input aria-label="Search"
+        class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-64"
+        placeholder="Search..." type="search" />
+      <button aria-controls="addLocationModal" aria-haspopup="dialog" class="custom-btn ml-4" id="addLocationBtn"
+        type="button">
+        Add location
+      </button>
+    </div>
+    <h2 class="font-semibold text-gray-900 text-sm mb-3">
+      Properties - Location
+    </h2>
+    <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
+      <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <thead class="bg-white">
+          <tr>
+            <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200" scope="col">
+              Location ID
+            </th>
+            <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200" scope="col">
+              Name
+            </th>
+            <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200" scope="col"></th>
+          </tr>
+        </thead>
+        <tbody class="bg-white">
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-gray-900">1</td>
+            <td class="px-6 py-4 whitespace-nowrap text-gray-900">
+              ItemName
+            </td>
+
+            <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
+              <button aria-label="Edit location" class="text-yellow-400 hover:text-yellow-500">
+                <i class="fas fa-pencil-alt"> </i>
+              </button>
+              <button aria-label="Delete location" class="text-red-600 hover:text-red-700">
+                <i class="fas fa-trash-alt"> </i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Add Modal -->
+  <div aria-labelledby="modalTitle" aria-modal="true" class="fixed inset-0 z-50 hidden items-center justify-center"
+    id="addLocationModal" role="dialog">
+    <div class="modal-backdrop fixed inset-0 bg-black opacity-50" id="modalBackdropLocation"></div>
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
+          <span class="font-black text-xl text-black">Add Location</span>
+        </div>
+      </div>
+      <form class="space-y-4" id="addLocationForm">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="locationName">
+            Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+            id="locationName" name="locationName" required="" type="text" />
+        </div>
+        <div class="flex justify-end space-x-3 pt-4">
           <button
-            aria-expanded="false"
-            aria-haspopup="true"
-            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
-            id="masterlistBtn"
-            type="button"
-          >
-            Masterlist
-            <i class="fas fa-chevron-down ml-1 text-xs"> </i>
+            class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+            id="cancelBtn" type="button">
+            Cancel
           </button>
-          <ul
-            aria-labelledby="masterlistBtn"
-            class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
-            id="masterlistMenu"
-            role="menu"
-          >
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/admins.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Admins
-              </a>
-            </li>
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/inventory.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Inventory
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="relative">
           <button
-            aria-expanded="false"
-            aria-haspopup="true"
-            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
-            id="consumablesBtn"
-            type="button"
-          >
-            Consumables
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+            class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
+            type="submit">
+            Save
           </button>
-          <ul
-            aria-labelledby="consumablesBtn"
-            class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
-            id="consumablesMenu"
-            role="menu"
-          >
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/chemicals.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Chemicals
-              </a>
-            </li>
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/items.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Items
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="relative">
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Edit Modal -->
+  <div aria-labelledby="editLocationModalTitle" aria-modal="true"
+    class="fixed inset-0 z-50 hidden items-center justify-center" id="editLocationModal" role="dialog">
+    <div class="modal-backdrop fixed inset-0 bg-black opacity-50" id="modalBackdropEditLocation"></div>
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
+          <span class="font-black text-xl text-black">Edit Location</span>
+        </div>
+      </div>
+      <form class="space-y-4" id="editLocationForm">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="editLocationId">Location ID</label>
+          <input
+            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+            id="editLocationId" name="editLocationId" type="text" readonly />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="editLocationName">Name <span
+              class="text-red-500">*</span></label>
+          <input
+            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+            id="editLocationName" name="editLocationName" required type="text" />
+        </div>
+        <div class="flex justify-end space-x-3 pt-4">
           <button
-            aria-expanded="false"
-            aria-haspopup="true"
-            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
-            id="nonconsumablesBtn"
-            type="button"
-          >
-            Non-consumables
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+            class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+            id="cancelEditLocationBtn" type="button">
+            Cancel
           </button>
-          <ul
-            aria-labelledby="nonconsumablesBtn"
-            class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
-            id="nonconsumablesMenu"
-            role="menu"
-          >
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/equipments.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Equipment
-              </a>
-            </li>
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/apparatus.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Apparatus
-              </a>
-            </li>
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/glassware.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Glassware
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="relative">
           <button
-            aria-expanded="false"
-            aria-haspopup="true"
-            class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none"
-            id="propertiesBtn"
-            type="button"
-          >
-            Properties
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+            class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
+            type="submit">
+            Save
           </button>
-          <ul
-            aria-labelledby="propertiesBtn"
-            class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
-            id="propertiesMenu"
-            role="menu"
-          >
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/unitType.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Unit Type
-              </a>
-            </li>
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="#"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Location
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <a
-            class="hover:underline"
-            href="/Frontend_Code/html/components/restocks.html"
-          >
-            Restocks
-          </a>
-        </li>
-        <li>
-          <a
-            class="hover:underline"
-            href="/Frontend_Code/html/components/transactions.html"
-          >
-            Transactions
-          </a>
-        </li>
-        <li>
-          <a
-            class="hover:underline"
-            href="/Frontend_Code/html/components/statistics.html"
-          >
-            Statistics
-          </a>
-        </li>
-      </ul>
-    </nav>
-    <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 mt-6">
-      <div class="flex justify-between items-center w-full">
-        <input
-          aria-label="Search"
-          class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-64"
-          placeholder="Search..."
-          type="search"
-        />
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Delete Confirmation Modal -->
+  <div aria-labelledby="deleteLocationModalTitle" aria-modal="true"
+    class="fixed inset-0 z-50 hidden items-center justify-center" id="deleteLocationModal" role="dialog">
+    <div class="modal-backdrop fixed inset-0 bg-black opacity-50" id="modalBackdropDeleteLocation"></div>
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
+          <span class="font-black text-xl text-black">Delete Location</span>
+        </div>
+      </div>
+      <p class="text-gray-700 mb-6">
+        Are you sure you want to delete this location? This action cannot be
+        undone.
+      </p>
+      <div class="flex justify-end space-x-3">
         <button
-          aria-controls="addLocationModal"
-          aria-haspopup="dialog"
-          class="custom-btn ml-4"
-          id="addLocationBtn"
-          type="button"
-        >
-          Add location
+          class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+          id="cancelDeleteLocationBtn" type="button">
+          Cancel
+        </button>
+        <button
+          class="px-4 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+          id="confirmDeleteLocationBtn" type="button">
+          Delete
         </button>
       </div>
-      <h2 class="font-semibold text-gray-900 text-sm mb-3">
-        Properties - Location
-      </h2>
-      <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
-        <table class="min-w-full divide-y divide-gray-200 text-sm">
-          <thead class="bg-white">
-            <tr>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Location ID
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Name
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              ></th>
-            </tr>
-          </thead>
-          <tbody class="bg-white">
-            <tr>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">1</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                ItemName
-              </td>
-
-              <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
-                <button
-                  aria-label="Edit location"
-                  class="text-yellow-400 hover:text-yellow-500"
-                >
-                  <i class="fas fa-pencil-alt"> </i>
-                </button>
-                <button
-                  aria-label="Delete location"
-                  class="text-red-600 hover:text-red-700"
-                >
-                  <i class="fas fa-trash-alt"> </i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </main>
-
-    <!-- Modal -->
-    <div
-      aria-labelledby="modalTitle"
-      aria-modal="true"
-      class="fixed inset-0 z-50 hidden items-center justify-center"
-      id="addLocationModal"
-      role="dialog"
-    >
-      <div
-        class="modal-backdrop fixed inset-0 bg-black opacity-50"
-        id="modalBackdropLocation"
-      ></div>
-      <div
-        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
-      >
-        <h3 class="text-lg font-semibold text-gray-900 mb-4" id="modalTitle">
-          Add Location
-        </h3>
-        <form class="space-y-4" id="addLocationForm">
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="locationId"
-            >
-              Item ID
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="locationId"
-              name="locationId"
-              required=""
-              type="text"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="locationName"
-            >
-              Name
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="locationName"
-              name="locationName"
-              required=""
-              type="text"
-            />
-          </div>
-          <div class="flex justify-end space-x-3 pt-4">
-            <button
-              class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-              id="cancelBtn"
-              type="button"
-            >
-              Cancel
-            </button>
-            <button
-              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
-              type="submit"
-            >
-              Save
-            </button>
-          </div>
-        </form>
-      </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module" src="../../js/location.js"></script>
-  </body>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="../../js/location.js"></script>
+</body>
+
 </html>
