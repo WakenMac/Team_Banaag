@@ -1227,53 +1227,58 @@ export async function deleteChemicalsRecordByItemId(itemId = 0){
  * 
  * @returns A string containing the status of the deleted record (Success or Error)
  */
-export async function update_chemicals_record_by_all(
+export async function updateChemicalsRecordByAll(
         itemId, 
+        itemName,
         locationName, 
         unitTypeName, 
         brandModel,
         containerSize,
-        barcode,
-        CASNo,
-        MSDS,
-        remarks
+        barcode = '',
+        CASNo = '',
+        MSDS = '',
+        remarks = ''
     ){
     try{
-        const [ sLocationName, sUnitTypeName, sBrandModel, sBarcode, sCASNo, sMSDS, sRemarks ] = converter('string', 
-            locationName, unitTypeName, brandModel, barcode, CASNo, MSDS, remarks);
-        const [ iItemId ] = converter('string', itemId);
+        const [ sItemName, sLocationName, sUnitTypeName, sBrandModel, sBarcode, sCASNo, sMSDS, sRemarks ] = converter('string', 
+            itemName, locationName, unitTypeName, brandModel, barcode, CASNo, MSDS, remarks);
+        const [ iItemId ] = converter('int', itemId);
         const [ iContainerSize ] = converter('float', containerSize);
-
-        if (typeof sLocationName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Location Name parameter must be a string.")
+        
+        if (typeof sItemName !== 'string'){
+            console.error("PARAMETER ERROR: updateChemicalsRecordByAll's Item Name parameter must be a string.")
+            return null;
+        } else if (typeof sLocationName !== 'string'){
+            console.error("PARAMETER ERROR: updateChemicalsRecordByAll's Location Name parameter must be a string.")
             return null;
         } else if (typeof sUnitTypeName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Unit Type Name parameter must be a string.")
+            console.error("PARAMETER ERROR: updateChemicalsRecordByAll's Unit Type Name parameter must be a string.")
             return null;
         } else if (typeof sBrandModel !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Brand/Model parameter must be a string.")
+            console.error("PARAMETER ERROR: updateChemicalsRecordByAll's Brand/Model parameter must be a string.")
             return null;
         } else if (typeof sBarcode !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Barcode parameter must be a string.")
+            console.error("PARAMETER ERROR: updateChemicalsRecordByAll's Barcode parameter must be a string.")
             return null;
         } else if (typeof sCASNo !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's CAS No. parameter must be a string.")
+            console.error("PARAMETER ERROR: updateChemicalsRecordByAll's CAS No. parameter must be a string.")
             return null;
         } else if (typeof sMSDS !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's MSDS parameter must be a string.")
+            console.error("PARAMETER ERROR: updateChemicalsRecordByAll's MSDS parameter must be a string.")
             return null;
         } else if (typeof sRemarks !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Remarks parameter must be a string.")
+            console.error("PARAMETER ERROR: updateChemicalsRecordByAll's Remarks parameter must be a string.")
             return null;
         }
 
         if ((typeof iItemId !== 'number' || iItemId < 1) || (typeof iContainerSize !== 'number' || iContainerSize < 1)){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Item ID & Container Size parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: updateChemicalsRecordByAll's Item ID & Container Size parameter must be a positive non-zero integer.")
             return null;
         }
 
         const {data, error: supabaseError} = await supabaseClient.rpc('update_chemicals_record_by_all', {
             input_item_id : iItemId,
+            input_item_name : sItemName,
             input_location_name : sLocationName,
             input_unit_type_name : sUnitTypeName,
             input_brand_model : sBrandModel,
