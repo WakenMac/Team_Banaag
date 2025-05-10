@@ -303,61 +303,18 @@
         <table class="min-w-full divide-y divide-gray-200 text-sm">
           <thead class="bg-white">
             <tr>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Item ID
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Name
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Unit
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Location
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Brand
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Initial Quantity
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Container Size
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Remaining Quantity
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              ></th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200" scope="col">Item ID</th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200" scope="col">Name</th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200" scope="col">Unit</th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200" scope="col">Location</th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200" scope="col">Brand</th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200" scope="col">Initial Quantity</th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200" scope="col">Container Size</th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200" scope="col">Remaining Quantity</th>
+              <th class="px-8 py-3 text-center font-semibold text-gray-900 border-b border-gray-200" scope="col"></th>
             </tr>
           </thead>
-          <tbody id="chemicalsTableBody" class="bg-white">
+          <tbody id="chemicalsTableBody" class="bg-white text-center">
             <!-- This is just for the table body -->
             <!-- Example row will be added dynamically through CRUD -->
           </tbody>
@@ -567,189 +524,62 @@
       <div
         class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
       >
-        <h3 class="text-lg font-semibold text-gray-900 mb-4" id="modalTitle">
-          Add Chemical
-        </h3>
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-8 h-8 object-contain" />
+            <span class="font-black text-xl text-black">Add Chemical</span>
+          </div>
+        </div>
         <form class="space-y-4" id="addChemicalsForm">
           <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalId"
-            >
-              Item ID
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalId"
-              name="chemicalId"
-              required=""
-              type="text"
-              placeholder="Enter item ID"
-            />
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalId">Item ID</label>
+            <input class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent" id="chemicalId" name="chemicalId" required type="text" placeholder="Enter item ID" />
           </div>
           <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalName"
-            >
-              Name
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalName"
-              name="chemicalName"
-              required=""
-              type="text"
-              placeholder="Enter chemical name"
-            />
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalName">Name</label>
+            <input class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent" id="chemicalName" name="chemicalName" required type="text" placeholder="Enter chemical name" />
           </div>
           <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalUnit"
-            >
-              Unit
-            </label>
-            <select
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 placeholder-gray-400"
-              id="chemicalUnit"
-              name="chemicalUnit"
-              required
-            >
-              <option value="" disabled selected class="placeholder-option">
-                Select Unit
-              </option>
-              <!-- Options will be populated dynamically from the database -->
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalUnit">Unit</label>
+            <select class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 placeholder-gray-400" id="chemicalUnit" name="chemicalUnit" required>
+              <option value="" disabled selected class="placeholder-option">Select Unit</option>
               <option value="ml">mL</option>
             </select>
           </div>
           <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalLocation"
-            >
-              Location
-            </label>
-            <select
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent custom-select"
-              id="chemicalLocation"
-              name="chemicalLocation"
-              required
-            >
-              <option value="" disabled selected class="placeholder-option">
-                Select Location
-              </option>
-              <!-- Options will be populated dynamically from the database -->
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalLocation">Location</label>
+            <select class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent custom-select" id="chemicalLocation" name="chemicalLocation" required>
+              <option value="" disabled selected class="placeholder-option">Select Location</option>
               <option value="Gensan">Gensan</option>
             </select>
           </div>
           <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalBrand"
-            >
-              Brand
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalBrand"
-              name="chemicalBrand"
-              required=""
-              type="text"
-              placeholder="Enter brand"
-            />
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalBrand">Brand</label>
+            <input class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent" id="chemicalBrand" name="chemicalBrand" required type="text" placeholder="Enter brand" />
           </div>
           <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalQuantity"
-            >
-              Quantity
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalQuantity"
-              name="chemicalQuantity"
-              required=""
-              type="text"
-              placeholder="Enter quantity"
-            />
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalQuantity">Quantity</label>
+            <input class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent" id="chemicalQuantity" name="chemicalQuantity" required type="text" placeholder="Enter quantity" />
           </div>
           <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalContainerSize"
-            >
-              Container Size
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalContainerSize"
-              name="chemicalContainerSize"
-              required=""
-              type="text"
-              placeholder="Enter quantity"
-            />
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalContainerSize">Container Size</label>
+            <input class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent" id="chemicalContainerSize" name="chemicalContainerSize" required type="text" placeholder="Enter quantity" />
           </div>
           <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalCASNo"
-            >
-              CAS No.
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalCASNo"
-              name="chemicalCASNo"
-              type="number"
-              placeholder="Enter CAS number"
-            />
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalCASNo">CAS No.</label>
+            <input class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent" id="chemicalCASNo" name="chemicalCASNo" type="number" placeholder="Enter CAS number" />
           </div>
           <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalMSDS"
-            >
-              MSDS
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalMSDS"
-              name="chemicalMSDS"
-              rows="3"
-              placeholder="Enter MSDS"
-            />
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalMSDS">MSDS</label>
+            <input class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent" id="chemicalMSDS" name="chemicalMSDS" rows="3" placeholder="Enter MSDS" />
           </div>
           <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalBarCode"
-            >
-              Bar Code
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalBarCode"
-              name="chemicalBarCode"
-              type="text"
-              placeholder="Enter bar code"
-            />
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalBarCode">Bar Code</label>
+            <input class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent" id="chemicalBarCode" name="chemicalBarCode" type="text" placeholder="Enter bar code" />
           </div>
           <div class="flex justify-end space-x-3 pt-4">
-            <button
-              class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-              id="cancelBtn"
-              type="button"
-            >
-              Cancel
-            </button>
-            <button
-              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
-              type="submit"
-            >
-              Save
-            </button>
+            <button class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]" id="cancelBtn" type="button">Cancel</button>
+            <button class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]" type="submit">Save</button>
           </div>
         </form>
       </div>

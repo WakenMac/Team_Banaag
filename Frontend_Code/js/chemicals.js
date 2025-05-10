@@ -185,6 +185,7 @@ const cancelBtn = document.getElementById("cancelBtn");
 const modalBackdropAddChemical = document.getElementById(
   "modalBackdropAddChemical"
 );
+const closeAddChemicalModalBtn = document.getElementById("closeAddChemicalModalBtn");
 
 /**
  * Opens the add chemicals modal
@@ -206,6 +207,7 @@ function closeAddModal() {
 addChemicalsBtn.addEventListener("click", openAddModal);
 cancelBtn.addEventListener("click", closeAddModal);
 modalBackdropAddChemical.addEventListener("click", closeAddModal);
+if (closeAddChemicalModalBtn) closeAddChemicalModalBtn.addEventListener("click", closeAddModal);
 
 /**
  * Handles the submission of new chemical data
@@ -226,6 +228,7 @@ addChemicalsForm.addEventListener("submit", (e) => {
   const chemicalCASNo = addChemicalsForm.chemicalCASNo.value.trim();
   const chemicalMSDS = addChemicalsForm.chemicalMSDS.value.trim();
   const chemicalBarCode = addChemicalsForm.chemicalBarCode.value.trim();
+  const chemicalRemainingQuantity = ""; // placeholder for the remaining quantity, idk basig sa backend siya na part hehe
 
   if (
     !chemicalId ||
@@ -249,7 +252,8 @@ addChemicalsForm.addEventListener("submit", (e) => {
   <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalBrand}</td>
   <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalQuantity}</td>
   <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalContainerSize}</td>
-  <td class="px-6 py-4 whitespace-nowrap text-right space-x-3 flex items-center justify-end">
+  <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalRemainingQuantity}</td>
+  <td class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3">
     <button aria-label="Info" class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
       data-cas="${chemicalCASNo}"
       data-msd="${chemicalMSDS}"
