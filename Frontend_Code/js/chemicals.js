@@ -60,6 +60,7 @@ const confirmDeleteChemicalBtn = document.getElementById(
   "confirmDeleteChemicalBtn"
 );
 let chemicalRowToDelete = null;
+let initialQuantity = 0;  // Variable used to change the initial quantity of Chemical records (For updates)
 
 await initialize();
 
@@ -202,13 +203,14 @@ function populateEditForm(row) {
    *
    * NOTE: Walay 5, since I removed the input field to edit the Chemical Quantity in the edit modal
    */
+
   const fieldMap = [
     { id: "editChemicalId", idx: 0 },
     { id: "editChemicalName", idx: 1 },
     { id: "editChemicalUnit", idx: 2 },
     { id: "editChemicalLocation", idx: 3 },
     { id: "editChemicalBrand", idx: 4 },
-    { id: "editChemicalContainerSize", idx: 6 },
+    { id: "editChemicalContainerSize", idx: 6 }
   ];
 
   for (const { id, idx } of fieldMap) {
@@ -222,11 +224,13 @@ function populateEditForm(row) {
       continue;
     }
 
-    if (idx == 5 || idx == 6)
+    if (idx == 6)
 	    el.value = cells[idx].textContent.replace((" " + cells[2].textContent.trim()), "");
     else
       el.value = cells[idx].textContent;
   }
+
+  initialQuantity = cells[5].textContent.replace((" " + cells[2].textContent.trim()), "");
 
   const infoBtn = row.querySelector('button[aria-label="Info"]');
   let cas = "",
@@ -237,6 +241,7 @@ function populateEditForm(row) {
     msd = infoBtn.getAttribute("data-msd") || "";
     barcode = infoBtn.getAttribute("data-barcode") || "";
   }
+
   const casField = document.getElementById("editChemicalCASNo");
   const msdsField = document.getElementById("editChemicalMSDS");
   const barcodeField = document.getElementById("editChemicalBarCode");
@@ -291,7 +296,7 @@ editChemicalForm.addEventListener("submit", async (e) => {
     alert(result);
   } else {
     updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit, editChemicalLocation, editChemicalBrand,
-      editChemicalContainerSize, editChemicalCASNo, editChemicalMSDS, editChemicalBarCode);
+      initialQuantity, editChemicalContainerSize, editChemicalCASNo, editChemicalMSDS, editChemicalBarCode);
     console.log(result);
     closeEditModal();
   }
@@ -698,12 +703,18 @@ function updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit,
 
   rows.forEach((row) => {
     if (row.children[0].textContent === editChemicalId) {
+      let originalUnit = row.children[2].textContent;
+
+      console.log(row.children[5].textContent);
+      console.log(editChemicalContainerSize);
+
       row.children[1].textContent = editChemicalName;
       row.children[2].textContent = editChemicalUnit;
       row.children[3].textContent = editChemicalLocation;
       row.children[4].textContent = editChemicalBrand;
-      row.children[5].textContent = editChemicalContainerSize + " " + editChemicalUnit;
-      row.children[6].textContent = row.children[6].textContent.replace((" " + row.children[2].textContent), "") + " " + editChemicalUnit;
+      row.children[5].textContent = editChemicalQuantity + " " + editChemicalUnit;
+      row.children[6].textContent = row.children[6].textContent.replace((" " + originalUnit), "") + " " + editChemicalUnit;
+      row.children[7].textContent = row.children[7].textContent.replace((" " + originalUnit), "") + " " + editChemicalUnit;
       const infoBtn = row.querySelector('button[aria-label="Info"]');
       if (infoBtn) {
         infoBtn.setAttribute("data-cas", editChemicalCASNo);

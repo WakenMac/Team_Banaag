@@ -1240,6 +1240,8 @@ export async function updateChemicalsRecordByAll(
         remarks = ''
     ){
     try{
+        console.log(barcode, CASNo, MSDS);
+
         const [ sItemName, sLocationName, sUnitTypeName, sBrandModel, sBarcode, sCASNo, sMSDS, sRemarks ] = converter('string', 
             itemName, locationName, unitTypeName, brandModel, barcode, CASNo, MSDS, remarks);
         const [ iItemId ] = converter('int', itemId);
@@ -1416,6 +1418,6 @@ export function converter(condition = '', ...objectArray){
             newArray[i] = parseFloat(String(objectArray[i]))
 
     }
-    
+
     return newArray;
 }
