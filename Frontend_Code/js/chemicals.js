@@ -158,8 +158,8 @@ function populateEditForm(row) {
   setSelectValue("editChemicalUnit", cells[2].textContent.trim());
   setSelectValue("editChemicalLocation", cells[3].textContent.trim());
   document.getElementById("editChemicalBrand").value = cells[4].textContent;
-  document.getElementById("editChemicalQuantity").value = cells[5].textContent;
-  document.getElementById("editChemicalContainerSize").value = cells[6].textContent;
+  document.getElementById("editChemicalQuantity").value = cells[5].textContent.replace((" " + cells[2].textContent.trim()), "");
+  document.getElementById("editChemicalContainerSize").value = cells[6].textContent.replace((" " + cells[2].textContent.trim()), "");
 
   const infoBtn = row.querySelector('button[aria-label="Info"]');
   let cas = "",
@@ -192,25 +192,21 @@ editChemicalForm.addEventListener("submit", async (e) => {
   const editChemicalMSDS = document.getElementById("editChemicalMSDS").value.trim();
   const editChemicalBarCode = document.getElementById("editChemicalBarCode").value.trim();
 
-  const rows = chemicalsTableBody.querySelectorAll("tr");
-  rows.forEach((row) => {
-    if (row.children[0].textContent === editChemicalId) {
-      row.children[1].textContent = editChemicalName;
-      row.children[2].textContent = editChemicalUnit;
-      row.children[3].textContent = editChemicalLocation;
-      row.children[4].textContent = editChemicalBrand;
-      row.children[5].textContent = editChemicalQuantity;
-      row.children[6].textContent = editChemicalContainerSize;
-      const infoBtn = row.querySelector('button[aria-label="Info"]');
-      if (infoBtn) {
-        infoBtn.setAttribute("data-cas", editChemicalCASNo);
-        infoBtn.setAttribute("data-msd", editChemicalMSDS);
-        infoBtn.setAttribute("data-barcode", editChemicalBarCode);
-      }
-    }
-  });
+  let result = await dbhandler.updateChemicalsRecordByAll(
+    editChemicalId, editChemicalName, editChemicalLocation, editChemicalUnit, editChemicalBrand, editChemicalContainerSize, editChemicalBarCode, 
+    editChemicalCASNo, editChemicalMSDS
+  )
 
-  closeEditModal();
+  if (result == null)
+      alert(`The mainHandler.updateChemicalsRecordByAll() DOESN'T return a status statement.`)
+  else if (result.includes('ERROR')){
+    alert(result);
+  } else {
+    updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit, editChemicalLocation, editChemicalBrand, editChemicalQuantity,
+      editChemicalContainerSize, editChemicalCASNo, editChemicalMSDS, editChemicalBarCode);
+    console.log(result);
+    closeEditModal();
+  }
 });
 
 // Add Event Listener for Edit Buttons
@@ -475,9 +471,9 @@ function createNewChemicalRow(
     <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalUnit}</td>
     <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalLocation}</td>
     <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalBrand}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalInitialQuantity} ${chemicalUnit}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalContainerSize} ${chemicalUnit}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalRemainingQuantity} ${chemicalUnit}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalInitialQuantity}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalContainerSize}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${chemicalRemainingQuantity}</td>
     <td class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3">
       <button aria-label="Info" class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
         data-cas="${chemicalCASNo}"
@@ -527,6 +523,31 @@ function createNewLocationRow(locationName) {
   editChemicalLocation.appendChild(tr2);
 }
 
+
+function updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit, editChemicalLocation, editChemicalBrand, editChemicalQuantity,
+  editChemicalContainerSize, editChemicalCASNo, editChemicalMSDS, editChemicalBarCode
+){
+  const rows = chemicalsTableBody.querySelectorAll("tr");
+
+  rows.forEach((row) => {
+    if (row.children[0].textContent === editChemicalId) {
+      row.children[1].textContent = editChemicalName;
+      row.children[2].textContent = editChemicalUnit;
+      row.children[3].textContent = editChemicalLocation;
+      row.children[4].textContent = editChemicalBrand;
+      row.children[5].textContent = editChemicalQuantity + " " + editChemicalUnit;
+      row.children[6].textContent = editChemicalContainerSize + " " + editChemicalUnit;
+      row.children[7].textContent = row.children[7].textContent.replace((" " + row.children[2].textContent), "") + " " + editChemicalUnit;
+      const infoBtn = row.querySelector('button[aria-label="Info"]');
+      if (infoBtn) {
+        infoBtn.setAttribute("data-cas", editChemicalCASNo);
+        infoBtn.setAttribute("data-msd", editChemicalMSDS);
+        infoBtn.setAttribute("data-barcode", editChemicalBarCode);
+      }
+    }
+  });
+}
+
 // ===============================================================================================
 // BACK END-RELATED METHODS
 
@@ -538,6 +559,8 @@ async function prepareChemicalsTable() {
   try {
     let data = await dbhandler.getAllChemicalRecords();
 
+    console.log(data.length);
+
     if (data.length == 0) {
       console.error("Chemical table has no records.");
       return;
@@ -545,7 +568,7 @@ async function prepareChemicalsTable() {
 
     for (let i = 0; i < data.length; i++) {
       createNewChemicalRow(
-        data[i]["Chemical ID"],
+        data[i]["Item ID"],
         data[i]["Name"],
         data[i]["Unit"],
         data[i]["Location"],
