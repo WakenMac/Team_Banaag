@@ -288,27 +288,7 @@
             </tr>
           </thead>
           <tbody class="bg-white">
-            <tr>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">1</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                UnitType 1
-              </td>
-
-              <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
-                <button
-                  aria-label="Edit unit type"
-                  class="text-yellow-400 hover:text-yellow-500"
-                >
-                  <i class="fas fa-pencil-alt"> </i>
-                </button>
-                <button
-                  aria-label="Delete unit type"
-                  class="text-red-600 hover:text-red-700"
-                >
-                  <i class="fas fa-trash-alt"> </i>
-                </button>
-              </td>
-            </tr>
+            <!-- Unit Type Table -->
           </tbody>
         </table>
       </div>
@@ -324,7 +304,7 @@
     >
       <div
         class="modal-backdrop fixed inset-0 bg-black opacity-50"
-        id="modalBackdropUnitType"
+        id="modalBackdropEditUnitType"
       ></div>
       <div
         class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
@@ -407,23 +387,25 @@
             >
               Unit Type ID
             </label>
-            <input class="w-full rounded-md border border-gray-300 px-3 py-2focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent" 
-            id="unitTypeId" 
-            name="unitTypeId"
-            required="" 
-            type="text" />
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="unitTypeId"
+              name="unitTypeId"
+              required=""
+              type="text"
+            />
           </div>
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="editUnitTypeName"
+              for="unitTypeName"
             >
               Name
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="editUnitTypeName"
-              name="editUnitTypeName"
+              id="unitTypeName"
+              name="unitTypeName"
               required=""
               type="text"
             />

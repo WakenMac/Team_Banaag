@@ -9,6 +9,14 @@ const cancelBtn = document.getElementById("cancelBtn");
 const addUnitTypeForm = document.getElementById("addUnitTypeForm");
 const tbody = document.querySelector("tbody");
 
+// Initialize modals for editing
+const editUnitTypeModal = document.getElementById("editUnitTypeModal");
+const editUnitTypeForm = document.getElementById("editUnitTypeForm");
+const cancelBtnEditUnitType = document.getElementById("cancelBtnEditUnitType");
+const modalBackdropEditUnitType = document.getElementById(
+  "modalBackdropEditUnitType"
+);
+
 // Initialize table components
 await initialize();
 
@@ -50,6 +58,79 @@ function setupDropdown(buttonId, menuId) {
   });
 }
 
+/**
+ * Opens the edit modal for the selected unit type
+ * @param {int} unitTypeId Primary key of the unitType table
+ * @param {string} unitTypeName Name of the unitType to be edited
+ */
+
+function openEditModal(unitTypeId, unitTypeName) {
+  editUnitTypeModal.classList.remove("hidden");
+  editUnitTypeModal.classList.add("flex");
+}
+
+/**
+ * CLoses the edit modal for the selected unit type
+ */
+function closeEditModal() {
+  editUnitTypeModal.classList.add("hidden");
+  editUnitTypeModal.classList.remove("flex");
+  editUnitTypeForm.reset();
+}
+
+cancelBtnEditUnitType.addEventListener("click", closeEditModal);
+modalBackdropEditUnitType.addEventListener("click", closeEditModal);
+
+/**
+ * Populates the edit modal with the selected unit type's data
+ */
+function populateEditForm(row) {
+  const cells = row.children;
+  document.getElementById("editUnitTypeId").value = cells[0].textContent;
+  document.getElementById("editUnitTypeName").value = cells[1].textContent;
+  openEditModal();
+}
+
+// Move event listeners outside of populateEditForm
+editUnitTypeForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const editUnitTypeId = document.getElementById("editUnitTypeId").value.trim();
+  const editUnitTypeName = document.getElementById("editUnitTypeName").value.trim();
+
+  if (!editUnitTypeId || !editUnitTypeName) {
+    alert("Please fill in all required fields.");
+    return;
+  }
+
+  let result = await dbhandler.updateUnitTypeRecord(editUnitTypeId, editUnitTypeName);
+
+  if (result == null) {
+    alert("The mainHandler.updateUnitTypeRecord() DOESN'T return a status statement.");
+  } else if (result.includes("ERROR")) {
+    alert(result);
+  } else {
+    // Update the row in the table
+    const rows = tbody.querySelectorAll("tr");
+    rows.forEach((row) => {
+      if (row.children[0].textContent === editUnitTypeId) {
+        row.children[1].textContent = editUnitTypeName;
+      }
+    });
+    closeEditModal();
+  }
+});
+
+// Add click handler for edit buttons
+tbody.addEventListener("click", (e) => {
+  if (
+    e.target.closest("button") &&
+    e.target.closest("button").getAttribute("aria-label") === "Edit unit type"
+  ) {
+    const row = e.target.closest("tr");
+    populateEditForm(row);
+  }
+});
+
 function openModal() {
   addUnitTypeModal.classList.remove("hidden");
   addUnitTypeModal.classList.add("flex");
@@ -68,8 +149,8 @@ modalBackdropUnitType.addEventListener("click", closeModal);
 addUnitTypeForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const unitTypeId = addUnitTypeForm.unitTypeId.value.trim();
-  const unitTypeName = addUnitTypeForm.unitTypeName.value.trim();
+  const unitTypeId = document.getElementById("unitTypeId").value.trim();
+  const unitTypeName = document.getElementById("unitTypeName").value.trim();
 
   if (!unitTypeId || !unitTypeName) {
     alert("Please fill in all required fields.");
@@ -79,15 +160,17 @@ addUnitTypeForm.addEventListener("submit", async (e) => {
   let result = await dbhandler.addUnitTypeRecord(unitTypeName);
 
   if (result == null) {
-    alert(`The mainHandler.addUnitTypeRecord() DOESN'T return a status statement.`);
+    alert(
+      `The mainHandler.addUnitTypeRecord() DOESN'T return a status statement.`
+    );
     closeModal();
   } else if (result.includes("ERROR")) {
     alert(result);
   } else {
-      console.log(result);
-      let newUnitTypeId = result.slice(47, result.length - 1);
-      createNewUnitTypeRow(newUnitTypeId, unitTypeName);
-      closeModal();
+    console.log(result);
+    let newUnitTypeId = result.slice(47, result.length - 1);
+    createNewUnitTypeRow(newUnitTypeId, unitTypeName);
+    closeModal();
   }
 });
 
@@ -146,23 +229,19 @@ function createNewUnitTypeRow(unitTypeId, unitTypeName) {
 // ===============================================================================================
 // BACK END-RELATED METHODS
 
-async function prepareUnitTypeTable(){
-  try{
+async function prepareUnitTypeTable() {
+  try {
     let data = await dbhandler.getAllUnitTypeRecords();
 
-    if (data.length == 0){
-      console.error('Unit type table has no records.')
+    if (data.length == 0) {
+      console.error("Unit type table has no records.");
       return;
     }
 
-    for (let i = 0; i < data.length; i++){
-      createNewUnitTypeRow(
-        data[i]['Unit Type ID'],
-        data[i]['Name'] 
-      )
+    for (let i = 0; i < data.length; i++) {
+      createNewUnitTypeRow(data[i]["Unit Type ID"], data[i]["Name"]);
     }
-
-  } catch (generalError){
-      console.error(generalError);
+  } catch (generalError) {
+    console.error(generalError);
   }
 }
