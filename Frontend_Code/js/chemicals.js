@@ -15,8 +15,6 @@ import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
 // Initialize Compoenents
 
-
-
 // Dropdown elements
 const addChemicalLocation = document.getElementById("chemicalLocation");
 const addChemicalUnit = document.getElementById("chemicalUnit");
@@ -102,7 +100,6 @@ async function initialize() {
     "N/A"
   );
 
-
   await dbhandler.testPresence();
   await prepareChemicalsTable();
 
@@ -171,10 +168,41 @@ function closeEditModal() {
  * Populates the edit form with data from the selected chemical
  * @param {HTMLElement} row - The table row containing chemical data
  */
+
 function populateEditForm(row) {
   const cells = row.children;
   console.log("Row cells:", cells);
 
+  /** SLIGHTTT DOCUMENTATION FOR fieldMap:
+   * Maps table cell values to corresponding input fields in the edit modal.
+   *
+   * The `fieldMap` array defines which table column (by index) should populate which
+   * input field (by its DOM id) in the edit modal. This allows for a concise and
+   * maintainable way to assign values from a table row to the modal's form fields.
+   *
+   * For each mapping:
+   *   - `id`: The id of the input element in the edit modal.
+   *   - `idx`: The index of the cell in the table row whose value should be assigned.
+   *
+   * The loop iterates over each mapping, finds the input element and the corresponding
+   * table cell, and assigns the cell's text content to the input's value.
+   * If an input or cell is missing, it logs an error for easier debugging.
+   *
+   * Example:
+   *   If the table row is:
+   *     <tr>
+   *       <td>CHEM001</td>   // idx: 0
+   *       <td>Acetone</td>   // idx: 1
+   *       <td>Litre</td>     // idx: 2
+   *       ...
+   *     </tr>
+   *   Then:
+   *     document.getElementById('editChemicalId').value = cells[0].textContent;
+   *     document.getElementById('editChemicalName').value = cells[1].textContent;
+   *     ...
+   *
+   * NOTE: Walay 5, since I removed the input field to edit the Chemical Quantity in the edit modal
+   */
   const fieldMap = [
     { id: "editChemicalId", idx: 0 },
     { id: "editChemicalName", idx: 1 },
@@ -386,7 +414,6 @@ chemicalsTableBody.addEventListener("click", (e) => {
   }
 });
 
-
 function openDeleteChemicalModal(row) {
   chemicalRowToDelete = row;
   deleteChemicalModal.classList.remove("hidden");
@@ -416,7 +443,6 @@ confirmDeleteChemicalBtn.addEventListener("click", async () => {
 // Add event listeners for closing the delete modal
 cancelDeleteChemicalBtn.addEventListener("click", closeDeleteChemicalModal);
 modalBackdropDeleteChemical.addEventListener("click", closeDeleteChemicalModal);
-
 
 //=================================================================================================================================
 // Tooltip Functionality
@@ -459,8 +485,9 @@ chemicalsTableBody.addEventListener("mouseover", function (e) {
 
   // Position the tooltip
   const rect = btn.getBoundingClientRect();
-  tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - tooltip.offsetWidth / 2
-    }px`;
+  tooltip.style.left = `${
+    rect.left + window.scrollX + rect.width / 2 - tooltip.offsetWidth / 2
+  }px`;
   tooltip.style.top = `${rect.bottom + window.scrollY + 8}px`;
 
   // Remove tooltip on mouseout
