@@ -1302,6 +1302,48 @@ export async function updateChemicalsRecordByAll(
     }
 }
 
+/**
+ /**
+ * Method to update an existing record's remarks in the Chemicals Table based on its Item ID
+ * 
+ * @param {int} chemicalId                      Primary key of the Chemicals table
+ * @param {string} chemicalBarCode              Barcode of the chemical to be added
+ * 
+ * @returns A string containing the status of the deleted record (Success or Error)
+ */
+export async function updateChemicalRemarkByItemId(itemId, remarks = ''){
+    try{
+        const [ sRemarks ] = converter('string', remarks);
+        const [ iItemId ] = converter('int', itemId);
+        
+        if (typeof sRemarks !== 'string'){
+            console.error("PARAMETER ERROR: updateChemicalsRecordByAll's Remarks parameter must be a string.")
+            return null;
+        }
+
+        if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: updateChemicalsRecordByAll's Item ID & Container Size parameter must be a positive non-zero integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_chemicals_remark_by_item_id', {
+            input_item_id : iItemId,
+            input_remarks : sRemarks
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
 
 // ======================================================================================================================================
 // Methods for Restocks
@@ -1374,7 +1416,6 @@ export function converter(condition = '', ...objectArray){
             newArray[i] = parseFloat(String(objectArray[i]))
 
     }
-
-    console.log(newArray);
+    
     return newArray;
 }

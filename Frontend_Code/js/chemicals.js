@@ -222,7 +222,11 @@ function populateEditForm(row) {
       console.error(`Table cell index ${idx} not found in row!`);
       continue;
     }
-    el.value = cells[idx].textContent;
+
+    if (idx == 5 || idx == 6)
+	    el.value = cells[idx].textContent.replace((" " + cells[2].textContent.trim()), "");
+    else
+      el.value = cells[idx].textContent;
   }
 
   const infoBtn = row.querySelector('button[aria-label="Info"]');
@@ -287,7 +291,7 @@ editChemicalForm.addEventListener("submit", async (e) => {
   else if (result.includes('ERROR')){
     alert(result);
   } else {
-    updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit, editChemicalLocation, editChemicalBrand, editChemicalQuantity,
+    updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit, editChemicalLocation, editChemicalBrand,
       editChemicalContainerSize, editChemicalCASNo, editChemicalMSDS, editChemicalBarCode);
     console.log(result);
     closeEditModal();
@@ -351,12 +355,10 @@ addChemicalsForm.addEventListener("submit", async (e) => {
   // Conditions that are commented are to be removed~
   // Hindi ko lang muna tinanggal just in case may changes na gagawin - Waks
   if (
-    // !chemicalId ||
     !chemicalName ||
     !chemicalUnit ||
     !chemicalLocation ||
     !chemicalBrand ||
-    // !chemicalQuantity ||
     !chemicalContainerSize
   ) {
     alert("Please fill in all required fields.");
@@ -427,11 +429,13 @@ function closeDeleteChemicalModal() {
 confirmDeleteChemicalBtn.addEventListener("click", async () => {
   if (chemicalRowToDelete) {
     const chemicalId = chemicalRowToDelete.children[0].textContent;
-    let result = await dbhandler.removeChemicalRecordByChemicalId(chemicalId);
+
+    let result = await dbhandler.deleteChemicalsRecordByItemId(chemicalId);
     if (result && result.includes("ERROR")) {
       alert(result);
       return;
     }
+    console.log(result);
     chemicalRowToDelete.remove();
     closeDeleteChemicalModal();
   }
@@ -507,6 +511,7 @@ function openRemarksModal(chemicalId) {
   const remarksBtn = document.querySelector(
     `button[data-chemical-id="${chemicalId}"]`
   );
+
   const existingRemarks = remarksBtn.getAttribute("data-remarks");
   if (existingRemarks) {
     document.getElementById("remarksText").value = existingRemarks;
@@ -545,7 +550,7 @@ chemicalsTableBody.addEventListener("click", (e) => {
  * Blue: Has remarks
  * Gray: No remarks
  */
-remarksForm.addEventListener("submit", (e) => {
+remarksForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const chemicalId = document.getElementById("remarksChemicalId").value;
   const remarks = document.getElementById("remarksText").value.trim();
@@ -554,6 +559,15 @@ remarksForm.addEventListener("submit", (e) => {
   const remarksBtn = document.querySelector(
     `button[data-chemical-id="${chemicalId}"]`
   );
+
+  // Updates the remarks in the database
+  let result = await dbhandler.updateChemicalRemarkByItemId(chemicalId, remarks);
+
+  if (result && result.includes("ERROR")){
+    alert(result);
+    return;
+  }
+
   if (remarks) {
     remarksBtn.classList.remove("text-gray-700", "border-gray-700");
     remarksBtn.classList.add("text-blue-600", "border-blue-600");
@@ -583,7 +597,7 @@ remarksForm.addEventListener("submit", (e) => {
  * @param {string} chemicalMSDS               MSDS of the chemical to be added
  * @param {string} chemicalBarCode            Barcode of the chemical to be added
  */
-function createNewChemicalRow(
+async function createNewChemicalRow(
   chemicalId,
   chemicalName,
   chemicalUnit,
@@ -656,6 +670,29 @@ function createNewLocationRow(locationName) {
   editChemicalLocation.appendChild(tr2);
 }
 
+/**
+ * Method to add an existing remarks to the remarksText element
+ * @param {string} remarks The remarks of the chemical
+ * @param {int} chemicalId The primary key of the Chemical table.
+ */
+async function createNewRemarks(remarks, chemicalId){
+  document.getElementById("remarksText").value = remarks;
+
+  const remarksBtn = document.querySelector(
+    `button[data-chemical-id="${chemicalId}"]`
+  );
+
+  if (remarks) {
+    remarksBtn.classList.remove("text-gray-700", "border-gray-700");
+    remarksBtn.classList.add("text-blue-600", "border-blue-600");
+    remarksBtn.setAttribute("data-remarks", remarks);
+  } else {
+    remarksBtn.classList.remove("text-blue-600", "border-blue-600");
+    remarksBtn.classList.add("text-gray-700", "border-gray-700");
+    remarksBtn.removeAttribute("data-remarks");
+  }
+}
+
 
 function updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit, editChemicalLocation, editChemicalBrand, editChemicalQuantity,
   editChemicalContainerSize, editChemicalCASNo, editChemicalMSDS, editChemicalBarCode
@@ -668,9 +705,8 @@ function updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit,
       row.children[2].textContent = editChemicalUnit;
       row.children[3].textContent = editChemicalLocation;
       row.children[4].textContent = editChemicalBrand;
-      row.children[5].textContent = editChemicalQuantity + " " + editChemicalUnit;
-      row.children[6].textContent = editChemicalContainerSize + " " + editChemicalUnit;
-      row.children[7].textContent = row.children[7].textContent.replace((" " + row.children[2].textContent), "") + " " + editChemicalUnit;
+      row.children[5].textContent = editChemicalContainerSize + " " + editChemicalUnit;
+      row.children[6].textContent = row.children[6].textContent.replace((" " + row.children[2].textContent), "") + " " + editChemicalUnit;
       const infoBtn = row.querySelector('button[aria-label="Info"]');
       if (infoBtn) {
         infoBtn.setAttribute("data-cas", editChemicalCASNo);
@@ -700,7 +736,7 @@ async function prepareChemicalsTable() {
     }
 
     for (let i = 0; i < data.length; i++) {
-      createNewChemicalRow(
+      await createNewChemicalRow(
         data[i]["Item ID"],
         data[i]["Name"],
         data[i]["Unit"],
@@ -713,6 +749,9 @@ async function prepareChemicalsTable() {
         data[i]["MSDS"] || "N/A",
         data[i]["Barcode"] || "N/A"
       );
+
+      await createNewRemarks(data[i]["Remarks"], data[i]["Item ID"]);
+      console.log(data[i]["Remarks"]);
     }
   } catch (generalError) {
     console.error(generalError);
