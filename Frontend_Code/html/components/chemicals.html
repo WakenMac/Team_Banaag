@@ -26,7 +26,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <title>CARES | CAS Automated Resource and Equipment System</title>
+    <title>CARES | CAS Lab Inventory</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
@@ -219,7 +219,7 @@
             <li role="none">
               <a
                 class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="#"
+                href="/Frontend_Code/html/components/unitType.html"
                 role="menuitem"
                 tabindex="-1"
               >
@@ -293,7 +293,7 @@
           id="addChemicalsBtn"
           type="button"
         >
-          Add Chemicals
+          Add Chemical
         </button>
       </div>
       <h2 class="font-semibold text-gray-900 text-sm mb-3 mt-4">
@@ -337,7 +337,19 @@
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Quantity
+                Initial Quantity
+              </th>
+              <th
+                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                scope="col"
+              >
+                Container Size
+              </th>
+              <th
+                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                scope="col"
+              >
+                Remaining Quantity
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
@@ -368,12 +380,16 @@
       <div
         class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
       >
-        <h3
-          class="text-lg font-semibold text-gray-900 mb-4"
-          id="editModalTitle"
-        >
-          Edit Chemicals
-        </h3>
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img
+              src="/Frontend_Code/images/cas_logo.png"
+              alt="CARES logo"
+              class="w-12 h-12 object-contain"
+            />
+            <span class="font-black text-3xl text-black">Edit Chemical</span>
+          </div>
+        </div>
         <form class="space-y-4" id="editChemicalForm">
           <div>
             <label
@@ -402,7 +418,6 @@
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
               id="editChemicalName"
               name="editChemicalName"
-              required
               type="text"
               placeholder="Enter chemical name"
             />
@@ -423,6 +438,9 @@
               <option value="" disabled selected class="placeholder-option">
                 Select Unit
               </option>
+              <option value="mL">mL</option>
+              <option value="L">L</option>
+              <option value="g">g</option>
               <!-- Options will be populated dynamically from the database -->
             </select>
           </div>
@@ -437,11 +455,11 @@
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
               id="editChemicalLocation"
               name="editChemicalLocation"
-              required
             >
               <option value="" disabled selected class="placeholder-option">
                 Select Location
               </option>
+              <option value="Gensan">Gensan</option>
               <!-- Options will be populated dynamically from the database -->
             </select>
           </div>
@@ -456,7 +474,6 @@
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
               id="editChemicalBrand"
               name="editChemicalBrand"
-              required
               type="text"
               placeholder="Enter brand"
             />
@@ -472,9 +489,23 @@
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
               id="editChemicalQuantity"
               name="editChemicalQuantity"
-              required
               type="text"
               placeholder="Enter quantity"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="editChemicalContainerSize"
+            >
+              Container Size
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="editChemicalContainerSize"
+              name="editChemicalContainerSize"
+              type="text"
+              placeholder="Enter container size"
             />
           </div>
           <div>
@@ -489,21 +520,23 @@
               id="editChemicalCASNo"
               name="editChemicalCASNo"
               type="number"
+              placeholder="Enter CAS number"
             />
           </div>
 
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="editChemicalMSD"
+              for="editChemicalMSDS"
             >
-              MSD
+              MSDS
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="editChemicalMSD"
-              name="editChemicalMSD"
-              rows="3"
+              id="editChemicalMSDS"
+              name="editChemicalMSDS"
+              type="text"
+              placeholder="Enter MSDS"
             />
           </div>
           <div>
@@ -518,6 +551,7 @@
               id="editChemicalBarCode"
               name="editChemicalBarCode"
               type="text"
+              placeholder="Enter bar code"
             />
           </div>
 
@@ -555,9 +589,24 @@
       <div
         class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
       >
-        <h3 class="text-lg font-semibold text-gray-900 mb-4" id="modalTitle">
-          Add Chemicals
-        </h3>
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img
+              src="/Frontend_Code/images/cas_logo.png"
+              alt="CARES logo"
+              class="w-12 h-12 object-contain"
+            />
+            <span class="font-black text-3xl text-black">Add Chemical</span>
+          </div>
+          <button
+            type="button"
+            aria-label="Close"
+            id="closeAddChemicalModalBtn"
+            class="text-black text-3xl font-light hover:text-gray-600 focus:outline-none"
+          >
+            &times;
+          </button>
+        </div>
         <form class="space-y-4" id="addChemicalsForm">
           <div>
             <label
@@ -604,9 +653,13 @@
               name="chemicalUnit"
               required
             >
-              <option value="" disabled selected hidden>Select Unit</option>
+              <option value="" disabled selected class="placeholder-option">
+                Select Unit
+              </option>
               <!-- Options will be populated dynamically from the database -->
-              <option value="ml">mL</option>
+              <option value="mL">mL</option>
+              <option value="L">L</option>
+              <option value="g">g</option>
             </select>
           </div>
           <div>
@@ -656,6 +709,22 @@
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
               id="chemicalQuantity"
               name="chemicalQuantity"
+              required=""
+              type="text"
+              placeholder="Enter quantity"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="chemicalContainerSize"
+            >
+              Container Size
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="chemicalContainerSize"
+              name="chemicalContainerSize"
               required=""
               type="text"
               placeholder="Enter quantity"
