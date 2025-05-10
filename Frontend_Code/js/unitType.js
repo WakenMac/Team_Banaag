@@ -21,10 +21,18 @@ const modalBackdropEditUnitType = document.getElementById(
 await initialize();
 
 async function initialize() {
+  // Prepares the dropdown elements
   setupDropdown("masterlistBtn", "masterlistMenu");
   setupDropdown("consumablesBtn", "consumablesMenu");
   setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
   setupDropdown("propertiesBtn", "propertiesMenu");
+
+  // Prepares the modals
+  addUnitTypeBtn.addEventListener("click", openModal);
+  cancelBtn.addEventListener("click", closeModal);
+  modalBackdropUnitType.addEventListener("click", closeModal);
+  cancelBtnEditUnitType.addEventListener("click", closeEditModal);
+  modalBackdropEditUnitType.addEventListener("click", closeEditModal);
 
   // Prepares the contents of the admin table
   await dbhandler.testPresence();
@@ -63,14 +71,13 @@ function setupDropdown(buttonId, menuId) {
  * @param {int} unitTypeId Primary key of the unitType table
  * @param {string} unitTypeName Name of the unitType to be edited
  */
-
 function openEditModal(unitTypeId, unitTypeName) {
   editUnitTypeModal.classList.remove("hidden");
   editUnitTypeModal.classList.add("flex");
 }
 
 /**
- * CLoses the edit modal for the selected unit type
+ * Closes the edit modal for the selected unit type
  */
 function closeEditModal() {
   editUnitTypeModal.classList.add("hidden");
@@ -78,8 +85,16 @@ function closeEditModal() {
   editUnitTypeForm.reset();
 }
 
-cancelBtnEditUnitType.addEventListener("click", closeEditModal);
-modalBackdropEditUnitType.addEventListener("click", closeEditModal);
+function openModal() {
+  addUnitTypeModal.classList.remove("hidden");
+  addUnitTypeModal.classList.add("flex");
+}
+
+function closeModal() {
+  addUnitTypeModal.classList.add("hidden");
+  addUnitTypeModal.classList.remove("flex");
+  addUnitTypeForm.reset();
+}
 
 /**
  * Populates the edit modal with the selected unit type's data
@@ -102,7 +117,7 @@ editUnitTypeForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  let result = await dbhandler.updateUnitTypeRecord(editUnitTypeId, editUnitTypeName);
+  let result = await dbhandler.updateUnitTypeRecordName(editUnitTypeId, editUnitTypeName);
 
   if (result == null) {
     alert("The mainHandler.updateUnitTypeRecord() DOESN'T return a status statement.");
@@ -131,21 +146,6 @@ tbody.addEventListener("click", (e) => {
   }
 });
 
-function openModal() {
-  addUnitTypeModal.classList.remove("hidden");
-  addUnitTypeModal.classList.add("flex");
-}
-
-function closeModal() {
-  addUnitTypeModal.classList.add("hidden");
-  addUnitTypeModal.classList.remove("flex");
-  addUnitTypeForm.reset();
-}
-
-addUnitTypeBtn.addEventListener("click", openModal);
-cancelBtn.addEventListener("click", closeModal);
-modalBackdropUnitType.addEventListener("click", closeModal);
-
 addUnitTypeForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -165,7 +165,7 @@ addUnitTypeForm.addEventListener("submit", async (e) => {
     );
     closeModal();
   } else if (result.includes("ERROR")) {
-    alert(result);
+      alert(result);
   } else {
     console.log(result);
     let newUnitTypeId = result.slice(47, result.length - 1);
@@ -186,11 +186,12 @@ tbody.addEventListener("click", async (e) => {
     if (row) {
       let result = await dbhandler.removeUnitTypeRecordByUnitTypeId(unitTypeId);
 
-      if (result == null)
+      if (result == null) 
         alert(
           `The mainHandler.removeUnitTypeRecordByUnitTypeId() DOESN'T return a status statement.`
         );
-      else if (result.includes("ERROR")) alert(result);
+      else if (result.includes("ERROR")) 
+        alert(result);
       else {
         console.log(result);
         row.remove();
