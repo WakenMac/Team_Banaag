@@ -55,6 +55,8 @@ TODO: The edit button is not yet implemented, but it will be added later.
 
 ------------------------------------------------------------
 */
+
+// Add Modal logic
 const addApparatusBtn = document.getElementById("addApparatusBtn");
 const addApparatusModal = document.getElementById("addApparatusModal");
 const modalBackdropApparatus = document.getElementById(
@@ -64,20 +66,20 @@ const cancelApparatusBtn = document.getElementById("cancelApparatusBtn");
 const addApparatusForm = document.getElementById("addApparatusForm");
 const tbody = document.querySelector("tbody");
 
-function openModal() {
+function openAddModal() {
   addApparatusModal.classList.remove("hidden");
   addApparatusModal.classList.add("flex");
 }
 
-function closeModal() {
+function closeAddModal() {
   addApparatusModal.classList.add("hidden");
   addApparatusModal.classList.remove("flex");
   addApparatusForm.reset();
 }
 
-addApparatusBtn.addEventListener("click", openModal);
-cancelApparatusBtn.addEventListener("click", closeModal);
-modalBackdropApparatus.addEventListener("click", closeModal);
+addApparatusBtn.addEventListener("click", openAddModal);
+cancelApparatusBtn.addEventListener("click", closeAddModal);
+modalBackdropApparatus.addEventListener("click", closeAddModal);
 
 addApparatusForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -121,8 +123,10 @@ addApparatusForm.addEventListener("submit", (e) => {
             </td>
           `;
   tbody.appendChild(tr);
-  closeModal();
+  closeAddModal();
 });
+
+// Edit modal logic
 
 tbody.addEventListener("click", (e) => {
   if (
