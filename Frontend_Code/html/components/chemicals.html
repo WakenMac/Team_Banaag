@@ -26,7 +26,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <title>CARES | CAS Automated Resource and Equipment System</title>
+    <title>CARES | CAS Lab Inventory</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
@@ -604,7 +604,9 @@
               name="chemicalUnit"
               required
             >
-              <option value="" disabled selected hidden>Select Unit</option>
+              <option value="" disabled selected class="placeholder-option">
+                Select Unit
+              </option>
               <!-- Options will be populated dynamically from the database -->
               <option value="ml">mL</option>
             </select>
