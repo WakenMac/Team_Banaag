@@ -7,7 +7,8 @@ const addUnitTypeModal = document.getElementById("addUnitTypeModal");
 const modalBackdropUnitType = document.getElementById("modalBackdropUnitType");
 const cancelBtn = document.getElementById("cancelBtn");
 const addUnitTypeForm = document.getElementById("addUnitTypeForm");
-const addUnitTypeError = document.getElementById("addUnitTypeError"); // for error message
+const addUnitTypeError = document.getElementById("addUnitTypeError"); // for error message (adding)
+const editUnitTypeError = document.getElementById("editUnitTypeError"); // for error message (editing)
 const tbody = document.querySelector("tbody");
 
 // Initialize modals for editing
@@ -37,11 +38,26 @@ async function initialize() {
   setupDropdown("propertiesBtn", "propertiesMenu");
 
   // Prepares the modals
+
   addUnitTypeBtn.addEventListener("click", openModal);
-  cancelBtn.addEventListener("click", closeModal);
+  cancelBtn.addEventListener("click", () => {
+    // Once clicked, clears the error message in the modal and closes (hides) the Add Location Modal
+    addUnitTypeError.classList.add("hidden");
+    addUnitTypeError.textContent = '';
+    closeModal();
+  });
   modalBackdropUnitType.addEventListener("click", closeModal);
-  cancelBtnEditUnitType.addEventListener("click", closeEditModal);
-  modalBackdropEditUnitType.addEventListener("click", closeEditModal);
+
+  cancelBtnEditUnitType.addEventListener("click", () => {
+    editUnitTypeError.classList.add("hidden");
+    editUnitTypeError.textContent = '';
+    closeEditModal();
+  });
+  modalBackdropEditUnitType.addEventListener("click", () => {
+    editUnitTypeError.classList.add("hidden");
+    editUnitTypeError.textContent = '';
+    closeEditModal();
+  });
 
   // Prepares the contents of the admin table
   await dbhandler.testPresence();
@@ -80,7 +96,7 @@ function setupDropdown(buttonId, menuId) {
  * @param {int} unitTypeId Primary key of the unitType table
  * @param {string} unitTypeName Name of the unitType to be edited
  */
-function openEditModal(unitTypeId, unitTypeName) {
+function openEditModal() {
   editUnitTypeModal.classList.remove("hidden");
   editUnitTypeModal.classList.add("flex");
 }
@@ -121,7 +137,7 @@ editUnitTypeForm.addEventListener("submit", async (e) => {
   const editUnitTypeId = document.getElementById("editUnitTypeId").value.trim();
   const editUnitTypeName = document.getElementById("editUnitTypeName").value.trim();
 
-  if (!editUnitTypeId || !editUnitTypeName) {
+  if (!editUnitTypeName) {
     alert("Please fill in all required fields.");
     return;
   }
@@ -129,9 +145,13 @@ editUnitTypeForm.addEventListener("submit", async (e) => {
   let result = await dbhandler.updateUnitTypeRecordName(editUnitTypeId, editUnitTypeName);
 
   if (result == null) {
-    alert("The mainHandler.updateUnitTypeRecord() DOESN'T return a status statement.");
+    editUnitTypeError.textContent = `Something went wrong. Please try again.`;
+    editUnitTypeError.classList.remove("hidden");
+    return;
   } else if (result.includes("ERROR")) {
-    alert(result);
+    editUnitTypeError.textContent = result.replace(/^ERROR:\s*/i, ''); // Removes the ERROR sign
+    editUnitTypeError.classList.remove("hidden");
+    return;
   } else {
     // Update the row in the table
     const rows = tbody.querySelectorAll("tr");
@@ -157,13 +177,12 @@ tbody.addEventListener("click", (e) => {
 
 addUnitTypeForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  const unitTypeId = document.getElementById("unitTypeId").value.trim();
   const unitTypeName = document.getElementById("unitTypeName").value.trim();
 
   addUnitTypeError.classList.add("hidden");
   addUnitTypeError.textContent = "";
-  if (!unitTypeId || !unitTypeName) {
+  
+  if (!unitTypeName) {
     addUnitTypeError.textContent = "Please fill in all required fields.";
     addUnitTypeError.classList.remove("hidden");
     return;
@@ -176,7 +195,7 @@ addUnitTypeForm.addEventListener("submit", async (e) => {
     addUnitTypeError.classList.remove("hidden");
     return;
   } else if (result.includes("ERROR")) {
-    addUnitTypeError.textContent = result.replace(/^ERROR:\s*/i, '');
+    addUnitTypeError.textContent = result.replace(/^ERROR:\s*/i, ''); // Removes the ERROR sign
     addUnitTypeError.classList.remove("hidden");
     return;
   } else {
