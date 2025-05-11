@@ -63,18 +63,21 @@ function closeModal() {
 }
 
 addLocationBtn.addEventListener("click", openModal);
-cancelBtn.addEventListener("click", closeModal);
-modalBackdropLocation.addEventListener("click", closeModal);
+cancelBtn.addEventListener("click", (e) => {
+  addLocationError.classList.add('hidden');
+  addLocationError.textContent = '';
+  closeModal();
+});
 
+modalBackdropLocation.addEventListener("click", closeModal);
 addLocationForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const locationId = addLocationForm.locationId.value.trim();
   const locationName = addLocationForm.locationName.value.trim();
 
   addLocationError.classList.add("hidden");
   addLocationError.textContent = "";
-  if (!locationId || !locationName) {
+  if (!locationName) {
     addLocationError.textContent = "Please fill in all required fields.";
     addLocationError.classList.remove("hidden");
     return;

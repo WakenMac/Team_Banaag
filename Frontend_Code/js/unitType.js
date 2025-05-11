@@ -38,9 +38,20 @@ async function initialize() {
 
   // Prepares the modals
   addUnitTypeBtn.addEventListener("click", openModal);
-  cancelBtn.addEventListener("click", closeModal);
+  cancelBtn.addEventListener("click", (e) => {
+    // Once clicked, clears the error message in the modal and closes (hides) the Add Location Modal
+    addUnitTypeError.classList.add("hidden");
+    addUnitTypeError.textContent = '';
+    closeModal();
+  });
+
+  //TODO: Add error element
   modalBackdropUnitType.addEventListener("click", closeModal);
-  cancelBtnEditUnitType.addEventListener("click", closeEditModal);
+  cancelBtnEditUnitType.addEventListener("click", (e) => {
+    // editUnitTypeError.classList.add("hidden");
+    // editUnitTypeError.textContent = '';
+    closeEditModal();
+  });
   modalBackdropEditUnitType.addEventListener("click", closeEditModal);
 
   // Prepares the contents of the admin table
@@ -121,7 +132,7 @@ editUnitTypeForm.addEventListener("submit", async (e) => {
   const editUnitTypeId = document.getElementById("editUnitTypeId").value.trim();
   const editUnitTypeName = document.getElementById("editUnitTypeName").value.trim();
 
-  if (!editUnitTypeId || !editUnitTypeName) {
+  if (!editUnitTypeName) {
     alert("Please fill in all required fields.");
     return;
   }
@@ -157,13 +168,12 @@ tbody.addEventListener("click", (e) => {
 
 addUnitTypeForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  const unitTypeId = document.getElementById("unitTypeId").value.trim();
   const unitTypeName = document.getElementById("unitTypeName").value.trim();
 
   addUnitTypeError.classList.add("hidden");
   addUnitTypeError.textContent = "";
-  if (!unitTypeId || !unitTypeName) {
+  
+  if (!unitTypeName) {
     addUnitTypeError.textContent = "Please fill in all required fields.";
     addUnitTypeError.classList.remove("hidden");
     return;
@@ -176,7 +186,7 @@ addUnitTypeForm.addEventListener("submit", async (e) => {
     addUnitTypeError.classList.remove("hidden");
     return;
   } else if (result.includes("ERROR")) {
-    addUnitTypeError.textContent = result.replace(/^ERROR:\s*/i, '');
+    addUnitTypeError.textContent = result.replace(/^ERROR:\s*/i, ''); // Removes the ERROR sign
     addUnitTypeError.classList.remove("hidden");
     return;
   } else {
