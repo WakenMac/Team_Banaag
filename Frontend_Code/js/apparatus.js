@@ -1,8 +1,17 @@
 // ----------------------------------------------------------
-/*
- * This code is for apparatus html. most specifically, the modal form.
- */
-// -----------------------------------------------------------
+// Apparatus Management JS
+// ----------------------------------------------------------
+// This script controls the add, edit, and delete features for the Apparatus table.
+// //** ADD ADDITIONAL DOCUMENTATION HERE WHEN DATABASE IS CONNECTED HEHE @WAKS -Dave */
+//
+// Main Features:
+// - Add new apparatus using a form and modal
+// - Edit existing apparatus by clicking the edit button
+// - Delete apparatus by clicking the delete button
+// - Show a notification when an apparatus is updated
+//
+// All changes are temporary and will reset if you reload the page since it's not connected to a database yet.
+// ----------------------------------------------------------
 
 /* This is the code for the dropdown menus. */
 
@@ -113,7 +122,12 @@ addApparatusForm.addEventListener("submit", (e) => {
             <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusLocation}</td>
               <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusBrand}</td>
               <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusQuantity}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
+              <td class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3">
+              <button aria-label="Add remarks"
+                class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
+                data-apparatus-id="${apparatusId}">
+                <i class="fas fa-comment-alt text-[14px]"></i>
+              </button>
               <button aria-label="Edit apparatus" class="text-yellow-400 hover:text-yellow-500">
                 <i class="fas fa-pencil-alt"></i>
               </button>
@@ -127,15 +141,210 @@ addApparatusForm.addEventListener("submit", (e) => {
 });
 
 // Edit modal logic
+const editApparatusModal = document.getElementById("editApparatusModal");
+const modalBackdropEditApparatus = document.getElementById(
+  "modalBackdropEditApparatus"
+);
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+const editApparatusForm = document.getElementById("editApparatusForm");
+let rowBeingEdited = null;
 
+function openEditModal() {
+  editApparatusModal.classList.remove("hidden");
+  editApparatusModal.classList.add("flex");
+}
+function closeEditModal() {
+  editApparatusModal.classList.add("hidden");
+  editApparatusModal.classList.remove("flex");
+  editApparatusForm.reset();
+  rowBeingEdited = null;
+}
+cancelEditBtn.addEventListener("click", closeEditModal);
+modalBackdropEditApparatus.addEventListener("click", closeEditModal);
+
+// --- Delete Apparatus Modal Logic ---
+// Handles the confirmation modal for deleting apparatus
+const deleteApparatusModal = document.getElementById("deleteApparatusModal");
+const modalBackdropDeleteApparatus = document.getElementById(
+  "modalBackdropDeleteApparatus"
+);
+const cancelDeleteApparatusBtn = document.getElementById(
+  "cancelDeleteApparatusBtn"
+);
+const confirmDeleteApparatusBtn = document.getElementById(
+  "confirmDeleteApparatusBtn"
+);
+let rowToDelete = null;
+
+// Show the delete modal
+function openDeleteModal(row) {
+  deleteApparatusModal.classList.remove("hidden");
+  deleteApparatusModal.classList.add("flex");
+  rowToDelete = row;
+}
+// Close the delete modal
+function closeDeleteModal() {
+  deleteApparatusModal.classList.add("hidden");
+  deleteApparatusModal.classList.remove("flex");
+  rowToDelete = null;
+}
+cancelDeleteApparatusBtn.addEventListener("click", closeDeleteModal);
+modalBackdropDeleteApparatus.addEventListener("click", closeDeleteModal);
+
+// Confirm deletion
+confirmDeleteApparatusBtn.addEventListener("click", () => {
+  if (rowToDelete) {
+    rowToDelete.remove();
+    showToast("Apparatus deleted successfully");
+  }
+  closeDeleteModal();
+});
+
+// Update tbody event listener to use the modal for deletion
+// Handles clicking edit/delete buttons in the table
 tbody.addEventListener("click", (e) => {
-  if (
-    e.target.closest("button") &&
-    e.target.closest("button").getAttribute("aria-label") === "Delete apparatus"
-  ) {
-    const row = e.target.closest("tr");
-    if (row) {
-      row.remove();
-    }
+  const btn = e.target.closest("button");
+  if (!btn) return;
+  const row = btn.closest("tr");
+  // Delete apparatus
+  if (btn.getAttribute("aria-label") === "Delete apparatus") {
+    if (row) openDeleteModal(row);
+  }
+  // Edit apparatus
+  else if (btn.getAttribute("aria-label") === "Edit apparatus") {
+    rowBeingEdited = row;
+    document.getElementById("editApparatusId").value =
+      row.children[0].textContent;
+    document.getElementById("editApparatusName").value =
+      row.children[1].textContent;
+    document.getElementById("editApparatusUnit").value =
+      row.children[2].textContent;
+    document.getElementById("editApparatusLocation").value =
+      row.children[3].textContent;
+    document.getElementById("editApparatusBrand").value =
+      row.children[4].textContent;
+    openEditModal();
   }
 });
+
+// --- Toast Notification --- The notification that appears when an apparatus is updated.
+//Hello u can adjust the toast notification style by changing and naa sa baba hihi added some comments for you - Dave
+function showToast(message) {
+  let toast = document.getElementById("custom-toast");
+  if (!toast) {
+    toast = document.createElement("div"); // Creates a new div element
+    toast.id = "custom-toast"; // div id
+    toast.style.position = "fixed"; // div position (fixed means it will stay in the same place even if the page is scrolled)
+    toast.style.bottom = "32px"; // div position from the bottom (32px from the bottom of the page)
+    toast.style.right = "32px"; // div position from the right (32px from the right of the page)
+    toast.style.background = "rgba(44, 161, 74, 0.95)"; // div background color
+    toast.style.color = "white"; // text color
+    toast.style.padding = "16px 28px"; // div padding (16px from the top & bottom, 28px from the left & right)
+    toast.style.borderRadius = "8px"; // div border radius (rounded corners, pag gusto mo mas round make it higher)
+    toast.style.fontSize = "16px"; // div font size
+    toast.style.fontWeight = "regular"; // div font weight
+    toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)"; // div box shadow
+    toast.style.opacity = "0"; // div opacity
+    toast.style.transition = "opacity 0.4s"; // div transition
+    toast.style.zIndex = "9999"; // div z index
+    document.body.appendChild(toast); // add the div to the body (body means the entire page)
+  }
+  toast.textContent = message; // set the text content of the div to the message
+  toast.style.opacity = "1"; // set the opacity of the div to 1
+  setTimeout(() => {
+    toast.style.opacity = "0"; // set the opacity of the div to 0 after 1800ms
+  }, 1800);
+}
+
+// Edit form submit: update the row in the table
+editApparatusForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (!rowBeingEdited) return;
+  // Get new values
+  rowBeingEdited.children[1].textContent =
+    document.getElementById("editApparatusName").value;
+  rowBeingEdited.children[2].textContent =
+    document.getElementById("editApparatusUnit").value;
+  rowBeingEdited.children[3].textContent = document.getElementById(
+    "editApparatusLocation"
+  ).value;
+  rowBeingEdited.children[4].textContent =
+    document.getElementById("editApparatusBrand").value;
+  closeEditModal();
+  showToast("Apparatus updated successfully");
+});
+
+// Remarks Modal Functionality
+const remarksModal = document.getElementById("remarksModal");
+const remarksForm = document.getElementById("remarksForm");
+const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
+const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
+
+/**
+ * Opens the remarks modal and populates it with existing remarks if any
+ * @param {string} apparatusId - The ID of the apparatus to add/edit remarks for
+ */
+function openRemarksModal(apparatusId) {
+  remarksModal.classList.remove("hidden");
+  remarksModal.classList.add("flex");
+  document.getElementById("remarksApparatusId").value = apparatusId;
+
+  // Check if there are existing remarks
+  const remarksBtn = document.querySelector(
+    `button[data-apparatus-id="${apparatusId}"]`
+  );
+  const existingRemarks = remarksBtn.getAttribute("data-remarks");
+  if (existingRemarks) {
+    document.getElementById("remarksText").value = existingRemarks;
+  } else {
+    document.getElementById("remarksText").value = "";
+  }
+}
+
+function closeRemarksModal() {
+  remarksModal.classList.add("hidden");
+  remarksModal.classList.remove("flex");
+  remarksForm.reset();
+}
+
+// Handle remarks button clicks
+tbody.addEventListener("click", (e) => {
+  const remarksBtn = e.target.closest('button[aria-label="Add remarks"]');
+  if (remarksBtn) {
+    const apparatusId = remarksBtn.getAttribute("data-apparatus-id");
+    openRemarksModal(apparatusId);
+  }
+});
+
+/**
+ * Handles the submission of remarks
+ * Updates the remarks button color based on whether remarks exist
+ * Blue: Has remarks
+ * Gray: No remarks
+ */
+remarksForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const apparatusId = document.getElementById("remarksApparatusId").value;
+  const remarks = document.getElementById("remarksText").value.trim();
+
+  // Update the remarks button color and store remarks
+  const remarksBtn = document.querySelector(
+    `button[data-apparatus-id="${apparatusId}"]`
+  );
+  if (remarks) {
+    remarksBtn.classList.remove("text-gray-700", "border-gray-700");
+    remarksBtn.classList.add("text-blue-600", "border-blue-600");
+    remarksBtn.setAttribute("data-remarks", remarks);
+  } else {
+    remarksBtn.classList.remove("text-blue-600", "border-blue-600");
+    remarksBtn.classList.add("text-gray-700", "border-gray-700");
+    remarksBtn.removeAttribute("data-remarks");
+  }
+
+  closeRemarksModal();
+  showToast("Remarks updated successfully");
+});
+
+// Close remarks modal
+cancelRemarksBtn.addEventListener("click", closeRemarksModal);
+modalBackdropRemarks.addEventListener("click", closeRemarksModal);

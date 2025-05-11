@@ -1,20 +1,22 @@
 /**
  * CARES - Centralized Resource and Equipment System
- * Chemicals Management Module
+ * Chemicals Management JS
+ * ----------------------------------------------------------
+ * This script controls the add, edit, delete, and remarks features for the Chemicals table.
+ * This is already connected to the database.
  *
- * This module handles the management of chemicals in the inventory system.
- * It includes functionality for:
- * - Adding new chemicals
- * - Editing existing chemicals
- * - Deleting chemicals
- * - Adding/viewing remarks
- * - Displaying chemical information in info (tooltip)
+ * Features:
+ * - Add new chemicals using a form and modal
+ * - Edit existing chemicals by clicking the edit button
+ * - Delete chemicals with confirmation modal
+ * - Add/view remarks for chemicals
+ * - Info button to show extra info when hovering over the info button
+ * - Show a toast notification for all actions (add, edit, delete, remarks, errors)
+ * - All user feedback is shown as a toast at the bottom right (no more alert popups)
  */
-
 import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
 // Initialize Compoenents
-
 const addChemicalLocation = document.getElementById("chemicalLocation");
 const addChemicalUnit = document.getElementById("chemicalUnit");
 const editChemicalLocation = document.getElementById("editChemicalLocation");
@@ -60,7 +62,7 @@ const confirmDeleteChemicalBtn = document.getElementById(
   "confirmDeleteChemicalBtn"
 );
 let chemicalRowToDelete = null;
-let initialQuantity = 0;  // Variable used to change the initial quantity of Chemical records (For updates)
+let initialQuantity = 0; // Variable used to change the initial quantity of Chemical records (For updates)
 
 await initialize();
 
@@ -155,9 +157,7 @@ function openEditModal() {
   editChemicalModal.classList.add("flex");
 }
 
-/**
- * Closes the edit modal and resets the form
- */
+/** Closes the edit modal and resets the form */
 function closeEditModal() {
   editChemicalModal.classList.add("hidden");
   editChemicalModal.classList.remove("flex");
@@ -210,7 +210,7 @@ function populateEditForm(row) {
     { id: "editChemicalUnit", idx: 2 },
     { id: "editChemicalLocation", idx: 3 },
     { id: "editChemicalBrand", idx: 4 },
-    { id: "editChemicalContainerSize", idx: 6 }
+    { id: "editChemicalContainerSize", idx: 6 },
   ];
 
   for (const { id, idx } of fieldMap) {
@@ -225,12 +225,17 @@ function populateEditForm(row) {
     }
 
     if (idx == 6)
-	    el.value = cells[idx].textContent.replace((" " + cells[2].textContent.trim()), "");
-    else
-      el.value = cells[idx].textContent;
+      el.value = cells[idx].textContent.replace(
+        " " + cells[2].textContent.trim(),
+        ""
+      );
+    else el.value = cells[idx].textContent;
   }
 
-  initialQuantity = cells[5].textContent.replace((" " + cells[2].textContent.trim()), "");
+  initialQuantity = cells[5].textContent.replace(
+    " " + cells[2].textContent.trim(),
+    ""
+  );
 
   const infoBtn = row.querySelector('button[aria-label="Info"]');
   let cas = "",
@@ -284,24 +289,45 @@ editChemicalForm.addEventListener("submit", async (e) => {
   const editChemicalBarCode = document
     .getElementById("editChemicalBarCode")
     .value.trim();
-  const remarks = document.querySelector(
-    `button[data-chemical-id="${editChemicalId}"]`
-  ).getAttribute("data-remarks");
+  const remarks = document
+    .querySelector(`button[data-chemical-id="${editChemicalId}"]`)
+    .getAttribute("data-remarks");
 
   let result = await dbhandler.updateChemicalsRecordByAll(
-    editChemicalId, editChemicalName, editChemicalLocation, editChemicalUnit, editChemicalBrand, editChemicalContainerSize, editChemicalBarCode, 
-    editChemicalCASNo, editChemicalMSDS, remarks
-  )
+    editChemicalId,
+    editChemicalName,
+    editChemicalLocation,
+    editChemicalUnit,
+    editChemicalBrand,
+    editChemicalContainerSize,
+    editChemicalBarCode,
+    editChemicalCASNo,
+    editChemicalMSDS,
+    remarks
+  );
 
   if (result == null)
-      alert(`The mainHandler.updateChemicalsRecordByAll() DOESN'T return a status statement.`)
-  else if (result.includes('ERROR')){
-    alert(result);
+    showToast(
+      `The mainHandler.updateChemicalsRecordByAll() DOESN'T return a status statement.`,
+      true
+    );
+  else if (result.includes("ERROR")) {
+    showToast(result, true);
   } else {
-    updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit, editChemicalLocation, editChemicalBrand,
-      initialQuantity, editChemicalCASNo, editChemicalMSDS, editChemicalBarCode);
+    updateChemicalTable(
+      editChemicalId,
+      editChemicalName,
+      editChemicalUnit,
+      editChemicalLocation,
+      editChemicalBrand,
+      initialQuantity,
+      editChemicalCASNo,
+      editChemicalMSDS,
+      editChemicalBarCode
+    );
     console.log(result);
     closeEditModal();
+    showToast("Chemical updated successfully");
   }
 });
 
@@ -366,7 +392,7 @@ addChemicalsForm.addEventListener("submit", async (e) => {
     !chemicalBrand ||
     !chemicalContainerSize
   ) {
-    alert("Please fill in all required fields.");
+    showToast("Please fill in all required fields.", true);
     return;
   }
 
@@ -382,11 +408,12 @@ addChemicalsForm.addEventListener("submit", async (e) => {
   );
 
   if (result == null) {
-    alert(
-      `The mainHandler.addChemicalsRecord() DOESN'T return a status statement.`
+    showToast(
+      `The mainHandler.addChemicalsRecord() DOESN'T return a status statement.`,
+      true
     );
   } else if (result.includes("ERROR")) {
-    alert(result);
+    showToast(result, true);
   } else {
     console.log(result);
     let newItemId = result.slice(46, result.length - 1);
@@ -396,14 +423,15 @@ addChemicalsForm.addEventListener("submit", async (e) => {
       chemicalUnit,
       chemicalLocation,
       chemicalBrand,
-      '0 ' + chemicalUnit,
-      chemicalContainerSize  + ' ' + chemicalUnit,
-      '0 ' + chemicalUnit,
+      "0 " + chemicalUnit,
+      chemicalContainerSize + " " + chemicalUnit,
+      "0 " + chemicalUnit,
       chemicalCASNo,
       chemicalMSDS,
       chemicalBarCode
     );
     closeAddModal();
+    showToast("Chemical added successfully");
   }
 });
 
@@ -437,12 +465,13 @@ confirmDeleteChemicalBtn.addEventListener("click", async () => {
 
     let result = await dbhandler.deleteChemicalsRecordByItemId(chemicalId);
     if (result && result.includes("ERROR")) {
-      alert(result);
+      showToast(result, true);
       return;
     }
     console.log(result);
     chemicalRowToDelete.remove();
     closeDeleteChemicalModal();
+    showToast("Chemical deleted successfully");
   }
 });
 
@@ -480,7 +509,7 @@ chemicalsTableBody.addEventListener("mouseover", function (e) {
     </div>
   `;
 
-  const tooltip = document.createElement("div"); // div ang butngan sa informations
+  const tooltip = document.createElement("div"); // div ang butngan sa information
   tooltip.className =
     "custom-tooltip absolute z-50 bg-gray-800 text-white text-xs rounded shadow-lg";
   tooltip.style.position = "absolute";
@@ -528,9 +557,7 @@ function openRemarksModal(chemicalId) {
 //=================================================================================================================================
 // Remarks Modals
 
-/**
- * Closes the remarks modal and resets the form
- */
+/** Closes the remarks modal and resets the form */
 function closeRemarksModal() {
   remarksModal.classList.add("hidden");
   remarksModal.classList.remove("flex");
@@ -566,10 +593,13 @@ remarksForm.addEventListener("submit", async (e) => {
   );
 
   // Updates the remarks in the database
-  let result = await dbhandler.updateChemicalRemarkByItemId(chemicalId, remarks);
+  let result = await dbhandler.updateChemicalRemarkByItemId(
+    chemicalId,
+    remarks
+  );
 
-  if (result && result.includes("ERROR")){
-    alert(result);
+  if (result && result.includes("ERROR")) {
+    showToast(result, true);
     return;
   }
 
@@ -584,24 +614,11 @@ remarksForm.addEventListener("submit", async (e) => {
   }
 
   closeRemarksModal();
+  showToast("Remarks updated successfully");
 });
 
 // ===============================================================================================
 // FRONT END-RELATED METHODS
-
-/**
- * Method to add a new row to the Chemicals Table
- * @param {int} chemicalId                    Primary key of the Chemicals table
- * @param {string} chemicalName               Name of the chemical to be added
- * @param {string} chemicalUnit               Unit Type of the chemical (e.g. Millimeters, Grams)
- * @param {string} chemicalLocation           Location where the chemical will be stored
- * @param {string} chemicalBrand              Brand of the chemical to be added
- * @param {float} chemicalInitialQuantity    Initial quantity of the chemical
- * @param {float} chemicalRemainingQuantity  Remaining quantity of the chemical
- * @param {string} chemicalCASNo              CAS number of the chemical to be added
- * @param {string} chemicalMSDS               MSDS of the chemical to be added
- * @param {string} chemicalBarCode            Barcode of the chemical to be added
- */
 async function createNewChemicalRow(
   chemicalId,
   chemicalName,
@@ -680,7 +697,7 @@ function createNewLocationRow(locationName) {
  * @param {string} remarks The remarks of the chemical
  * @param {int} chemicalId The primary key of the Chemical table.
  */
-async function createNewRemarks(remarks, chemicalId){
+async function createNewRemarks(remarks, chemicalId) {
   document.getElementById("remarksText").value = remarks;
 
   const remarksBtn = document.querySelector(
@@ -698,10 +715,17 @@ async function createNewRemarks(remarks, chemicalId){
   }
 }
 
-
-function updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit, editChemicalLocation, editChemicalBrand, 
-  editChemicalQuantity, editChemicalCASNo, editChemicalMSDS, editChemicalBarCode
-){
+function updateChemicalTable(
+  editChemicalId,
+  editChemicalName,
+  editChemicalUnit,
+  editChemicalLocation,
+  editChemicalBrand,
+  editChemicalQuantity,
+  editChemicalCASNo,
+  editChemicalMSDS,
+  editChemicalBarCode
+) {
   const rows = chemicalsTableBody.querySelectorAll("tr");
 
   rows.forEach((row) => {
@@ -712,9 +736,16 @@ function updateChemicalTable(editChemicalId, editChemicalName, editChemicalUnit,
       row.children[2].textContent = editChemicalUnit;
       row.children[3].textContent = editChemicalLocation;
       row.children[4].textContent = editChemicalBrand;
-      row.children[5].textContent = editChemicalQuantity + " " + editChemicalUnit;
-      row.children[6].textContent = row.children[6].textContent.replace((" " + originalUnit), "") + " " + editChemicalUnit;
-      row.children[7].textContent = row.children[7].textContent.replace((" " + originalUnit), "") + " " + editChemicalUnit;
+      row.children[5].textContent =
+        editChemicalQuantity + " " + editChemicalUnit;
+      row.children[6].textContent =
+        row.children[6].textContent.replace(" " + originalUnit, "") +
+        " " +
+        editChemicalUnit;
+      row.children[7].textContent =
+        row.children[7].textContent.replace(" " + originalUnit, "") +
+        " " +
+        editChemicalUnit;
       const infoBtn = row.querySelector('button[aria-label="Info"]');
       if (infoBtn) {
         infoBtn.setAttribute("data-cas", editChemicalCASNo);
@@ -808,4 +839,38 @@ async function prepareLocationDropdown() {
   } catch (generalError) {
     console.error(generalError);
   }
+}
+
+// --- Toast Notification ---
+// Shows a small message at the bottom right when something is added, edited, deleted, or an error occurs
+function showToast(message, isError = false) {
+  let toast = document.getElementById("custom-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "custom-toast";
+    toast.style.position = "fixed";
+    toast.style.bottom = "32px";
+    toast.style.right = "32px";
+    toast.style.background = isError
+      ? "rgba(220, 38, 38, 0.95)"
+      : "rgba(44, 161, 74, 0.95)"; // Red for error, green for success
+    toast.style.color = "white";
+    toast.style.padding = "16px 28px";
+    toast.style.borderRadius = "8px";
+    toast.style.fontSize = "16px";
+    toast.style.fontWeight = "bold";
+    toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+    toast.style.opacity = "0";
+    toast.style.transition = "opacity 0.4s";
+    toast.style.zIndex = "9999";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.style.background = isError
+    ? "rgba(220, 38, 38, 0.95)"
+    : "rgba(44, 161, 74, 0.95)";
+  toast.style.opacity = "1";
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, 1800);
 }

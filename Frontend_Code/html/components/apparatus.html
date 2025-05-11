@@ -222,35 +222,64 @@
           </ul>
         </li>
         <li>
-          <a class="hover:underline" href="#"> Restocks </a>
+          <a
+            class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]"
+            href="/Frontend_Code/html/components/restocks.html"
+          >
+            Restocks
+          </a>
         </li>
         <li>
-          <a class="hover:underline" href="#"> Transactions </a>
+          <a
+            class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]"
+            href="/Frontend_Code/html/components/transactions.html"
+          >
+            Transactions
+          </a>
         </li>
         <li>
-          <a class="hover:underline" href="#"> Statistics </a>
+          <a
+            class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]"
+            href="/Frontend_Code/html/components/statistics.html"
+          >
+            Statistics
+          </a>
         </li>
       </ul>
     </nav>
     <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 mt-6">
-      <div class="flex justify-between items-center w-full">
-        <input
-          aria-label="Search"
-          class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-64"
-          placeholder="Search..."
-          type="search"
-        />
+      <div
+        class="flex flex-col sm:flex-row justify-between items-center w-full gap-3 sm:gap-0"
+      >
+        <div
+          class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto"
+        >
+          <input
+            aria-label="Search"
+            class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-64"
+            placeholder="Search..."
+            type="search"
+          />
+          <select
+            aria-label="Filter by"
+            class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-48 custom-select"
+          >
+            <option value="" disabled selected class="placeholder-option">
+              Filter by
+            </option>
+          </select>
+        </div>
         <button
           aria-controls="addApparatusModal"
           aria-haspopup="dialog"
-          class="custom-btn ml-4"
+          class="custom-btn"
           id="addApparatusBtn"
           type="button"
         >
           Add Apparatus
         </button>
       </div>
-      <h2 class="font-semibold text-gray-900 text-sm mb-3">
+      <h2 class="font-semibold text-gray-900 text-sm mb-3 mt-4">
         Non-consumables - Apparatus
       </h2>
       <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
@@ -302,28 +331,73 @@
           <tbody class="bg-white">
             <tr>
               <td class="px-6 py-4 whitespace-nowrap text-gray-900">1</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                ItemName
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Unit</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Beaker</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">pcs</td>
               <td class="px-6 py-4 whitespace-nowrap text-gray-900">
                 Stock Room
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Brand</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">5</td>
-
-              <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Pyrex</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">10</td>
+              <td
+                class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3"
+              >
                 <button
-                  aria-label="Edit equipment"
-                  class="text-yellow-400 hover:text-yellow-500"
+                  aria-label="Add remarks"
+                  class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
+                  data-apparatus-id="1"
                 >
-                  <i class="fas fa-pencil-alt"> </i>
+                  <i class="fas fa-comment-alt text-[14px]"></i>
+                </button>
+                <button
+                  aria-label="Edit apparatus"
+                  class="text-yellow-400 hover:text-yellow-500"
+                  data-id="1"
+                >
+                  <i class="fas fa-pencil-alt"></i>
                 </button>
                 <button
                   aria-label="Delete apparatus"
                   class="text-red-600 hover:text-red-700"
+                  data-id="1"
                 >
-                  <i class="fas fa-trash-alt"> </i>
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">2</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">
+                Test Tube
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">pcs</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">
+                Lab Drawer
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Corning</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">25</td>
+              <td
+                class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3"
+              >
+                <button
+                  aria-label="Add remarks"
+                  class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
+                  data-apparatus-id="2"
+                >
+                  <i class="fas fa-comment-alt text-[14px]"></i>
+                </button>
+                <button
+                  aria-label="Edit apparatus"
+                  class="text-yellow-400 hover:text-yellow-500"
+                  data-id="2"
+                >
+                  <i class="fas fa-pencil-alt"></i>
+                </button>
+                <button
+                  aria-label="Delete apparatus"
+                  class="text-red-600 hover:text-red-700"
+                  data-id="2"
+                >
+                  <i class="fas fa-trash-alt"></i>
                 </button>
               </td>
             </tr>
@@ -332,7 +406,7 @@
       </div>
     </main>
 
-    <!-- Modal -->
+    <!-- Add Apparatus Modal -->
     <div
       aria-labelledby="modalTitle"
       aria-modal="true"
@@ -347,31 +421,23 @@
       <div
         class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
       >
-        <h3 class="text-lg font-semibold text-gray-900 mb-4" id="modalTitle">
-          Add Apparatus
-        </h3>
-        <form class="space-y-4" id="addApparatusForm">
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="apparatusId"
-            >
-              Item ID
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="apparatusId"
-              name="apparatusId"
-              required=""
-              type="text"
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img
+              src="/Frontend_Code/images/cas_logo.png"
+              alt="CARES logo"
+              class="w-12 h-12 object-contain"
             />
+            <span class="font-black text-3xl text-black">Add Apparatus</span>
           </div>
+        </div>
+        <form class="space-y-4" id="addApparatusForm">
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
               for="apparatusName"
             >
-              Name
+              Name <span class="text-red-500">*</span>
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
@@ -379,6 +445,7 @@
               name="apparatusName"
               required=""
               type="text"
+              placeholder="e.g. Apparatus Name"
             />
           </div>
           <div>
@@ -386,36 +453,52 @@
               class="block text-sm font-medium text-gray-700 mb-1"
               for="apparatusUnit"
             >
-              Unit
+              Unit <span class="text-red-500">*</span>
             </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+            <select
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 placeholder-gray-400"
               id="apparatusUnit"
               name="apparatusUnit"
-              type="text"
-            />
+              required
+            >
+              <option value="" disabled selected class="placeholder-option">
+                - Select Unit -
+              </option>
+              <option value="mL">mL</option>
+              <option value="pcs">pcs</option>
+              <!-- Options will be populated dynamically from the database -->
+              <!-- ~The dynamic options have been implemented~  -->
+            </select>
           </div>
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
               for="apparatusLocation"
             >
-              Location
+              Location <span class="text-red-500">*</span>
             </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+            <select
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent custom-select"
               id="apparatusLocation"
               name="apparatusLocation"
-              required=""
-              type="text"
-            />
+              required
+            >
+              <option value="" disabled selected class="placeholder-option">
+                - Select Location -
+              </option>
+              <option value="General Santos">General Santos</option>
+              <option value="Stock Room">Stock Room</option>
+              <option value="Lab Drawer">Lab Drawer</option>
+              <!-- Options will be populated dynamically from the database -->
+              <!-- ~The dynamic options have been implemented~  -->
+            </select>
           </div>
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
               for="apparatusBrand"
             >
-              Brand
+              Brand <span class="text-red-500">*</span>
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
@@ -423,27 +506,264 @@
               name="apparatusBrand"
               required=""
               type="text"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="apparatusQuantity"
-            >
-              Quantity
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="apparatusQuantity"
-              name="apparatusQuantity"
-              required=""
-              type="text"
+              placeholder="e.g. Brand Name"
             />
           </div>
           <div class="flex justify-end space-x-3 pt-4">
             <button
               class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
               id="cancelApparatusBtn"
+              type="button"
+            >
+              Cancel
+            </button>
+            <button
+              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
+              type="submit"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit Apparatus Modal -->
+    <div
+      aria-labelledby="editModalTitle"
+      aria-modal="true"
+      class="fixed inset-0 z-50 hidden items-center justify-center"
+      id="editApparatusModal"
+      role="dialog"
+    >
+      <div
+        class="modal-backdrop fixed inset-0 bg-black opacity-50"
+        id="modalBackdropEditApparatus"
+      ></div>
+      <div
+        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img
+              src="/Frontend_Code/images/cas_logo.png"
+              alt="CARES logo"
+              class="w-12 h-12 object-contain"
+            />
+            <span class="font-black text-3xl text-black">Edit Apparatus</span>
+          </div>
+        </div>
+        <form class="space-y-4" id="editApparatusForm">
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="editApparatusId"
+            >
+              Apparatus ID
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="editApparatusId"
+              name="editApparatusId"
+              type="text"
+              readonly
+              placeholder="Enter apparatus ID"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="editApparatusName"
+            >
+              Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="editApparatusName"
+              name="editApparatusName"
+              required
+              type="text"
+              placeholder="Enter apparatus name"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="editApparatusUnit"
+            >
+              Unit <span class="text-red-500">*</span>
+            </label>
+            <select
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 placeholder-gray-400"
+              id="editApparatusUnit"
+              name="editApparatusUnit"
+              required
+            >
+              <option value="" disabled selected class="placeholder-option">
+                - Select Unit -
+              </option>
+              <option value="mL">mL</option>
+              <option value="pcs">pcs</option>
+              <!-- Options will be populated dynamically from the database -->
+            </select>
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="editApparatusLocation"
+            >
+              Location <span class="text-red-500">*</span>
+            </label>
+            <select
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="editApparatusLocation"
+              name="editApparatusLocation"
+              required
+            >
+              <option value="" disabled selected class="placeholder-option">
+                - Select Location -
+              </option>
+              <option value="General Santos">General Santos</option>
+              <option value="Stock Room">Stock Room</option>
+              <option value="Lab Drawer">Lab Drawer</option>
+              <!-- Options will be populated dynamically from the database -->
+            </select>
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="editApparatusBrand"
+            >
+              Brand <span class="text-red-500">*</span>
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="editApparatusBrand"
+              name="editApparatusBrand"
+              required
+              type="text"
+              placeholder="Enter brand"
+            />
+          </div>
+          <div class="flex justify-end space-x-3 pt-4">
+            <button
+              class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+              id="cancelEditBtn"
+              type="button"
+            >
+              Cancel
+            </button>
+            <button
+              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
+              type="submit"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- End of Edit Modal-->
+
+    <!-- Delete Apparatus Modal -->
+    <div
+      aria-labelledby="deleteApparatusModalTitle"
+      aria-modal="true"
+      class="fixed inset-0 z-50 hidden items-center justify-center"
+      id="deleteApparatusModal"
+      role="dialog"
+    >
+      <div
+        class="modal-backdrop fixed inset-0 bg-black opacity-50"
+        id="modalBackdropDeleteApparatus"
+      ></div>
+      <div
+        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img
+              src="/Frontend_Code/images/cas_logo.png"
+              alt="CARES logo"
+              class="w-12 h-12 object-contain"
+            />
+            <span class="font-black text-3xl text-black">Delete Apparatus</span>
+          </div>
+        </div>
+        <p class="text-gray-700 mb-6">
+          Are you sure you want to delete this apparatus? This action cannot be
+          undone.
+        </p>
+        <div class="flex justify-end space-x-3">
+          <button
+            class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+            id="cancelDeleteApparatusBtn"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="px-4 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+            id="confirmDeleteApparatusBtn"
+            type="button"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- End of Delete Apparatus Modal -->
+
+    <!-- Add Remarks Modal -->
+    <div
+      aria-labelledby="remarksModalTitle"
+      aria-modal="true"
+      class="fixed inset-0 z-50 hidden items-center justify-center"
+      id="remarksModal"
+      role="dialog"
+    >
+      <div
+        class="modal-backdrop fixed inset-0 bg-black opacity-50"
+        id="modalBackdropRemarks"
+      ></div>
+      <div
+        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img
+              src="/Frontend_Code/images/cas_logo.png"
+              alt="CARES logo"
+              class="w-12 h-12 object-contain"
+            />
+            <span class="font-black text-3xl text-black">Add Remarks</span>
+          </div>
+        </div>
+        <form class="space-y-4" id="remarksForm">
+          <input
+            type="hidden"
+            id="remarksApparatusId"
+            name="remarksApparatusId"
+          />
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="remarksText"
+            >
+              Remarks
+            </label>
+            <textarea
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="remarksText"
+              name="remarksText"
+              rows="4"
+              placeholder="Enter your remarks here..."
+            ></textarea>
+          </div>
+          <div class="flex justify-end space-x-3 pt-4">
+            <button
+              class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+              id="cancelRemarksBtn"
               type="button"
             >
               Cancel

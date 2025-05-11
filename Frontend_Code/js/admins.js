@@ -1,4 +1,4 @@
-import * as dbhandler from '../../Backend_Code/mainHandler.js';
+import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
 // Modal logic
 const addAdminBtn = document.getElementById("addAdminBtn");
@@ -13,9 +13,13 @@ const addAdminError = document.getElementById("addAdminError"); // for error mes
 const editAdminModal = document.getElementById("editAdminModal");
 const editAdminForm = document.getElementById("editAdminForm");
 const cancelEditAdminBtn = document.getElementById("cancelEditAdminBtn");
-const modalBackdropEditAdmin = document.getElementById("modalBackdropEditAdmin");
+const modalBackdropEditAdmin = document.getElementById(
+  "modalBackdropEditAdmin"
+);
 const deleteAdminModal = document.getElementById("deleteAdminModal");
-const modalBackdropDeleteAdmin = document.getElementById("modalBackdropDeleteAdmin");
+const modalBackdropDeleteAdmin = document.getElementById(
+  "modalBackdropDeleteAdmin"
+);
 const cancelDeleteAdminBtn = document.getElementById("cancelDeleteAdminBtn");
 const confirmDeleteAdminBtn = document.getElementById("confirmDeleteAdminBtn");
 let adminRowToEdit = null;
@@ -93,14 +97,26 @@ addEquipmentForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  let result = await dbhandler.addAdminRecord(adminId, firstName, middleName, lastName, 'randomPassword');
+  let result = await dbhandler.addAdminRecord(
+    adminId,
+    firstName,
+    middleName,
+    lastName,
+    "randomPassword"
+  );
 
-  if (result.includes('ERROR')) {
-    addAdminError.textContent = result.replace(/^ERROR:\s*/i, '');
+  if (result.includes("ERROR")) {
+    addAdminError.textContent = result.replace(/^ERROR:\s*/i, "");
     addAdminError.classList.remove("hidden");
     return;
   } else {
-    createNewAdminRow(adminId, firstName, middleName, lastName, 'randomPassword');
+    createNewAdminRow(
+      adminId,
+      firstName,
+      middleName,
+      lastName,
+      "randomPassword"
+    );
     console.log(result);
     addAdminError.classList.add("hidden");
     addAdminError.textContent = "";
@@ -108,17 +124,17 @@ addEquipmentForm.addEventListener("submit", async (e) => {
 
   dbhandler.testPresence();
   closeModal();
+  showToast("Admin added successfully");
 });
 
 // Hide error message when user starts typing in any input
-[...addEquipmentForm.querySelectorAll('input')].forEach(input => {
-  input.addEventListener('input', () => {
-    addAdminError.classList.add('hidden');
-    addAdminError.textContent = '';
+[...addEquipmentForm.querySelectorAll("input")].forEach((input) => {
+  input.addEventListener("input", () => {
+    addAdminError.classList.add("hidden");
+    addAdminError.textContent = "";
   });
 });
 
-// Optional: Add delete functionality for dynamically added rows
 tbody.addEventListener("click", async (e) => {
   if (
     e.target.closest("button") &&
@@ -136,7 +152,7 @@ tbody.addEventListener("click", async (e) => {
 
 /**
  * Method to create a new admin row to the front end table.
- * 
+ *
  * @param {*} adminId New ID of the admin (User Defined)
  * @param {*} firstName First name of the admin
  * @param {*} middleName Middle name of the admin
@@ -178,13 +194,12 @@ async function prepareAdminTable() {
 
     for (let i = 0; i < data.length; i++) {
       createNewAdminRow(
-        data[i]['Admin ID'],
-        data[i]['First Name'],
-        data[i]['Middle Name'],
-        data[i]['Last Name']
+        data[i]["Admin ID"],
+        data[i]["First Name"],
+        data[i]["Middle Name"],
+        data[i]["Last Name"]
       );
     }
-
   } catch (error) {
     console.error(error);
   }
@@ -250,7 +265,8 @@ editAdminForm.addEventListener("submit", async (e) => {
   if (!editAdminError) {
     editAdminError = document.createElement("div");
     editAdminError.id = "editAdminError";
-    editAdminError.className = "mb-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded px-3 py-2";
+    editAdminError.className =
+      "mb-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded px-3 py-2";
     editAdminForm.prepend(editAdminError);
   }
   editAdminError.classList.add("hidden");
@@ -269,9 +285,14 @@ editAdminForm.addEventListener("submit", async (e) => {
       return;
     }
   }
-  let result = await dbhandler.updateAdminRecord(adminId, firstName, middleName, lastName);
+  let result = await dbhandler.updateAdminRecord(
+    adminId,
+    firstName,
+    middleName,
+    lastName
+  );
   if (result && result.includes("ERROR")) {
-    editAdminError.textContent = result.replace(/^ERROR:\s*/i, '');
+    editAdminError.textContent = result.replace(/^ERROR:\s*/i, "");
     editAdminError.classList.remove("hidden");
     return;
   }
@@ -285,6 +306,7 @@ editAdminForm.addEventListener("submit", async (e) => {
   editAdminError.classList.add("hidden");
   editAdminError.textContent = "";
   closeEditAdminModal();
+  showToast("Admin updated successfully");
 });
 
 // Delete confirm
@@ -298,5 +320,40 @@ confirmDeleteAdminBtn.addEventListener("click", async () => {
     }
     adminRowToDelete.remove();
     closeDeleteAdminModal();
+    showToast("Admin deleted successfully");
   }
 });
+
+// --- Toast Notification ---
+// Shows a small message at the bottom right when something is added, edited, deleted, or an error occurs
+function showToast(message, isError = false) {
+  let toast = document.getElementById("custom-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "custom-toast";
+    toast.style.position = "fixed";
+    toast.style.bottom = "32px";
+    toast.style.right = "32px";
+    toast.style.background = isError
+      ? "rgba(220, 38, 38, 0.95)"
+      : "rgba(44, 161, 74, 0.95)"; // Red for error, green for success
+    toast.style.color = "white";
+    toast.style.padding = "16px 28px";
+    toast.style.borderRadius = "8px";
+    toast.style.fontSize = "16px";
+    toast.style.fontWeight = "regular";
+    toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+    toast.style.opacity = "0";
+    toast.style.transition = "opacity 0.4s";
+    toast.style.zIndex = "9999";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.style.background = isError
+    ? "rgba(220, 38, 38, 0.95)"
+    : "rgba(44, 161, 74, 0.95)";
+  toast.style.opacity = "1";
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, 1800);
+}
