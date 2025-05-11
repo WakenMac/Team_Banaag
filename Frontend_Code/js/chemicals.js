@@ -19,6 +19,7 @@ import * as dbhandler from "../../Backend_Code/mainHandler.js";
 // Initialize Compoenents
 const addChemicalLocation = document.getElementById("chemicalLocation");
 const addChemicalUnit = document.getElementById("chemicalUnit");
+
 const editChemicalLocation = document.getElementById("editChemicalLocation");
 const editChemicalUnit = document.getElementById("editChemicalUnit");
 
@@ -45,9 +46,6 @@ const addChemicalsForm = document.getElementById("addChemicalsForm");
 const cancelBtn = document.getElementById("cancelBtn");
 const modalBackdropAddChemical = document.getElementById(
   "modalBackdropAddChemical"
-);
-const closeAddChemicalModalBtn = document.getElementById(
-  "closeAddChemicalModalBtn"
 );
 
 // Delete Chemical Functionality
