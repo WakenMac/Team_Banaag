@@ -21,836 +21,843 @@
   - Save and Cancel buttons (todo: ave button will be changed to Update button when editing)
   - Close on backdrop click
 -->
-
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <title>CARES | CAS Lab Inventory</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&amp;display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/Frontend_Code/css/admin.css" />
-  </head>
-
-  <body class="bg-[#f3f7f7] min-h-screen">
-    <nav
-      class="flex items-center justify-between px-4 md:px-8 lg:px-12 h-20 border-b border-gray-300 bg-[#f3f7f7]"
-    >
-      <!-- Left side: Logo and Title -->
-      <a
-        href="/Frontend_Code/html/main.html"
-        class="flex items-center space-x-3 group"
+<DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <meta content="width=device-width, initial-scale=1" name="viewport" />
+      <title>CARES | CAS Lab Inventory</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        rel="stylesheet"
+      />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&amp;display=swap"
+        rel="stylesheet"
+      />
+      <link rel="stylesheet" href="/Frontend_Code/css/admin.css" />
+    </head>
+    <body class="bg-[#f3f7f7] min-h-screen">
+      <nav
+        class="flex items-center justify-between px-4 md:px-8 lg:px-12 h-20 border-b border-gray-300 bg-[#f3f7f7]"
       >
-        <img
-          alt="CAS Lab logo with green and yellow colors, circular emblem with text"
-          class="w-12 h-12 object-contain transition-transform"
-          height="48"
-          src="/Frontend_Code/images/cas_logo.png"
-          width="48"
-        />
-        <div class="flex flex-col leading-tight">
-          <span class="font-semibold text-black text-sm"> CARES. </span>
-          <span class="text-[9px] font-semibold text-black/80 tracking-tight">
-            CENTRALIZED RESOURCE
-          </span>
-          <span class="text-[9px] font-semibold text-black/80 tracking-tight">
-            AND EQUIPMENT SYSTEM
-          </span>
+        <!-- Left side: Logo and Title -->
+        <a
+          href="/Frontend_Code/html/main.html"
+          class="flex items-center space-x-3 group"
+        >
+          <img
+            alt="CAS Lab logo with green and yellow colors, circular emblem with text"
+            class="w-12 h-12 object-contain transition-transform"
+            height="48"
+            src="/Frontend_Code/images/cas_logo.png"
+            width="48"
+          />
+          <div class="flex flex-col leading-tight">
+            <span class="font-semibold text-black text-sm"> CARES. </span>
+            <span class="text-[9px] font-semibold text-black/80 tracking-tight">
+              CENTRALIZED RESOURCE
+            </span>
+            <span class="text-[9px] font-semibold text-black/80 tracking-tight">
+              AND EQUIPMENT SYSTEM
+            </span>
+          </div>
+          <div class="border-l border-black/40 h-10 ml-4"></div>
+        </a>
+
+        <!-- Right side: Navigation Links -->
+        <ul class="flex space-x-8 text-[13px] font-normal text-black">
+          <li>
+            <a
+              class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]"
+              href="/Frontend_Code/html/main.html"
+            >
+              Dashboard
+            </a>
+          </li>
+          <li class="relative">
+            <button
+              aria-expanded="false"
+              aria-haspopup="true"
+              class="inline-flex items-center cursor-pointer select-none focus:outline-none"
+              id="masterlistBtn"
+              type="button"
+            >
+              Masterlist
+              <i class="fas fa-chevron-down ml-1 text-xs"> </i>
+            </button>
+            <ul
+              aria-labelledby="masterlistBtn"
+              class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+              id="masterlistMenu"
+              role="menu"
+            >
+              <li role="none">
+                <a
+                  class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                  href="/Frontend_Code/html/components/admins.html"
+                  role="menuitem"
+                  tabindex="-1"
+                >
+                  Admins
+                </a>
+              </li>
+              <li role="none">
+                <a
+                  class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                  href="/Frontend_Code/html/components/inventory.html"
+                  role="menuitem"
+                  tabindex="-1"
+                >
+                  Inventory
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="relative">
+            <button
+              aria-expanded="false"
+              aria-haspopup="true"
+              class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none"
+              id="consumablesBtn"
+              type="button"
+            >
+              Consumables
+              <i class="fas fa-chevron-down ml-1 text-xs"> </i>
+            </button>
+            <ul
+              aria-labelledby="consumablesBtn"
+              class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+              id="consumablesMenu"
+              role="menu"
+            >
+              <li role="none">
+                <a
+                  class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                  href="/Frontend_Code/html/components/chemicals.html"
+                  role="menuitem"
+                  tabindex="-1"
+                >
+                  Chemicals
+                </a>
+              </li>
+              <li role="none">
+                <a
+                  class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                  href="/Frontend_Code/html/components/items.html"
+                  role="menuitem"
+                  tabindex="-1"
+                >
+                  Items
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="relative">
+            <button
+              aria-expanded="false"
+              aria-haspopup="true"
+              class="inline-flex items-center cursor-pointer select-none focus:outline-none"
+              id="nonconsumablesBtn"
+              type="button"
+            >
+              Non-consumables
+              <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+            </button>
+            <ul
+              aria-labelledby="nonconsumablesBtn"
+              class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+              id="nonconsumablesMenu"
+              role="menu"
+            >
+              <li role="none">
+                <a
+                  class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                  href="/Frontend_Code/html/components/equipments.html"
+                  role="menuitem"
+                  tabindex="-1"
+                >
+                  Equipment
+                </a>
+              </li>
+              <li role="none">
+                <a
+                  class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                  href="/Frontend_Code/html/components/apparatus.html"
+                  role="menuitem"
+                  tabindex="-1"
+                >
+                  Apparatus
+                </a>
+              </li>
+              <li role="none">
+                <a
+                  class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                  href="/Frontend_Code/html/components/glassware.html"
+                  role="menuitem"
+                  tabindex="-1"
+                >
+                  Glassware
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="relative">
+            <button
+              aria-expanded="false"
+              aria-haspopup="true"
+              class="inline-flex items-center cursor-pointer select-none focus:outline-none"
+              id="propertiesBtn"
+              type="button"
+            >
+              Properties
+              <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+            </button>
+            <ul
+              aria-labelledby="propertiesBtn"
+              class="absolute left-0 top-full mt-1 w-40 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+              id="propertiesMenu"
+              role="menu"
+            >
+              <li role="none">
+                <a
+                  class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                  href="/Frontend_Code/html/components/unitType.html"
+                  role="menuitem"
+                  tabindex="-1"
+                >
+                  Unit Type
+                </a>
+              </li>
+              <li role="none">
+                <a
+                  class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                  href="/Frontend_Code/html/components/location.html"
+                  role="menuitem"
+                  tabindex="-1"
+                >
+                  Location
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a
+              class="hover:underline"
+              href="/Frontend_Code/html/components/restocks.html"
+            >
+              Restocks
+            </a>
+          </li>
+          <li>
+            <a
+              class="hover:underline"
+              href="/Frontend_Code/html/components/transactions.html"
+            >
+              Transactions
+            </a>
+          </li>
+          <li>
+            <a
+              class="hover:underline"
+              href="/Frontend_Code/html/components/statistics.html"
+            >
+              Statistics
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 mt-6">
+        <div
+          class="flex flex-col sm:flex-row justify-between items-center w-full gap-3 sm:gap-0"
+        >
+          <div
+            class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto"
+          >
+            <input
+              aria-label="Search"
+              class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-64"
+              placeholder="Search..."
+              type="search"
+            />
+            <select
+              aria-label="Filter by"
+              class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-48 custom-select"
+            >
+              <option value="" disabled selected class="placeholder-option">
+                Filter by
+              </option>
+            </select>
+          </div>
+          <button
+            aria-controls="addChemicalsModal"
+            aria-haspopup="dialog"
+            class="custom-btn"
+            id="addChemicalsBtn"
+            type="button"
+          >
+            Add Chemical
+          </button>
         </div>
-        <div class="border-l border-black/40 h-10 ml-4"></div>
-      </a>
-      <!-- Right side: Navigation Links -->
-      <ul class="flex space-x-8 text-[13px] font-normal text-black">
-        <li>
-          <a
-            class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]"
-            href="/Frontend_Code/html/main.html"
-          >
-            Dashboard
-          </a>
-        </li>
-        <li class="relative">
-          <button
-            aria-expanded="false"
-            aria-haspopup="true"
-            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
-            id="masterlistBtn"
-            type="button"
-          >
-            Masterlist
-            <i class="fas fa-chevron-down ml-1 text-xs"> </i>
-          </button>
-          <ul
-            aria-labelledby="masterlistBtn"
-            class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
-            id="masterlistMenu"
-            role="menu"
-          >
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/admins.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Admins
-              </a>
-            </li>
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/inventory.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Inventory
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="relative">
-          <button
-            aria-expanded="false"
-            aria-haspopup="true"
-            class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none"
-            id="consumablesBtn"
-            type="button"
-          >
-            Consumables
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
-          </button>
-          <ul
-            aria-labelledby="consumablesBtn"
-            class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
-            id="consumablesMenu"
-            role="menu"
-          >
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/chemicals.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Chemicals
-              </a>
-            </li>
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/items.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Items
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="relative">
-          <button
-            aria-expanded="false"
-            aria-haspopup="true"
-            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
-            id="nonconsumablesBtn"
-            type="button"
-          >
-            Non-consumables
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
-          </button>
-          <ul
-            aria-labelledby="nonconsumablesBtn"
-            class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
-            id="nonconsumablesMenu"
-            role="menu"
-          >
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/equipments.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Equipment
-              </a>
-            </li>
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/apparatus.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Apparatus
-              </a>
-            </li>
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/glassware.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Glassware
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="relative">
-          <button
-            aria-expanded="false"
-            aria-haspopup="true"
-            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
-            id="propertiesBtn"
-            type="button"
-          >
-            Properties
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
-          </button>
-          <ul
-            aria-labelledby="propertiesBtn"
-            class="absolute left-0 top-full mt-1 w-40 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
-            id="propertiesMenu"
-            role="menu"
-          >
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/unitType.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Unit Type
-              </a>
-            </li>
-            <li role="none">
-              <a
-                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
-                href="/Frontend_Code/html/components/location.html"
-                role="menuitem"
-                tabindex="-1"
-              >
-                Location
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <a
-            class="hover:underline"
-            href="/Frontend_Code/html/components/restocks.html"
-          >
-            Restocks
-          </a>
-        </li>
-        <li>
-          <a
-            class="hover:underline"
-            href="/Frontend_Code/html/components/transactions.html"
-          >
-            Transactions
-          </a>
-        </li>
-        <li>
-          <a
-            class="hover:underline"
-            href="/Frontend_Code/html/components/statistics.html"
-          >
-            Statistics
-          </a>
-        </li>
-      </ul>
-    </nav>
-    <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 mt-6">
+        <h2 class="font-semibold text-gray-900 text-sm mb-3 mt-4">
+          Consumables - Chemicals
+        </h2>
+        <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
+          <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-white">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  scope="col"
+                >
+                  Item ID
+                </th>
+                <th
+                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  scope="col"
+                >
+                  Name
+                </th>
+                <th
+                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  scope="col"
+                >
+                  Unit
+                </th>
+                <th
+                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  scope="col"
+                >
+                  Location
+                </th>
+                <th
+                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  scope="col"
+                >
+                  Brand
+                </th>
+                <th
+                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  scope="col"
+                >
+                  Initial Quantity (Per Bottle)
+                </th>
+                <th
+                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  scope="col"
+                >
+                  Container Size
+                </th>
+                <th
+                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  scope="col"
+                >
+                  Remaining Quantity
+                </th>
+                <th
+                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  scope="col"
+                ></th>
+              </tr>
+            </thead>
+            <tbody id="chemicalsTableBody" class="bg-white">
+              <!-- This is just for the table body -->
+              <!-- Example row will be added dynamically through CRUD -->
+            </tbody>
+          </table>
+        </div>
+      </main>
+
+      <!-- Edit Modal -->
       <div
-        class="flex flex-col sm:flex-row justify-between items-center w-full gap-3 sm:gap-0"
+        aria-labelledby="editModalTitle"
+        aria-modal="true"
+        class="fixed inset-0 z-50 hidden items-center justify-center"
+        id="editChemicalModal"
+        role="dialog"
       >
         <div
-          class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto"
+          class="modal-backdrop fixed inset-0 bg-black opacity-50"
+          id="modalBackdropEditChemical"
+        ></div>
+        <div
+          class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
         >
-          <input
-            aria-label="Search"
-            class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-64"
-            placeholder="Search..."
-            type="search"
-          />
-          <select
-            aria-label="Filter by"
-            class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-48 custom-select"
-          >
-            <option value="" disabled selected class="placeholder-option">
-              Filter by
-            </option>
-          </select>
-        </div>
-        <button
-          aria-controls="addChemicalsModal"
-          aria-haspopup="dialog"
-          class="custom-btn"
-          id="addChemicalsBtn"
-          type="button"
-        >
-          Add Chemical
-        </button>
-      </div>
-      <h2 class="font-semibold text-gray-900 text-sm mb-3 mt-4">
-        Consumables - Chemicals
-      </h2>
-      <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
-        <table class="min-w-full divide-y divide-gray-200 text-sm">
-          <thead class="bg-white">
-            <tr>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <img
+                src="/Frontend_Code/images/cas_logo.png"
+                alt="CARES logo"
+                class="w-12 h-12 object-contain"
+              />
+              <span class="font-black text-3xl text-black">Edit Chemical</span>
+            </div>
+          </div>
+          <form class="space-y-4" id="editChemicalForm">
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="editChemicalId"
               >
-                Item ID
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
+                Chemical ID
+              </label>
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="editChemicalId"
+                name="editChemicalId"
+                type="text"
+                readonly
+                placeholder="Enter chemical ID"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="editChemicalName"
               >
                 Name
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
+              </label>
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="editChemicalName"
+                name="editChemicalName"
+                type="text"
+                placeholder="Enter chemical name"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="editChemicalUnit"
               >
                 Unit
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
+              </label>
+              <select
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 placeholder-gray-400"
+                id="editChemicalUnit"
+                name="editChemicalUnit"
+                required
+              >
+                <option value="" disabled selected class="placeholder-option">
+                  - Select Unit -
+                </option>
+                <!-- Options will be populated dynamically from the database -->
+                <!-- Options are now added dynamically through Unit Type CRUD -->
+              </select>
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="editChemicalLocation"
               >
                 Location
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
+              </label>
+              <select
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="editChemicalLocation"
+                name="editChemicalLocation"
+              >
+                <option value="" disabled selected class="placeholder-option">
+                  Select Location
+                </option>
+                <option value="Gensan">Gensan</option>
+                <!-- Options will be populated dynamically from the database -->
+                <!-- Options are now added dynamically through Unit Type CRUD -->
+              </select>
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="editChemicalBrand"
               >
                 Brand
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Initial Quantity (Per Bottle)
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
+              </label>
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="editChemicalBrand"
+                name="editChemicalBrand"
+                type="text"
+                placeholder="Enter brand"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="editChemicalContainerSize"
               >
                 Container Size
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
+              </label>
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="editChemicalContainerSize"
+                name="editChemicalContainerSize"
+                type="text"
+                placeholder="Enter container size"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="editChemicalCASNo"
               >
-                Remaining Quantity
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              ></th>
-            </tr>
-          </thead>
-          <tbody id="chemicalsTableBody" class="bg-white">
-            <!-- This is just for the table body -->
-            <!-- Example row will be added dynamically through CRUD -->
-          </tbody>
-        </table>
-      </div>
-    </main>
+                CAS No.
+              </label>
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="editChemicalCASNo"
+                name="editChemicalCASNo"
+                type="text"
+                placeholder="Enter CAS number"
+              />
+            </div>
 
-    <!-- Edit Modal -->
-    <div
-      aria-labelledby="editModalTitle"
-      aria-modal="true"
-      class="fixed inset-0 z-50 hidden items-center justify-center"
-      id="editChemicalModal"
-      role="dialog"
-    >
-      <div
-        class="modal-backdrop fixed inset-0 bg-black opacity-50"
-        id="modalBackdropEditChemical"
-      ></div>
-      <div
-        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
-      >
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center gap-3">
-            <img
-              src="/Frontend_Code/images/cas_logo.png"
-              alt="CARES logo"
-              class="w-12 h-12 object-contain"
-            />
-            <span class="font-black text-3xl text-black">Edit Chemical</span>
-          </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="editChemicalMSDS"
+              >
+                MSDS
+              </label>
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="editChemicalMSDS"
+                name="editChemicalMSDS"
+                type="text"
+                placeholder="Enter MSDS"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="editChemicalBarCode"
+              >
+                Bar Code
+              </label>
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="editChemicalBarCode"
+                name="editChemicalBarCode"
+                type="text"
+                placeholder="Enter bar code"
+              />
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-4">
+              <button
+                class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+                id="cancelEditBtn"
+                type="button"
+              >
+                Cancel
+              </button>
+              <button
+                class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
+                type="submit"
+              >
+                Save
+              </button>
+            </div>
+          </form>
         </div>
-        <form class="space-y-4" id="editChemicalForm">
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="editChemicalId"
-            >
-              Chemical ID
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="editChemicalId"
-              name="editChemicalId"
-              type="text"
-              readonly
-              placeholder="Enter chemical ID"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="editChemicalName"
-            >
-              Name
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="editChemicalName"
-              name="editChemicalName"
-              type="text"
-              placeholder="Enter chemical name"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="editChemicalUnit"
-            >
-              Unit
-            </label>
-            <select
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 placeholder-gray-400"
-              id="editChemicalUnit"
-              name="editChemicalUnit"
-              required
-            >
-              <option value="" disabled selected class="placeholder-option">
-                - Select Unit -
-              </option>
-              <!-- Options will be populated dynamically from the database -->
-              <!-- Options are now added dynamically through Unit Type CRUD -->
-            </select>
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="editChemicalLocation"
-            >
-              Location
-            </label>
-            <select
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="editChemicalLocation"
-              name="editChemicalLocation"
-            >
-              <option value="" disabled selected class="placeholder-option">
-                Select Location
-              </option>
-              <option value="Gensan">Gensan</option>
-              <!-- Options will be populated dynamically from the database -->
-              <!-- Options are now added dynamically through Unit Type CRUD -->
-            </select>
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="editChemicalBrand"
-            >
-              Brand
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="editChemicalBrand"
-              name="editChemicalBrand"
-              type="text"
-              placeholder="Enter brand"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="editChemicalContainerSize"
-            >
-              Container Size
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="editChemicalContainerSize"
-              name="editChemicalContainerSize"
-              type="text"
-              placeholder="Enter container size"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="editChemicalCASNo"
-            >
-              CAS No.
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="editChemicalCASNo"
-              name="editChemicalCASNo"
-              type="text"
-              placeholder="Enter CAS number"
-            />
-          </div>
+      </div>
 
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="editChemicalMSDS"
-            >
-              MSDS
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="editChemicalMSDS"
-              name="editChemicalMSDS"
-              type="text"
-              placeholder="Enter MSDS"
-            />
+      <!-- Add Modal -->
+      <div
+        aria-labelledby="modalTitle"
+        aria-modal="true"
+        class="fixed inset-0 z-50 hidden items-center justify-center"
+        id="addChemicalsModal"
+        role="dialog"
+      >
+        <div
+          class="modal-backdrop fixed inset-0 bg-black opacity-50"
+          id="modalBackdropAddChemical"
+        ></div>
+        <div
+          class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+        >
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <img
+                src="/Frontend_Code/images/cas_logo.png"
+                alt="CARES logo"
+                class="w-12 h-12 object-contain"
+              />
+              <span class="font-black text-3xl text-black">Add Chemical</span>
+            </div>
           </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="editChemicalBarCode"
-            >
-              Bar Code
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="editChemicalBarCode"
-              name="editChemicalBarCode"
-              type="text"
-              placeholder="Enter bar code"
-            />
-          </div>
+          <form class="space-y-4" id="addChemicalsForm">
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="chemicalName"
+              >
+                Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="chemicalName"
+                name="chemicalName"
+                required=""
+                type="text"
+                placeholder="e.g. Acetic Acid"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="chemicalUnit"
+              >
+                Unit <span class="text-red-500">*</span>
+              </label>
+              <select
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 placeholder-gray-400"
+                id="chemicalUnit"
+                name="chemicalUnit"
+                required
+              >
+                <option value="" disabled selected class="placeholder-option">
+                  - Select Unit -
+                </option>
+                <!-- Options will be populated dynamically from the database -->
+                <!-- ~The dynamic options have been implemented~  -->
+              </select>
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="chemicalLocation"
+              >
+                Location <span class="text-red-500">*</span>
+              </label>
+              <select
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent custom-select"
+                id="chemicalLocation"
+                name="chemicalLocation"
+                required
+              >
+                <option value="" disabled selected class="placeholder-option">
+                  - Select Location -
+                </option>
+                <!-- Options will be populated dynamically from the database -->
+                <!-- ~The dynamic options have been implemented~  -->
+              </select>
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="chemicalBrand"
+              >
+                Brand <span class="text-red-500">*</span>
+              </label>
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="chemicalBrand"
+                name="chemicalBrand"
+                required=""
+                type="text"
+                placeholder="e.g. Merck (N/A if not applicable)"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="chemicalContainerSize"
+              >
+                Container Size <span class="text-red-500">*</span>
+              </label>
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="chemicalContainerSize"
+                name="chemicalContainerSize"
+                required=""
+                type="text"
+                placeholder="e.g. 500 mL"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="chemicalCASNo"
+              >
+                CAS No.
+              </label>
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="chemicalCASNo"
+                name="chemicalCASNo"
+                type="text"
+                placeholder="e.g. 64-19-7"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="chemicalMSDS"
+              >
+                MSDS
+              </label>
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="chemicalMSDS"
+                name="chemicalMSDS"
+                rows="3"
+                placeholder="e.g. idk unsay porma"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="chemicalBarCode"
+              >
+                Bar Code
+              </label>
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="chemicalBarCode"
+                name="chemicalBarCode"
+                type="text"
+                placeholder="e.g. 1234567890123"
+              />
+            </div>
+            <div class="flex justify-end space-x-3 pt-4">
+              <button
+                class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+                id="cancelBtn"
+                type="button"
+              >
+                Cancel
+              </button>
+              <button
+                class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
+                type="submit"
+              >
+                Save
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- End of Add Modal -->
 
-          <div class="flex justify-end space-x-3 pt-4">
+      <!-- Remarks Modal -->
+      <div
+        aria-labelledby="remarksModalTitle"
+        aria-modal="true"
+        class="fixed inset-0 z-50 hidden items-center justify-center"
+        id="remarksModal"
+        role="dialog"
+      >
+        <div
+          class="modal-backdrop fixed inset-0 bg-black opacity-50"
+          id="modalBackdropRemarks"
+        ></div>
+        <div
+          class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+        >
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <img
+                src="/Frontend_Code/images/cas_logo.png"
+                alt="CARES logo"
+                class="w-12 h-12 object-contain"
+              />
+              <span class="font-black text-3xl text-black">Add Remarks</span>
+            </div>
+          </div>
+          <form class="space-y-4" id="remarksForm">
+            <input
+              type="hidden"
+              id="remarksChemicalId"
+              name="remarksChemicalId"
+            />
+            <div>
+              <label
+                class="block text-sm font-medium text-gray-700 mb-1"
+                for="remarksText"
+              >
+                Remarks
+              </label>
+              <textarea
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="remarksText"
+                name="remarksText"
+                rows="4"
+                placeholder="Enter your remarks here..."
+              ></textarea>
+            </div>
+            <div class="flex justify-end space-x-3 pt-4">
+              <button
+                class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+                id="cancelRemarksBtn"
+                type="button"
+              >
+                Cancel
+              </button>
+              <button
+                class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
+                type="submit"
+              >
+                Save
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- End of Remarks Modal -->
+
+      <!-- Delete Chemical Modal -->
+      <div
+        aria-labelledby="deleteChemicalModalTitle"
+        aria-modal="true"
+        class="fixed inset-0 z-50 hidden items-center justify-center"
+        id="deleteChemicalModal"
+        role="dialog"
+      >
+        <div
+          class="modal-backdrop fixed inset-0 bg-black opacity-50"
+          id="modalBackdropDeleteChemical"
+        ></div>
+        <div
+          class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+        >
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <img
+                src="/Frontend_Code/images/cas_logo.png"
+                alt="CARES logo"
+                class="w-12 h-12 object-contain"
+              />
+              <span class="font-black text-3xl text-black"
+                >Delete Chemical</span
+              >
+            </div>
+          </div>
+          <p class="text-gray-700 mb-6">
+            Are you sure you want to delete this chemical? This action cannot be
+            undone.
+          </p>
+          <div class="flex justify-end space-x-3">
             <button
               class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-              id="cancelEditBtn"
+              id="cancelDeleteChemicalBtn"
               type="button"
             >
               Cancel
             </button>
             <button
-              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
-              type="submit"
-            >
-              Save
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Add Modal -->
-    <div
-      aria-labelledby="modalTitle"
-      aria-modal="true"
-      class="fixed inset-0 z-50 hidden items-center justify-center"
-      id="addChemicalsModal"
-      role="dialog"
-    >
-      <div
-        class="modal-backdrop fixed inset-0 bg-black opacity-50"
-        id="modalBackdropAddChemical"
-      ></div>
-      <div
-        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
-      >
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center gap-3">
-            <img
-              src="/Frontend_Code/images/cas_logo.png"
-              alt="CARES logo"
-              class="w-12 h-12 object-contain"
-            />
-            <span class="font-black text-3xl text-black">Add Chemical</span>
-          </div>
-        </div>
-        <form class="space-y-4" id="addChemicalsForm">
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalName"
-            >
-              Name <span class="text-red-500">*</span>
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalName"
-              name="chemicalName"
-              required=""
-              type="text"
-              placeholder="e.g. Acetic Acid"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalUnit"
-            >
-              Unit <span class="text-red-500">*</span>
-            </label>
-            <select
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 placeholder-gray-400"
-              id="chemicalUnit"
-              name="chemicalUnit"
-              required
-            >
-              <option value="" disabled selected class="placeholder-option">
-                - Select Unit -
-              </option>
-              <!-- Options will be populated dynamically from the database -->
-              <!-- ~The dynamic options have been implemented~  -->
-            </select>
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalLocation"
-            >
-              Location <span class="text-red-500">*</span>
-            </label>
-            <select
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent custom-select"
-              id="chemicalLocation"
-              name="chemicalLocation"
-              required
-            >
-              <option value="" disabled selected class="placeholder-option">
-                - Select Location -
-              </option>
-              <!-- Options will be populated dynamically from the database -->
-              <!-- ~The dynamic options have been implemented~  -->
-            </select>
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalBrand"
-            >
-              Brand <span class="text-red-500">*</span>
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalBrand"
-              name="chemicalBrand"
-              required=""
-              type="text"
-              placeholder="e.g. Merck (N/A if not applicable)"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalContainerSize"
-            >
-              Container Size <span class="text-red-500">*</span>
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalContainerSize"
-              name="chemicalContainerSize"
-              required=""
-              type="text"
-              placeholder="e.g. 500 mL"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalCASNo"
-            >
-              CAS No.
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalCASNo"
-              name="chemicalCASNo"
-              type="text"
-              placeholder="e.g. 64-19-7"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalMSDS"
-            >
-              MSDS
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalMSDS"
-              name="chemicalMSDS"
-              rows="3"
-              placeholder="e.g. idk unsay porma"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="chemicalBarCode"
-            >
-              Bar Code
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="chemicalBarCode"
-              name="chemicalBarCode"
-              type="text"
-              placeholder="e.g. 1234567890123"
-            />
-          </div>
-          <div class="flex justify-end space-x-3 pt-4">
-            <button
-              class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-              id="cancelBtn"
+              class="px-4 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              id="confirmDeleteChemicalBtn"
               type="button"
             >
-              Cancel
+              Delete
             </button>
-            <button
-              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
-              type="submit"
-            >
-              Save
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-    <!-- Remarks Modal -->
-    <div
-      aria-labelledby="remarksModalTitle"
-      aria-modal="true"
-      class="fixed inset-0 z-50 hidden items-center justify-center"
-      id="remarksModal"
-      role="dialog"
-    >
-      <div
-        class="modal-backdrop fixed inset-0 bg-black opacity-50"
-        id="modalBackdropRemarks"
-      ></div>
-      <div
-        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
-      >
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center gap-3">
-            <img
-              src="/Frontend_Code/images/cas_logo.png"
-              alt="CARES logo"
-              class="w-12 h-12 object-contain"
-            />
-            <span class="font-black text-3xl text-black">Add Remarks</span>
           </div>
         </div>
-        <form class="space-y-4" id="remarksForm">
-          <input
-            type="hidden"
-            id="remarksChemicalId"
-            name="remarksChemicalId"
-          />
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="remarksText"
-            >
-              Remarks
-            </label>
-            <textarea
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="remarksText"
-              name="remarksText"
-              rows="4"
-              placeholder="Enter your remarks here..."
-            ></textarea>
-          </div>
-          <div class="flex justify-end space-x-3 pt-4">
-            <button
-              class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-              id="cancelRemarksBtn"
-              type="button"
-            >
-              Cancel
-            </button>
-            <button
-              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
-              type="submit"
-            >
-              Save
-            </button>
-          </div>
-        </form>
       </div>
-    </div>
-    <!-- Delete Chemical Modal -->
-    <div
-      aria-labelledby="deleteChemicalModalTitle"
-      aria-modal="true"
-      class="fixed inset-0 z-50 hidden items-center justify-center"
-      id="deleteChemicalModal"
-      role="dialog"
-    >
-      <div
-        class="modal-backdrop fixed inset-0 bg-black opacity-50"
-        id="modalBackdropDeleteChemical"
-      ></div>
-      <div
-        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
-      >
-        <div class="flex items-center justify-between mb-6">
-          <div class="flex items-center gap-3">
-            <img
-              src="/Frontend_Code/images/cas_logo.png"
-              alt="CARES logo"
-              class="w-12 h-12 object-contain"
-            />
-            <span class="font-black text-3xl text-black">Delete Chemical</span>
-          </div>
-        </div>
-        <p class="text-gray-700 mb-6">
-          Are you sure you want to delete this chemical? This action cannot be
-          undone.
-        </p>
-        <div class="flex justify-end space-x-3">
-          <button
-            class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-            id="cancelDeleteChemicalBtn"
-            type="button"
-          >
-            Cancel
-          </button>
-          <button
-            class="px-4 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-            id="confirmDeleteChemicalBtn"
-            type="button"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module" src="/Frontend_Code/js/chemicals.js"></script>
-  </body>
-</html>
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+      <script type="module" src="/Frontend_Code/js/chemicals.js"></script>
+    </body>
+  </html>
+</DOCTYPE>

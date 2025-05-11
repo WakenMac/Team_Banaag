@@ -2,6 +2,55 @@
  * This part of the code is for equipment html. most specifically, the modal form.
  */
 
+// Modal logic
+const addEquipmentLocation = document.getElementById("equipmentLocation");
+const addEquipmentUnit = document.getElementById("equipmentUnit");
+
+const editEquipmentLocation = document.getElementById("editEquipmentLocation");
+const editEquipmentUnit = document.getElementById("editEquipmentUnit");
+
+const modalBackdropEditEquipment = document.getElementById(
+  "modalBackdropEditEquipment"
+);
+const equipmentTablesBody = document.getElementById("equipmentTablesBody");
+
+// Remarks Modal
+const remarksModal = document.getElementById("remarksModal");
+const remarksForm = document.getElementById("remarksForm");
+const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
+const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
+
+// Edit Equipment
+const editEquipmentModal = document.getElementById("editEquipmentModal");
+const editEquipmentForm = document.getElementById("editEquipmentForm");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+// Add Equipment
+const addEquipmentBtn = document.getElementById("addEquipmentBtn");
+const addEquipmentModal = document.getElementById("addEquipmentModal");
+const addEquipmentForm = document.getElementById("addEquipmentForm");
+const cancelBtn = document.getElementById("cancelBtn");
+const modalBackdropAddEquipment = document.getElementById(
+  "modalBackdropAddEquipment"
+);
+
+// Delete Equipment
+const deleteEquipmentModal = document.getElementById("deleteEquipmentModal");
+const modalBackdropDeleteEquipment = document.getElementById(
+  "modalBackdropDeleteEquipment"
+);
+const cancelDeleteEquipmentBtn = document.getElementById(
+  "cancelDeleteEquipmentBtn"
+);
+const confirmDeleteEquipmentBtn = document.getElementById(
+  "confirmDeleteEquipmentBtn"
+);
+let equipmentRowToDelete = null;
+
+const cancelEquipmentBtn = document.getElementById("cancelEquipmentBtn");
+const tbody = document.querySelector("tbody");
+
+// Dropdown logic
 function setupDropdown(buttonId, menuId) {
   const btn = document.getElementById(buttonId);
   const menu = document.getElementById(menuId);
@@ -33,16 +82,49 @@ setupDropdown("consumablesBtn", "consumablesMenu");
 setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
 setupDropdown("propertiesBtn", "propertiesMenu");
 
-// Modal logic
-const addEquipmentBtn = document.getElementById("addEquipmentBtn");
-const addEquipmentModal = document.getElementById("addEquipmentModal");
-const addEquipmentForm = document.getElementById("addEquipmentForm");
-const modalBackdropEquipment = document.getElementById(
-  "modalBackdropEquipment"
-);
-const cancelEquipmentBtn = document.getElementById("cancelEquipmentBtn");
-const tbody = document.querySelector("tbody");
+// Editing: Open and close modal
+function openEditModal() {
+  editEquipmentModal.classList.remove("hidden");
+  editEquipmentModal.classList.add("flex");
+}
 
+function closeEditModal() {
+  editEquipmentModal.classList.add("hidden");
+  editEquipmentModal.classList.remove("flex");
+  editEquipmentForm.reset();
+}
+
+function populateEditForm(row) {
+  const cells = row.children;
+  console.log("Row cells:", cells);
+
+  const fieldMap = [
+    { id: "editEquipmentId", idx: 0 },
+    { id: "editEquipmentName", idx: 1 },
+    { id: "editEquipmentUnit", idx: 2 },
+    { id: "editEquipmentLocation", idx: 3 },
+    { id: "editEquipmentBrand", idx: 4 },
+  ];
+
+  for (const { id, idx } of fieldMap) {
+    const el = document.getElementById(id);
+    if (!el) {
+      console.error(`Element with id ${id} not found`);
+      continue;
+    }
+    if (!cells[idx]) {
+      console.error(`Cell at index ${idx} not found`);
+      continue;
+    } else el.value = cells[idx].textContent;
+  }
+
+  const infoBtn = row.querySelector('button[aria-label="Info"]');
+  let csn = ""; // compressed serial number
+  let cbd = ""; // calibration date
+  let;
+}
+
+// Adding: Open and close modal
 function openEquipmentModal() {
   addEquipmentModal.classList.remove("hidden");
   addEquipmentModal.classList.add("flex");
