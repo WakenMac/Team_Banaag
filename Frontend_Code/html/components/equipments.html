@@ -374,9 +374,9 @@
                   <button
                     aria-label="Info"
                     class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
-                    data-compress_serial_number="1"
-                    data-calibration-date="2023-01-01"
-                    data-freq-of-calibration="6 months"
+                    data-csn="1"
+                    data-cbd="2023-01-01"
+                    data-fcb="6 months"
                   >
                     <i class="fas fa-info text-[14px]"></i>
                   </button>
@@ -642,6 +642,7 @@
                 <option value="" disabled selected class="placeholder-option">
                   - Select Unit -
                 </option>
+                <option value="mL">mL</option>
                 <!-- Options will be populated dynamically from the database -->
               </select>
             </div>
@@ -684,7 +685,7 @@
                 class="block text-sm font-medium text-gray-700 mb-1"
                 for="editEquipmentCalibrationDate"
               >
-                Container Size
+                Calibration Date
               </label>
               <input
                 class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
