@@ -258,7 +258,7 @@ function createNewUnitTypeRow(unitTypeId, unitTypeName) {
 
 async function prepareUnitTypeTable() {
   try {
-    let data = await dbhandler.getAllUnitTypeRecords();
+    let data = await dbhandler.getAllUnitTypeRecordsOrderById();
 
     if (data.length == 0) {
       console.error("Unit type table has no records.");

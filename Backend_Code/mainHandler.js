@@ -241,12 +241,33 @@ export async function removeAdminRecordByAdminId(adminId){
 // Methods for location
 
 /**
- * Method to get all of the records on the location table
+ * Method to get all of the records on the location table, and are ordered by Location ID (Ascending)
  * @returns A record consisting of 4 columns (Location ID, Location Name)
  */
-export async function getAllLocationRecords(){
+export async function getAllLocationRecordsOrderById(){
     try{
-        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_location_records');
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_location_records_order_by_id');
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to get all of the records on the location table, and are ordered alphabetically
+ * @returns A record consisting of 4 columns (Location ID, Location Name)
+ */
+export async function getAllLocationRecordsOrderByName(){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_location_records_order_by_name');
         
         if (supabaseError){
             console.error(`Supabase Error:`, supabaseError.message);
@@ -493,12 +514,33 @@ export async function locationExists(locationId = 0){
 // Methods for Unit Type
 
 /**
- * Method to get all of the records on the unit type table
+ * Method to get all of the records on the unit type table, ordered by their Unit Type ID
  * @returns A record consisting of 2 columns (Unit Type ID, Name)
  */
-export async function getAllUnitTypeRecords(){
+export async function getAllUnitTypeRecordsOrderById(){
     try{
-        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_unit_type_records');
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_unit_type_records_order_by_id');
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to get all of the records on the unit type table, and are ordered alphabetically
+ * @returns A record consisting of 2 columns (Unit Type ID, Name)
+ */
+export async function getAllUnitTypeRecordsOrderByName(){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_unit_type_records_order_by_name');
         
         if (supabaseError){
             console.error(`Supabase Error:`, supabaseError.message);
@@ -1426,7 +1468,7 @@ export async function addGlasswaresRecord(itemName, locationName, unitTypeName, 
             return null;
         }
 
-        const {data, error: supabaseError} = await supabaseClient.rpc('add_glasswares_record', {
+        const {data, error: supabaseError} = await supabaseClient.rpc('main_add_glassware_record', {
             input_item_name : sItemName,
             input_location_name : sLocationName,
             input_unit_type_name : sUnitTypeName,
@@ -1489,6 +1531,48 @@ export async function updateGlasswaresRecordByAll(itemId = 0, itemName, location
             input_location_name : sLocationName,
             input_unit_type_name : sUnitTypeName,
             input_brand_model : sBrandModel,
+            input_remarks : sRemarks
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ /**
+ * Method to update an existing record's remarks in the Glasswares Table based on its Item ID
+ * 
+ * @param {int} itemId                          Primary key of the Glasswares table
+ * @param {string} chemicalBarCode              Barcode of the chemical to be added
+ * 
+ * @returns A string containing the status of the deleted record (Success or Error)
+ */
+export async function updateGlasswaresRemarkByItemId(itemId, remarks = ''){
+    try{
+        const [ sRemarks ] = converter('string', remarks);
+        const [ iItemId ] = converter('int', itemId);
+        
+        if (typeof sRemarks !== 'string'){
+            console.error("PARAMETER ERROR: updateGlasswaresRemarkByItemId's Remarks parameter must be a string.")
+            return null;
+        }
+
+        if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: updateGlasswaresRemarkByItemId's Item ID & Container Size parameter must be a positive non-zero integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_glasswares_remark_by_item_id', {
+            input_item_id : iItemId,
             input_remarks : sRemarks
         });
         

@@ -307,10 +307,11 @@ editChemicalForm.addEventListener("submit", async (e) => {
   if (result == null)
     showToast(
       `The mainHandler.updateChemicalsRecordByAll() DOESN'T return a status statement.`,
-      true
+      true, 
+      4000
     );
   else if (result.includes("ERROR")) {
-    showToast(result, true);
+    showToast(result, true, 4000);
   } else {
     updateChemicalTable(
       editChemicalId,
@@ -325,7 +326,7 @@ editChemicalForm.addEventListener("submit", async (e) => {
     );
     console.log(result);
     closeEditModal();
-    showToast("Chemical updated successfully");
+    showToast("Chemical updated successfully", false, 3000);
   }
 });
 
@@ -390,7 +391,7 @@ addChemicalsForm.addEventListener("submit", async (e) => {
     !chemicalBrand ||
     !chemicalContainerSize
   ) {
-    showToast("Please fill in all required fields.", true);
+    showToast("Please fill in all required fields.", true, 4000);
     return;
   }
 
@@ -408,10 +409,11 @@ addChemicalsForm.addEventListener("submit", async (e) => {
   if (result == null) {
     showToast(
       `The mainHandler.addChemicalsRecord() DOESN'T return a status statement.`,
-      true
+      true, 
+      4000
     );
   } else if (result.includes("ERROR")) {
-    showToast(result, true);
+    showToast(result, true, 4000);
   } else {
     console.log(result);
     let newItemId = result.slice(46, result.length - 1);
@@ -429,7 +431,7 @@ addChemicalsForm.addEventListener("submit", async (e) => {
       chemicalBarCode
     );
     closeAddModal();
-    showToast("Chemical added successfully");
+    showToast("Chemical added successfully", false, 3000);
   }
 });
 
@@ -463,13 +465,13 @@ confirmDeleteChemicalBtn.addEventListener("click", async () => {
 
     let result = await dbhandler.deleteChemicalsRecordByItemId(chemicalId);
     if (result && result.includes("ERROR")) {
-      showToast(result, true);
+      showToast(result, true, 4000);
       return;
     }
     console.log(result);
     chemicalRowToDelete.remove();
     closeDeleteChemicalModal();
-    showToast("Chemical deleted successfully");
+    showToast("Chemical deleted successfully", false, 3000);
   }
 });
 
@@ -530,6 +532,10 @@ chemicalsTableBody.addEventListener("mouseover", function (e) {
   });
 });
 
+
+//=================================================================================================================================
+// Remarks Modals
+
 /**
  * Opens the remarks modal and populates it with existing remarks if any
  * @param {string} chemicalId - The ID of the chemical to add/edit remarks for
@@ -551,9 +557,6 @@ function openRemarksModal(chemicalId) {
     document.getElementById("remarksText").value = "";
   }
 }
-
-//=================================================================================================================================
-// Remarks Modals
 
 /** Closes the remarks modal and resets the form */
 function closeRemarksModal() {
@@ -597,7 +600,7 @@ remarksForm.addEventListener("submit", async (e) => {
   );
 
   if (result && result.includes("ERROR")) {
-    showToast(result, true);
+    showToast(result, true, 4000);
     return;
   }
 
@@ -612,11 +615,13 @@ remarksForm.addEventListener("submit", async (e) => {
   }
 
   closeRemarksModal();
-  showToast("Remarks updated successfully");
+  showToast("Remarks updated successfully", false, 3000);
 });
 
 // ===============================================================================================
 // FRONT END-RELATED METHODS
+
+// TODO: Add documentation
 async function createNewChemicalRow(
   chemicalId,
   chemicalName,
@@ -713,6 +718,7 @@ async function createNewRemarks(remarks, chemicalId) {
   }
 }
 
+
 function updateChemicalTable(
   editChemicalId,
   editChemicalName,
@@ -765,7 +771,7 @@ async function prepareChemicalsTable() {
   try {
     let data = await dbhandler.getAllChemicalRecords();
 
-    console.log(data.length);
+    console.log('Number of records: ', data.length);
 
     if (data.length == 0) {
       console.error("Chemical table has no records.");
@@ -788,7 +794,6 @@ async function prepareChemicalsTable() {
       );
 
       await createNewRemarks(data[i]["Remarks"], data[i]["Item ID"]);
-      console.log(data[i]["Remarks"]);
     }
   } catch (generalError) {
     console.error(generalError);
@@ -802,7 +807,7 @@ async function prepareChemicalsTable() {
  */
 async function prepareUnitTypeDropdown() {
   try {
-    let data = await dbhandler.getAllUnitTypeRecords();
+    let data = await dbhandler.getAllUnitTypeRecordsOrderByName();
 
     if (data.length == 0) {
       console.error("Unit type table has no records.");
@@ -824,7 +829,7 @@ async function prepareUnitTypeDropdown() {
  */
 async function prepareLocationDropdown() {
   try {
-    let data = await dbhandler.getAllLocationRecords();
+    let data = await dbhandler.getAllLocationRecordsOrderByName();
 
     if (data.length == 0) {
       console.error("Unit type table has no records.");
@@ -841,7 +846,7 @@ async function prepareLocationDropdown() {
 
 // --- Toast Notification ---
 // Shows a small message at the bottom right when something is added, edited, deleted, or an error occurs
-function showToast(message, isError = false) {
+function showToast(message, isError = false, time = 1800) {
   let toast = document.getElementById("custom-toast");
   if (!toast) {
     toast = document.createElement("div");
@@ -870,5 +875,5 @@ function showToast(message, isError = false) {
   toast.style.opacity = "1";
   setTimeout(() => {
     toast.style.opacity = "0";
-  }, 1800);
+  }, time);
 }

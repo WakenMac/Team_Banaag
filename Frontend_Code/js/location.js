@@ -249,7 +249,7 @@ function createNewLocationRow(locationId, locationName) {
 
 async function prepareLocationTable() {
   try {
-    let data = await dbhandler.getAllLocationRecords();
+    let data = await dbhandler.getAllLocationRecordsOrderById();
 
     if (data.length == 0) {
       console.error('Location table has no records.')
