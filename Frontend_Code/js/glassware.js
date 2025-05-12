@@ -308,12 +308,16 @@ confirmDeleteGlasswareBtn.addEventListener("click", async () => {
     closeDeleteChemicalModal();
     showToast("Chemical deleted successfully", false, 3000);
   }
+
+  showToast("ERROR: Unable to find row to delete (Glassware-Delete-Row)", true, 4000);
+  closeDeleteChemicalModal();
 });
 
 // Table row actions: Edit and Delete
 glasswareTableBody.addEventListener("click", (e) => {
   const editBtn = e.target.closest("button[aria-label='Edit glassware']");
   const deleteBtn = e.target.closest("button[aria-label='Delete glassware']");
+
   if (editBtn) {
     const row = e.target.closest("tr");
     openEditGlasswareModal(row);
@@ -323,7 +327,7 @@ glasswareTableBody.addEventListener("click", (e) => {
   }
 });
 
-// ===================== Update Remarks Modal Logic =====================
+// ===================== Edit Remarks Modal Logic =====================
 
 // Remarks Modal Functionality
 const remarksModal = document.getElementById("remarksModal");

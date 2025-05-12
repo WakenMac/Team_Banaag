@@ -30,9 +30,6 @@ let initialQuantity = 0; // Variable used to change the initial quantity of Chem
 await initialize();
 
 async function initialize() {
-  cancelEditBtn.addEventListener("click", closeEditModal);
-  modalBackdropEditChemical.addEventListener("click", closeEditModal);
-
   // Initialize dropdown menus
   setupDropdown("masterlistBtn", "masterlistMenu");
   setupDropdown("consumablesBtn", "consumablesMenu");
@@ -211,8 +208,6 @@ addChemicalsForm.addEventListener("submit", async (e) => {
   }
 });
 
-
-
 // ===================== Edit Chemical Modal Logic =====================
 
 // Edit Chemicals Functionality
@@ -222,6 +217,9 @@ const cancelEditBtn = document.getElementById("cancelEditBtn");
 const modalBackdropEditChemical = document.getElementById(
   "modalBackdropEditChemical"
 );
+
+cancelEditBtn.addEventListener("click", closeEditModal);
+modalBackdropEditChemical.addEventListener("click", closeEditModal);
 
 /**
  * Opens the edit modal and populates it with chemical data

@@ -61,6 +61,13 @@ function setupDropdown(buttonId, menuId) {
   });
 }
 
+tbody.addEventListener("click", (e) => {
+  // This is an experimental code
+  let pressedRow = e.target.closest('tr');
+  let pressedId = pressedRow.children[0].textContent.trim();
+  console.log('Clicked row with the item id of:', pressedId);
+});
+
 // ===============================================================================================
 // FRONT END-RELATED METHODS
 
