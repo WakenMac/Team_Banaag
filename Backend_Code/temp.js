@@ -1,15 +1,15 @@
 // This is a temporary javascript file to prepare methods to be pasted in the mainHandler.js
 
 // ======================================================================================================================================
-// Methods for Glasswares
+// Methods for Lab Apparatus
 
 /**
- * Method to get all of the records on the Glasswares table
- * @returns A record consisting of 7 columns (Item ID, Name, Unit, Location, Brand, Quantity, Remarks)
+ * Method to get all of the records on the Lab Apparatus table
+ * @returns A record consisting of 7 columns (Item ID, Name, Unit, Location, Brand, Quantity, Serial No, Remarks)
  */
-export async function getAllGlasswaresRecords(){
+export async function getAllLabApparatusRecords(){
     try{
-        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_glasswares_records');
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_lab_apparatus_records');
         
         if (supabaseError){
             console.error(`Supabase Error:`, supabaseError.message);
@@ -25,20 +25,20 @@ export async function getAllGlasswaresRecords(){
 }
 
 /**
- * Method to get one record from the Glasswares table based on its item ID
- * @param {integer} itemId The primary key of the Glasswares table
+ * Method to get one record from the Lab Apparatus table based on its item ID
+ * @param {integer} itemId The primary key of the Lab Apparatus table
  * @returns A record consisting of  columns (Item ID, Name, Unit, Location, Brand, Quantity, Remarks)
  */
-export async function getGlasswaresRecordByItetmId(itemId = 0){
+export async function getLabApparatusRecordByItetmId(itemId = 0){
     try{
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getGlasswaresRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: getLabApparatusRecordByItetmId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
-        const {data, error: supabaseError} = await supabaseClient.rpc('get_glasswares_record_by_item_id', {
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_lab_apparatus_record_by_item_id', {
             input_item_id : iItemId
         });
         
@@ -57,39 +57,43 @@ export async function getGlasswaresRecordByItetmId(itemId = 0){
 
 /**
  * Method to add a new row to the Chemicals Table
- * @param {string} itemName           Name of the glassware to be added
- * @param {string} unitTypeName       Unit Type of the glassware (e.g. Unit, Piece)
+ * @param {string} itemName           Name of the lab apparatus to be added
+ * @param {string} unitTypeName       Unit Type of the lab apparatus (e.g. Unit, Piece)
  * @param {string} locationName       Location where the chemical will be stored
- * @param {string} brandModel         Brand of the glassware to be added
+ * @param {string} brandModel         Brand of the lab apparatus to be added
  * @param {string} remarks            Remarks of the chemical to be added
  */
-export async function addGlasswaresRecord(itemName, locationName, unitTypeName, brandModel = '', remarks = ''){
+export async function addLabApparatusRecord(itemName, locationName, unitTypeName, brandModel = '', serial_no, remarks = ''){
     try{
-        const [ sItemName, sLocationName, sUnitTypeName, sBrandModel, sRemarks ] = converter('string', 
-            itemName, locationName, unitTypeName, brandModel, remarks);
+        const [ sItemName, sLocationName, sUnitTypeName, sBrandModel, sSerialNo, sRemarks ] = converter('string', 
+            itemName, locationName, unitTypeName, brandModel, serial_no, remarks);
 
         if (typeof sLocationName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Location Name parameter must be a string.")
+            console.error("PARAMETER ERROR: addLabApparatusRecord's Location Name parameter must be a string.")
             return null;
         } else if (typeof sUnitTypeName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Unit Type Name parameter must be a string.")
+            console.error("PARAMETER ERROR: addLabApparatusRecord's Unit Type Name parameter must be a string.")
             return null;
         } else if (typeof sItemName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Item Name parameter must be a string.")
+            console.error("PARAMETER ERROR: addLabApparatusRecord's Item Name parameter must be a string.")
             return null;
         } else if (typeof sBrandModel !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Brand/Model parameter must be a string.")
+            console.error("PARAMETER ERROR: addLabApparatusRecord's Brand/Model parameter must be a string.")
+            return null;
+        } else if (typeof sSerialNo !== 'string'){
+            console.error("PARAMETER ERROR: addLabApparatusRecord's Remarks parameter must be a string.")
             return null;
         } else if (typeof sRemarks !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Remarks parameter must be a string.")
+            console.error("PARAMETER ERROR: addLabApparatusRecord's Remarks parameter must be a string.")
             return null;
         }
 
-        const {data, error: supabaseError} = await supabaseClient.rpc('add_glasswares_record', {
+        const {data, error: supabaseError} = await supabaseClient.rpc('main_add_lab_apparatus_record', {
             input_item_name : sItemName,
             input_location_name : sLocationName,
             input_unit_type_name : sUnitTypeName,
             input_brand_model : sBrandModel,
+            input_serial_no : sSerialNo,
             input_remarks : sRemarks
         });
         
@@ -107,17 +111,17 @@ export async function addGlasswaresRecord(itemName, locationName, unitTypeName, 
 }
 
 /**
- * Method to add a update a record from the Glasswares Table based on thier Item ID
- * @param {string} itemName           Name of the glassware to be added
- * @param {string} unitTypeName       Unit Type of the glassware (e.g. Unit, Piece)
+ * Method to add a update a record from the Lab Apparatus Table based on thier Item ID
+ * @param {string} itemName           Name of the lab apparatus to be added
+ * @param {string} unitTypeName       Unit Type of the lab apparatus (e.g. Unit, Piece)
  * @param {string} locationName       Location where the chemical will be stored
- * @param {string} brandModel         Brand of the glassware to be added
+ * @param {string} brandModel         Brand of the lab apparatus to be added
  * @param {string} remarks            Remarks of the chemical to be added
  */
-export async function updateGlasswaresRecordByAll(itemId = 0, itemName, locationName, unitTypeName, brandModel = '', remarks = ''){
+export async function updateLabApparatusRecordByAll(itemId = 0, itemName, locationName, unitTypeName, brandModel = '', serialNo, remarks = ''){
     try{
-        const [ sItemName, sLocationName, sUnitTypeName, sBrandModel, sRemarks ] = converter('string', 
-            itemName, locationName, unitTypeName, brandModel, remarks);
+        const [ sItemName, sLocationName, sUnitTypeName, sBrandModel, sSerialNo, sRemarks ] = converter('string', 
+            itemName, locationName, unitTypeName, brandModel, serialNo, remarks);
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof sLocationName !== 'string'){
@@ -132,22 +136,26 @@ export async function updateGlasswaresRecordByAll(itemId = 0, itemName, location
         } else if (typeof sBrandModel !== 'string'){
             console.error("PARAMETER ERROR: addChemicalsRecord's Brand/Model parameter must be a string.")
             return null;
+        } else if (typeof sSerialNo !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Remarks parameter must be a string.")
+            return null;
         } else if (typeof sRemarks !== 'string'){
             console.error("PARAMETER ERROR: addChemicalsRecord's Remarks parameter must be a string.")
             return null;
         }
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getGlasswaresRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: getLabApparatusRecordByItetmId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
-        const {data, error: supabaseError} = await supabaseClient.rpc('update_glasswares_record_by_all', {
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_lab_apparatus_record_by_all', {
             input_item_id : iItemId,
             input_item_name : sItemName,
             input_location_name : sLocationName,
             input_unit_type_name : sUnitTypeName,
             input_brand_model : sBrandModel,
+            input_serial_no : sSerialNo,
             input_remarks : sRemarks
         });
         
@@ -165,20 +173,62 @@ export async function updateGlasswaresRecordByAll(itemId = 0, itemName, location
 }
 
 /**
- * Method to remove a record to the Glasswares table
- * @param {int} itemId The primary key of the Glasswares table
+ /**
+ * Method to update an existing record's remarks in the Lab Apparatus Table based on its Item ID
+ * 
+ * @param {int} itemId                          Primary key of the Lab Apparatus table
+ * @param {string} chemicalBarCode              Barcode of the chemical to be added
+ * 
  * @returns A string containing the status of the deleted record (Success or Error)
  */
-export async function deleteGlasswaresRecordByItemId(itemId = 0){
+export async function updateLabApparatusRemarkByItemId(itemId, remarks = ''){
+    try{
+        const [ sRemarks ] = converter('string', remarks);
+        const [ iItemId ] = converter('int', itemId);
+        
+        if (typeof sRemarks !== 'string'){
+            console.error("PARAMETER ERROR: updateLabApparatusRemarkByItemId's Remarks parameter must be a string.")
+            return null;
+        }
+
+        if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: updateLabApparatusRemarkByItemId's Item ID & Container Size parameter must be a positive non-zero integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_lab_apparatus_remark_by_item_id', {
+            input_item_id : iItemId,
+            input_remarks : sRemarks
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to remove a record to the Lab Apparatus table
+ * @param {int} itemId The primary key of the Lab Apparatus table
+ * @returns A string containing the status of the deleted record (Success or Error)
+ */
+export async function deleteLabApparatusRecordByItemId(itemId = 0){
     try{
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getGlasswaresRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: getLabApparatusRecordByItetmId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
-        const {data, error: supabaseError} = await supabaseClient.rpc('delete_glasswares_record_by_item_id', {
+        const {data, error: supabaseError} = await supabaseClient.rpc('delete_lab_apparatus_record_by_item_id', {
             input_item_id : iItemId
         });
         

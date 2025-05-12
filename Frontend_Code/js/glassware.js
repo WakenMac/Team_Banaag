@@ -21,20 +21,6 @@ const addGlasswareUnit = document.getElementById('glasswareUnit');
 const editGlasswareLocation = document.getElementById('editGlasswareLocation');
 const editGlasswareUnit = document.getElementById('editGlasswareUnit');
 
-// Modal logic (Adding)
-const addGlasswareBtn = document.getElementById("addGlasswareBtn");
-const addGlasswareModal = document.getElementById("addGlasswareModal");
-const modalBackdrop = document.getElementById("modalBackdrop");
-const cancelBtn = document.getElementById("cancelBtn");
-const addGlasswareForm = document.getElementById("addGlasswareForm");
-const glasswareTableBody = document.getElementById("glasswareTableBody");
-
-// Remarks Modal Functionality
-const remarksModal = document.getElementById("remarksModal");
-const remarksForm = document.getElementById("remarksForm");
-const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
-const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
-
 await initialize();
 
 async function initialize(){
@@ -50,7 +36,41 @@ async function initialize(){
   await prepareUnitTypeDropdown();
 }
 
-// Dropdown toggle logic
+// ===================== Set Toast Messages Logic =====================
+function showToast(message, isError = false, time = 1800) {
+  let toast = document.getElementById("custom-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "custom-toast";
+    toast.style.position = "fixed";
+    toast.style.bottom = "32px";
+    toast.style.right = "32px";
+    toast.style.background = isError
+      ? "rgba(220, 38, 38, 0.95)"
+      : "rgba(44, 161, 74, 0.95)"; // Red for error, green for success
+    toast.style.color = "white";
+    toast.style.padding = "16px 28px";
+    toast.style.borderRadius = "8px";
+    toast.style.fontSize = "16px";
+    toast.style.fontWeight = "bold";
+    toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+    toast.style.opacity = "0";
+    toast.style.transition = "opacity 0.4s";
+    toast.style.zIndex = "9999";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.style.background = isError
+    ? "rgba(220, 38, 38, 0.95)"
+    : "rgba(44, 161, 74, 0.95)";
+  toast.style.opacity = "1";
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, time);
+}
+
+// ===================== Set Dropdown Toggle Logic =====================
+
 function setupDropdown(buttonId, menuId) {
   const btn = document.getElementById(buttonId);
   const menu = document.getElementById(menuId);
@@ -76,6 +96,16 @@ function setupDropdown(buttonId, menuId) {
     }
   });
 }
+
+// ===================== Add Glassware Modal Logic =====================
+
+// Modal logic (Adding)
+const addGlasswareBtn = document.getElementById("addGlasswareBtn");
+const addGlasswareModal = document.getElementById("addGlasswareModal");
+const modalBackdrop = document.getElementById("modalBackdrop");
+const cancelBtn = document.getElementById("cancelBtn");
+const addGlasswareForm = document.getElementById("addGlasswareForm");
+const glasswareTableBody = document.getElementById("glasswareTableBody");
 
 function openModal() {
   addGlasswareModal.classList.remove("hidden");
@@ -136,7 +166,7 @@ addGlasswareForm.addEventListener("submit", async (e) => {
   }
 });
 
-// ===================== Edit and Delete Glassware Modal Logic =====================
+// ===================== Edit Glassware Modal Logic =====================
 
 // Edit Modal Elements
 const editGlasswareModal = document.getElementById("editGlasswareModal");
@@ -147,30 +177,7 @@ const cancelEditGlasswareBtn = document.getElementById(
 const modalBackdropEdit = document.getElementById(
   "modalEditBackdrop"
 );
-
-// Delete Modal Elements
-const deleteGlasswareModal = document.getElementById("deleteGlasswareModal");
-const cancelDeleteGlasswareBtn = document.getElementById(
-  "cancelDeleteGlasswareBtn"
-);
-const confirmDeleteGlasswareBtn = document.getElementById(
-  "confirmDeleteGlasswareBtn"
-);
-const modalBackdropDelete = document.getElementById(
-  "modalDeleteBackdrop"
-);
-
 var glasswareRowToEdit = null;
-var glasswareRowToDelete = null;
-
-// Field mapping for edit modal and table columns
-const glasswareFieldMap = [
-  { id: "editGlasswareName", idx: 1 },
-  { id: "editGlasswareUnit", idx: 2 },
-  { id: "editGlasswareLocation", idx: 3 },
-  { id: "editGlasswareBrand", idx: 4 },
-  { id: "editGlasswareQuantity", idx: 5 },
-];
 
 // Open Edit Modal and populate fields
 function openEditGlasswareModal(row) {
@@ -245,6 +252,30 @@ editGlasswareForm.addEventListener("submit", async function (e) {
   }
 });
 
+// ===================== Delete Glassware Modal Logic =====================
+
+// Delete Modal Elements
+const deleteGlasswareModal = document.getElementById("deleteGlasswareModal");
+const cancelDeleteGlasswareBtn = document.getElementById(
+  "cancelDeleteGlasswareBtn"
+);
+const confirmDeleteGlasswareBtn = document.getElementById(
+  "confirmDeleteGlasswareBtn"
+);
+const modalBackdropDelete = document.getElementById(
+  "modalDeleteBackdrop"
+);
+var glasswareRowToDelete = null;
+
+// Field mapping for edit modal and table columns
+const glasswareFieldMap = [
+  { id: "editGlasswareName", idx: 1 },
+  { id: "editGlasswareUnit", idx: 2 },
+  { id: "editGlasswareLocation", idx: 3 },
+  { id: "editGlasswareBrand", idx: 4 },
+  { id: "editGlasswareQuantity", idx: 5 },
+];
+
 // Open Delete Modal
 function openDeleteGlasswareModal(row) {
   glasswareRowToDelete = row;
@@ -292,8 +323,13 @@ glasswareTableBody.addEventListener("click", (e) => {
   }
 });
 
-//=================================================================================================================================
-// Remarks Modals
+// ===================== Update Remarks Modal Logic =====================
+
+// Remarks Modal Functionality
+const remarksModal = document.getElementById("remarksModal");
+const remarksForm = document.getElementById("remarksForm");
+const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
+const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
 
 /**
  * Opens the remarks modal and populates it with existing remarks if any
@@ -374,8 +410,7 @@ remarksForm.addEventListener("submit", async (e) => {
   showToast("Remarks updated successfully", false, 3000);
 });
 
-// ===============================================================================================
-// FRONT END-RELATED METHODS
+// ===================== Front-End Related Logic =====================
 
 async function createNewGlasswareRow(
   glasswareId,
@@ -482,8 +517,7 @@ async function createNewRemarks(remarks, glasswareId) {
   }
 }
 
-// ===============================================================================================
-// BACK END-RELATED METHODS
+// ===================== Database Related Logic =====================
 
 /**
  * Gets all of the chemical records from the database then proceeds to populate them to the table
@@ -557,37 +591,4 @@ async function prepareLocationDropdown() {
   } catch (generalError) {
     console.error(generalError);
   }
-}
-
-// TODO: Add documentations
-function showToast(message, isError = false, time = 1800) {
-  let toast = document.getElementById("custom-toast");
-  if (!toast) {
-    toast = document.createElement("div");
-    toast.id = "custom-toast";
-    toast.style.position = "fixed";
-    toast.style.bottom = "32px";
-    toast.style.right = "32px";
-    toast.style.background = isError
-      ? "rgba(220, 38, 38, 0.95)"
-      : "rgba(44, 161, 74, 0.95)"; // Red for error, green for success
-    toast.style.color = "white";
-    toast.style.padding = "16px 28px";
-    toast.style.borderRadius = "8px";
-    toast.style.fontSize = "16px";
-    toast.style.fontWeight = "bold";
-    toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
-    toast.style.opacity = "0";
-    toast.style.transition = "opacity 0.4s";
-    toast.style.zIndex = "9999";
-    document.body.appendChild(toast);
-  }
-  toast.textContent = message;
-  toast.style.background = isError
-    ? "rgba(220, 38, 38, 0.95)"
-    : "rgba(44, 161, 74, 0.95)";
-  toast.style.opacity = "1";
-  setTimeout(() => {
-    toast.style.opacity = "0";
-  }, time);
 }

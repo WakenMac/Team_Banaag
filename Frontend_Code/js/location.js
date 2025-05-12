@@ -1,26 +1,9 @@
 // import modules
 import * as dbhandler from '../../Backend_Code/mainHandler.js';
 
-// Modal logic
-const addLocationBtn = document.getElementById("addLocationBtn");
-const addLocationModal = document.getElementById("addLocationModal");
-const addLocationError = document.getElementById("addLocationError");
-const modalBackdropLocation = document.getElementById("modalBackdropLocation");
-const addLocationForm = document.getElementById('addLocationForm');
-const cancelBtn = document.getElementById("cancelBtn");
-
-// Modals for editing
-const editLocationModal = document.getElementById("editLocationModal");
-const editLocationError = document.getElementById("editLocationError");
-const editLocationForm = document.getElementById('editLocationForm');
-const cancelEditLocationBtn = document.getElementById("cancelEditLocationBtn");
-const modalBackdropEditLocation = document.getElementById(
-  "modalBackdropEditLocation"
-);
-
 const tbody = document.querySelector("tbody");
 
-// Initialize table components
+// ===================== Initialize Components =====================
 await initialize();
 
 async function initialize() {
@@ -34,7 +17,8 @@ async function initialize() {
   await prepareLocationTable();
 }
 
-// Dropdown toggle logic
+// ===================== Set Dropdown Toggle Logic =====================
+
 function setupDropdown(buttonId, menuId) {
   const btn = document.getElementById(buttonId);
   const menu = document.getElementById(menuId);
@@ -60,25 +44,24 @@ function setupDropdown(buttonId, menuId) {
     }
   });
 
-  addLocationBtn.addEventListener("click", openModal);
-  cancelBtn.addEventListener("click", () => {
-    addLocationError.classList.add('hidden');
-    addLocationError.textContent = '';
-    closeModal();
-  });
-
-  cancelEditLocationBtn.addEventListener("click", () => {
-    editLocationError.classList.add("hidden");
-    editLocationError.textContent = '';
-    closeEditModal();
-  });
-
-  modalBackdropEditLocation.addEventListener("click", () => {
-    editLocationError.classList.add("hidden");
-    editLocationError.textContent = '';
-    closeEditModal();
-  });
 }
+
+// ===================== Add Glassware Modal Logic =====================
+
+// Modal logic
+const addLocationBtn = document.getElementById("addLocationBtn");
+const addLocationModal = document.getElementById("addLocationModal");
+const addLocationError = document.getElementById("addLocationError");
+const modalBackdropLocation = document.getElementById("modalBackdropLocation");
+const addLocationForm = document.getElementById('addLocationForm');
+const cancelBtn = document.getElementById("cancelBtn");
+
+addLocationBtn.addEventListener("click", openModal);
+cancelBtn.addEventListener("click", () => {
+  addLocationError.classList.add('hidden');
+  addLocationError.textContent = '';
+  closeModal();
+});
 
 function openModal() {
   addLocationModal.classList.remove("hidden");
@@ -89,17 +72,6 @@ function closeModal() {
   addLocationModal.classList.add("hidden");
   addLocationModal.classList.remove("flex");
   addLocationForm.reset();
-}
-
-function openEditModal() {
-  editLocationModal.classList.remove("hidden");
-  editLocationModal.classList.add("flex");
-}
-
-function closeEditModal() {
-  editLocationModal.classList.add("hidden");
-  editLocationModal.classList.remove("flex");
-  editLocationForm.reset();
 }
 
 modalBackdropLocation.addEventListener("click", closeModal);
@@ -141,6 +113,40 @@ document.getElementById('locationName').addEventListener('input', () => {
   addLocationError.classList.add('hidden');
   addLocationError.textContent = '';
 });
+
+// ===================== Edit Glassware Modal Logic =====================
+
+// Modals for editing
+const editLocationModal = document.getElementById("editLocationModal");
+const editLocationError = document.getElementById("editLocationError");
+const editLocationForm = document.getElementById('editLocationForm');
+const cancelEditLocationBtn = document.getElementById("cancelEditLocationBtn");
+const modalBackdropEditLocation = document.getElementById(
+  "modalBackdropEditLocation"
+);
+
+cancelEditLocationBtn.addEventListener("click", () => {
+  editLocationError.classList.add("hidden");
+  editLocationError.textContent = '';
+  closeEditModal();
+});
+
+modalBackdropEditLocation.addEventListener("click", () => {
+  editLocationError.classList.add("hidden");
+  editLocationError.textContent = '';
+  closeEditModal();
+});
+
+function openEditModal() {
+  editLocationModal.classList.remove("hidden");
+  editLocationModal.classList.add("flex");
+}
+
+function closeEditModal() {
+  editLocationModal.classList.add("hidden");
+  editLocationModal.classList.remove("flex");
+  editLocationForm.reset();
+}
 
 // Adds edit portion
 tbody.addEventListener("click", (e) => {
@@ -191,6 +197,8 @@ editLocationForm.addEventListener('submit', async (e) =>{
       closeEditModal();
     }
 });
+
+// ===================== Delete Glassware Modal Logic =====================
 
 // Optional: Add delete functionality for dynamically added rows
 tbody.addEventListener("click", async (e) => {
