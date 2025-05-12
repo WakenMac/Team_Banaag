@@ -1735,7 +1735,7 @@ export async function addLabApparatusRecord(itemName, locationName, unitTypeName
  */
 export async function updateLabApparatusRecordByAll(itemId = 0, itemName, locationName, unitTypeName, brandModel = '', remarks = ''){
     try{
-        const [ sItemName, sLocationName, sUnitTypeName, sBrandModel, sSerialNo, sRemarks ] = converter('string', 
+        const [ sItemName, sLocationName, sUnitTypeName, sBrandModel, sRemarks ] = converter('string', 
             itemName, locationName, unitTypeName, brandModel, remarks);
         const [ iItemId ] = converter('int', itemId);
 

@@ -39,6 +39,40 @@ async function initialize(){
   await prepareUnitTypeDropdown();
 }
 
+// ===================== Set Toast Messages Logic =====================
+function showToast(message, isError = false, time = 1800) {
+  let toast = document.getElementById("custom-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "custom-toast";
+    toast.style.position = "fixed";
+    toast.style.bottom = "32px";
+    toast.style.right = "32px";
+    toast.style.background = isError
+      ? "rgba(220, 38, 38, 0.95)"
+      : "rgba(44, 161, 74, 0.95)"; // Red for error, green for success
+    toast.style.color = "white";
+    toast.style.padding = "16px 28px";
+    toast.style.borderRadius = "8px";
+    toast.style.fontSize = "16px";
+    toast.style.fontWeight = "bold";
+    toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+    toast.style.opacity = "0";
+    toast.style.transition = "opacity 0.4s";
+    toast.style.zIndex = "9999";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.style.background = isError
+    ? "rgba(220, 38, 38, 0.95)"
+    : "rgba(44, 161, 74, 0.95)";
+  toast.style.opacity = "1";
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, time);
+}
+
+// ===================== Set Dropdown Toggle Logic =====================
 /* This is the code for the dropdown menus. */
 
 function setupDropdown(buttonId, menuId) {
@@ -111,41 +145,85 @@ addApparatusBtn.addEventListener("click", openAddModal);
 cancelApparatusBtn.addEventListener("click", closeAddModal);
 modalBackdropApparatus.addEventListener("click", closeAddModal);
 
-addApparatusForm.addEventListener("submit", (e) => {
+addApparatusForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const apparatusName = addApparatusForm.apparatusName.value.trim();
-  const apparatusUnit = addApparatusForm.apparatusUnit.value.trim();
-  const apparatusLocation = addApparatusForm.apparatusLocation.value.trim();
-  const apparatusBrand = addApparatusForm.apparatusBrand.value.trim();
-  const apparatusQuantity = addApparatusForm.apparatusQuantity.value.trim();
+  const apparatusName = document.getElementById('apparatusName').value.trim();
+  const apparatusUnit = document.getElementById('apparatusUnit').value.trim();
+  const apparatusLocation = document.getElementById('apparatusLocation').value.trim();
+  const apparatusBrand = document.getElementById('apparatusBrand').value.trim();
 
   if (
     !apparatusName ||
     !apparatusUnit ||
     !apparatusLocation ||
-    !apparatusBrand ||
-    !apparatusQuantity
+    !apparatusBrand
   ) {
     alert("Please fill in all required fields.");
     return;
   }
 
+  let result = await dbhandler.addLabApparatusRecord(apparatusName, apparatusLocation, 
+    apparatusUnit, apparatusBrand, '')
 
-
-  closeAddModal();
+  if (result == null) {
+    showToast(
+      `The mainHandler.addLabApparatusRecord() DOESN'T return a status statement.`,
+      true,
+      4000
+    );
+  } else if (result.includes("ERROR")) {
+    showToast(result, true, 4000);
+  } else {
+    console.log(result);
+    let newItemId = result.slice(51, result.length - 1);
+    console.log(result.slice(51, result.length - 1))
+    createNewLabApparatusRow(
+      newItemId,
+      apparatusName, 
+      apparatusUnit,
+      apparatusLocation,
+      apparatusBrand,
+      0
+    );
+    closeAddModal();
+    showToast("Glassware added successfully", false, 3000);
+  }
 });
 
-// Edit modal logic
+// ===================== Edit Lab Apparatus Modal Logic =====================
+
 const editApparatusModal = document.getElementById("editApparatusModal");
 const modalBackdropEditApparatus = document.getElementById(
   "modalBackdropEditApparatus"
 );
 const cancelEditBtn = document.getElementById("cancelEditBtn");
 const editApparatusForm = document.getElementById("editApparatusForm");
-let rowBeingEdited = null;
+var rowBeingEdited = null;
 
-function openEditModal() {
+const apparatusFieldMap = [
+  { id: "editApparatusId", idx: 0 },
+  { id: "editApparatusName", idx: 1 },
+  { id: "editApparatusUnit", idx: 2 },
+  { id: "editApparatusLocation", idx: 3 },
+  { id: "editApparatusBrand", idx: 4 },
+  { id: "editApparatusQuantity", idx: 5 },
+]
+
+function openEditModal(row) {
+  rowBeingEdited = row;
+  const cells = row.children;
+
+  for (const { id, idx } of apparatusFieldMap) {
+    const el = document.getElementById(id);
+    if (el && cells[idx]) {
+      if (idx != 5)
+        el.value = cells[idx].textContent.trim();
+      else
+        el.value = cells[idx].textContent.replace((' ' + cells[2].textContent.trim()), ''); // Removes the unit type portion on quantity
+    }
+  }
+
   editApparatusModal.classList.remove("hidden");
   editApparatusModal.classList.add("flex");
 }
@@ -158,7 +236,45 @@ function closeEditModal() {
 cancelEditBtn.addEventListener("click", closeEditModal);
 modalBackdropEditApparatus.addEventListener("click", closeEditModal);
 
-// --- Delete Apparatus Modal Logic ---
+// Edit form submit: update the row in the table
+editApparatusForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  
+  if (!rowBeingEdited) return;
+
+  // Get new values
+  const editApparatusId = document.getElementById("editApparatusId").value;
+  const editApparatusName = document.getElementById("editApparatusName").value;
+  const editApparatusUnit = document.getElementById("editApparatusUnit").value;
+  const editApparatusLocation = document.getElementById("editApparatusLocation").value;
+  const editApparatusBrand = document.getElementById("editApparatusBrand").value;
+  const remarks = document
+    .querySelector(`button[data-apparatus-id="${editApparatusId}"]`)
+    .getAttribute("data-remarks");
+
+  let result = await dbhandler.updateLabApparatusRecordByAll(editApparatusId, editApparatusName, editApparatusLocation, 
+    editApparatusUnit, editApparatusBrand, remarks);
+
+  if (result == null) {
+    showToast(
+      `The mainHandler.updateLabApparatusRecordByAll() DOESN'T return a status statement.`,
+      true,
+      4000
+    );
+  } else if (result.includes("ERROR")) {
+    showToast(result, true, 4000);
+  } else {
+    console.log(result);
+
+    // Only update editable fields (not quantity)
+    updateLabApparatusTable(rowBeingEdited.children);
+    showToast("Lab Apparatus updated successfully", false, 3000);
+    closeEditModal();
+  }
+});
+
+// ===================== Delete Lab Apparatus Modal Logic =====================
+
 // Handles the confirmation modal for deleting apparatus
 const deleteApparatusModal = document.getElementById("deleteApparatusModal");
 const modalBackdropDeleteApparatus = document.getElementById(
@@ -188,11 +304,21 @@ cancelDeleteApparatusBtn.addEventListener("click", closeDeleteModal);
 modalBackdropDeleteApparatus.addEventListener("click", closeDeleteModal);
 
 // Confirm deletion
-confirmDeleteApparatusBtn.addEventListener("click", () => {
+confirmDeleteApparatusBtn.addEventListener("click", async () => {
   if (rowToDelete) {
+
+    let result = await dbhandler.deleteLabApparatusRecordByItemId(rowToDelete.children[0].textContent);
+    if (result && result.includes("ERROR")) {
+      showToast(result, true, 4000);
+      return;
+    }
+        
+    console.log(result);
     rowToDelete.remove();
+    closeDeleteModal();
     showToast("Apparatus deleted successfully");
   }
+
   closeDeleteModal();
 });
 
@@ -201,76 +327,51 @@ confirmDeleteApparatusBtn.addEventListener("click", () => {
 tbody.addEventListener("click", (e) => {
   const btn = e.target.closest("button");
   if (!btn) return;
+
   const row = btn.closest("tr");
+  if (!row) return;
+
+
   // Delete apparatus
-  if (btn.getAttribute("aria-label") === "Delete apparatus") {
-    if (row) openDeleteModal(row);
-  }
+  if (btn.getAttribute("aria-label") === "Delete apparatus")
+    openDeleteModal(row);
   // Edit apparatus
   else if (btn.getAttribute("aria-label") === "Edit apparatus") {
-    rowBeingEdited = row;
-    document.getElementById("editApparatusId").value =
-      row.children[0].textContent;
-    document.getElementById("editApparatusName").value =
-      row.children[1].textContent;
-    document.getElementById("editApparatusUnit").value =
-      row.children[2].textContent;
-    document.getElementById("editApparatusLocation").value =
-      row.children[3].textContent;
-    document.getElementById("editApparatusBrand").value =
-      row.children[4].textContent;
-    openEditModal();
+    openEditModal(row);
   }
 });
 
 // --- Toast Notification --- The notification that appears when an apparatus is updated.
 //Hello u can adjust the toast notification style by changing and naa sa baba hihi added some comments for you - Dave
-function showToast(message) {
-  let toast = document.getElementById("custom-toast");
-  if (!toast) {
-    toast = document.createElement("div"); // Creates a new div element
-    toast.id = "custom-toast"; // div id
-    toast.style.position = "fixed"; // div position (fixed means it will stay in the same place even if the page is scrolled)
-    toast.style.bottom = "32px"; // div position from the bottom (32px from the bottom of the page)
-    toast.style.right = "32px"; // div position from the right (32px from the right of the page)
-    toast.style.background = "rgba(44, 161, 74, 0.95)"; // div background color
-    toast.style.color = "white"; // text color
-    toast.style.padding = "16px 28px"; // div padding (16px from the top & bottom, 28px from the left & right)
-    toast.style.borderRadius = "8px"; // div border radius (rounded corners, pag gusto mo mas round make it higher)
-    toast.style.fontSize = "16px"; // div font size
-    toast.style.fontWeight = "regular"; // div font weight
-    toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)"; // div box shadow
-    toast.style.opacity = "0"; // div opacity
-    toast.style.transition = "opacity 0.4s"; // div transition
-    toast.style.zIndex = "9999"; // div z index
-    document.body.appendChild(toast); // add the div to the body (body means the entire page)
-  }
-  toast.textContent = message; // set the text content of the div to the message
-  toast.style.opacity = "1"; // set the opacity of the div to 1
-  setTimeout(() => {
-    toast.style.opacity = "0"; // set the opacity of the div to 0 after 1800ms
-  }, 1800);
-}
+// function showToast(message) {
+//   let toast = document.getElementById("custom-toast");
+//   if (!toast) {
+//     toast = document.createElement("div"); // Creates a new div element
+//     toast.id = "custom-toast"; // div id
+//     toast.style.position = "fixed"; // div position (fixed means it will stay in the same place even if the page is scrolled)
+//     toast.style.bottom = "32px"; // div position from the bottom (32px from the bottom of the page)
+//     toast.style.right = "32px"; // div position from the right (32px from the right of the page)
+//     toast.style.background = "rgba(44, 161, 74, 0.95)"; // div background color
+//     toast.style.color = "white"; // text color
+//     toast.style.padding = "16px 28px"; // div padding (16px from the top & bottom, 28px from the left & right)
+//     toast.style.borderRadius = "8px"; // div border radius (rounded corners, pag gusto mo mas round make it higher)
+//     toast.style.fontSize = "16px"; // div font size
+//     toast.style.fontWeight = "regular"; // div font weight
+//     toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)"; // div box shadow
+//     toast.style.opacity = "0"; // div opacity
+//     toast.style.transition = "opacity 0.4s"; // div transition
+//     toast.style.zIndex = "9999"; // div z index
+//     document.body.appendChild(toast); // add the div to the body (body means the entire page)
+//   }
+//   toast.textContent = message; // set the text content of the div to the message
+//   toast.style.opacity = "1"; // set the opacity of the div to 1
+//   setTimeout(() => {
+//     toast.style.opacity = "0"; // set the opacity of the div to 0 after 1800ms
+//   }, 1800);
+// }
 
-// Edit form submit: update the row in the table
-editApparatusForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  if (!rowBeingEdited) return;
-  // Get new values
-  rowBeingEdited.children[1].textContent =
-    document.getElementById("editApparatusName").value;
-  rowBeingEdited.children[2].textContent =
-    document.getElementById("editApparatusUnit").value;
-  rowBeingEdited.children[3].textContent = document.getElementById(
-    "editApparatusLocation"
-  ).value;
-  rowBeingEdited.children[4].textContent =
-    document.getElementById("editApparatusBrand").value;
-  closeEditModal();
-  showToast("Apparatus updated successfully");
-});
+// ===================== Remarks Modal Functionality Logic =====================
 
-// Remarks Modal Functionality
 const remarksModal = document.getElementById("remarksModal");
 const remarksForm = document.getElementById("remarksForm");
 const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
@@ -318,7 +419,7 @@ tbody.addEventListener("click", (e) => {
  * Blue: Has remarks
  * Gray: No remarks
  */
-remarksForm.addEventListener("submit", (e) => {
+remarksForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const apparatusId = document.getElementById("remarksApparatusId").value;
   const remarks = document.getElementById("remarksText").value.trim();
@@ -327,6 +428,14 @@ remarksForm.addEventListener("submit", (e) => {
   const remarksBtn = document.querySelector(
     `button[data-apparatus-id="${apparatusId}"]`
   );
+
+  let result = await dbhandler.updateLabApparatusRemarkByItemId(apparatusId, remarks);
+  
+  if (result && result.includes("ERROR")) {
+    showToast(result, true, 4000);
+    return;
+  }
+
   if (remarks) {
     remarksBtn.classList.remove("text-gray-700", "border-gray-700");
     remarksBtn.classList.add("text-blue-600", "border-blue-600");
@@ -338,7 +447,7 @@ remarksForm.addEventListener("submit", (e) => {
   }
 
   closeRemarksModal();
-  showToast("Remarks updated successfully");
+  showToast("Remarks updated successfully", false, 3000);
 });
 
 // Close remarks modal
@@ -361,7 +470,7 @@ async function createNewLabApparatusRow(
       <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusUnit}</td>
       <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusLocation}</td>
       <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusBrand}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusQuantity}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusQuantity} ${apparatusUnit}</td>
       <td class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3">
         <button aria-label="Add remarks"
           class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
@@ -387,18 +496,22 @@ async function createNewLabApparatusRow(
  * @param {string} editLabApparatusBrand         Brand of the Lab Apparatus to be added
  * @param {int} editLabApparatusQuantity         Quantity of the Lab Apparatus
  */
-function updateLabApparatussTable(
+function updateLabApparatusTable(
   cells,
 ) {
+  let originalUnit = cells[2].textContent;
+
   for (const { id, idx } of apparatusFieldMap) {
     const el = document.getElementById(id);
+
     if (!el && !cells[idx]) 
       continue;
-
-    if (id === "editLabApparatusQuantity") // skip quantity
-      cells[idx].textContent = el.value.trim() + ' ' + cells[2].textContent;
-    else
+    if (id === "editApparatusQuantity") // skip quantity
+      cells[idx].textContent = cells[idx].textContent.replace((' ' + originalUnit), '') + ' ' + cells[2].textContent;
+    else{
+      console.log('Update Lab Apparatus Error:', id)
       cells[idx].textContent = el.value.trim();
+    }
   }
 }
 
