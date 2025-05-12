@@ -106,6 +106,7 @@ function populateEditForm(row) {
     { id: "editEquipmentBrand", idx: 4 },
   ];
 
+  // Populate main fields
   for (const { id, idx } of fieldMap) {
     const el = document.getElementById(id);
     if (!el) {
@@ -115,14 +116,184 @@ function populateEditForm(row) {
     if (!cells[idx]) {
       console.error(`Cell at index ${idx} not found`);
       continue;
-    } else el.value = cells[idx].textContent;
+    }
+    el.value = cells[idx].textContent.trim();
   }
 
+  // Get additional information from info button
   const infoBtn = row.querySelector('button[aria-label="Info"]');
-  let csn = ""; // compressed serial number
-  let cbd = ""; // calibration date
-  let;
+  if (infoBtn) {
+    const serialNumber = infoBtn.dataset.csn || "";
+    const calibrationDate = infoBtn.dataset.cbd || "";
+    const frequencyOfCalibration = infoBtn.dataset.fcb || "";
+
+    const additionalFields = [
+      { id: "editEquipmentSerialNumber", value: serialNumber },
+      { id: "editEquipmentCalibrationDate", value: calibrationDate },
+      { id: "editEquipmentFreqOfCalibration", value: frequencyOfCalibration },
+    ];
+
+    for (const { id, value } of additionalFields) {
+      const field = document.getElementById(id);
+      if (field) {
+        field.value = value;
+      }
+    }
+  }
+
+  const remarksBtn = row.querySelector('button[aria-label="Add remarks"]');
+  if (remarksBtn) {
+    const remarks = remarksBtn.dataset.remarks || "";
+    const remarksField = document.getElementById("editEquipmentRemarks");
+    if (remarksField) {
+      remarksField.value = remarks;
+    }
+  }
+
+  editEquipmentForm.dataset.editingRow = Array.from(tbody.children).indexOf(
+    row
+  );
 }
+
+tbody.addEventListener("click", (e) => {
+  if (
+    e.target.closest("button") &&
+    e.target.closest("button").getAttribute("aria-label") === "Edit equipment"
+  ) {
+    const row = e.target.closest("tr");
+    if (row) {
+      populateEditForm(row);
+      openEditModal();
+    }
+  }
+});
+
+// Editing Function
+// Handle Edit Form Submission
+editEquipmentForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  // Get form values
+  const editEquipmentId = document
+    .getElementById("editEquipmentId")
+    .value.trim();
+  const editEquipmentName = document
+    .getElementById("editEquipmentName")
+    .value.trim();
+  const editEquipmentUnit = document
+    .getElementById("editEquipmentUnit")
+    .value.trim();
+  const editEquipmentLocation = document
+    .getElementById("editEquipmentLocation")
+    .value.trim();
+  const editEquipmentBrand = document
+    .getElementById("editEquipmentBrand")
+    .value.trim();
+  const editEquipmentQuantity = document
+    .getElementById("editEquipmentQuantity")
+    .value.trim();
+  const editEquipmentSerialNumber =
+    document.getElementById("editEquipmentSerialNumber")?.value.trim() || "";
+  const editEquipmentCalibrationDate =
+    document.getElementById("editEquipmentCalibrationDate")?.value.trim() || "";
+  const editEquipmentFreqOfCalibration =
+    document.getElementById("editEquipmentFreqOfCalibration")?.value.trim() ||
+    "";
+
+  // Validation
+  if (
+    !editEquipmentId ||
+    !editEquipmentName ||
+    !editEquipmentUnit ||
+    !editEquipmentLocation ||
+    !editEquipmentBrand ||
+    !editEquipmentQuantity
+  ) {
+    showToast("Please fill in all required fields.", true);
+    return;
+  }
+
+  // Update the table row
+  updateEquipmentTable(
+    editEquipmentId,
+    editEquipmentName,
+    editEquipmentUnit,
+    editEquipmentLocation,
+    editEquipmentBrand,
+    editEquipmentQuantity,
+    editEquipmentSerialNumber,
+    editEquipmentCalibrationDate,
+    editEquipmentFreqOfCalibration
+  );
+
+  closeEditModal();
+  showToast("Equipment updated successfully");
+});
+
+// Function to update the table
+function updateEquipmentTable(
+  equipmentId,
+  equipmentName,
+  equipmentUnit,
+  equipmentLocation,
+  equipmentBrand,
+  equipmentQuantity,
+  serialNumber,
+  calibrationDate,
+  frequencyOfCalibration
+) {
+  const rows = tbody.getElementsByTagName("tr");
+  for (let row of rows) {
+    if (row.cells[0].textContent === equipmentId) {
+      row.cells[1].textContent = equipmentName;
+      row.cells[2].textContent = equipmentUnit;
+      row.cells[3].textContent = equipmentLocation;
+      row.cells[4].textContent = equipmentBrand;
+      row.cells[5].textContent = equipmentQuantity;
+
+      // Update info button data attributes
+      const infoBtn = row.querySelector('button[aria-label="Info"]');
+      if (infoBtn) {
+        infoBtn.dataset.csn = serialNumber;
+        infoBtn.dataset.cbd = calibrationDate;
+        infoBtn.dataset.fcb = frequencyOfCalibration;
+      }
+      break;
+    }
+  }
+}
+
+// Toast notification function
+function showToast(message, isError = false) {
+  const toast = document.createElement("div");
+  toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-md shadow-lg ${
+    isError ? "bg-red-500" : "bg-green-500"
+  } text-white z-50`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
+}
+
+// Add click event listener for edit buttons
+tbody.addEventListener("click", (e) => {
+  if (
+    e.target.closest("button") &&
+    e.target.closest("button").getAttribute("aria-label") === "Edit equipment"
+  ) {
+    const row = e.target.closest("tr");
+    if (row) {
+      populateEditForm(row);
+      openEditModal();
+    }
+  }
+});
+
+// Event listeners for modal actions
+modalBackdropEditEquipment.addEventListener("click", closeEditModal);
+cancelEditBtn.addEventListener("click", closeEditModal);
 
 // Adding: Open and close modal
 function openEquipmentModal() {
@@ -172,7 +343,16 @@ addEquipmentForm.addEventListener("submit", (e) => {
           <td class="px-6 py-4 whitespace-nowrap text-gray-900">${equipmentLocation}</td>
             <td class="px-6 py-4 whitespace-nowrap text-gray-900">${equipmentBrand}</td>
             <td class="px-6 py-4 whitespace-nowrap text-gray-900">${equipmentQuantity}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
+          <td class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3">
+          <button aria-label="Info" class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
+            data-csn="${equipmentSerialNumber}"
+            data-cbd="${equipmentCalibrationDate}"
+            data-fcb="${equipmentFreqOfCalibration}">            
+            <i class="fas fa-info text-[14px]"></i>
+          </button>
+          <button aria-label="Add remarks" class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100" data-chemical-id="${chemicalId}">
+            <i class="fas fa-comment-alt text-[14px]"></i>
+          </button>
             <button aria-label="Edit equipment" class="text-yellow-400 hover:text-yellow-500">
               <i class="fas fa-pencil-alt"></i>
             </button>
