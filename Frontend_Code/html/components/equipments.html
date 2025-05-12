@@ -294,7 +294,6 @@
               <!-- end of the chevron icon -->
             </div>
           </div>
-
           <button
             aria-controls="addEquipmentModal"
             aria-haspopup="dialog"
@@ -355,6 +354,7 @@
               </tr>
             </thead>
             <tbody id="equipmentsTableBody" class="bg-white">
+              <!-- Example row -->
               <tr>
                 <td class="px-6 py-4 whitespace-nowrap text-gray-900">1</td>
                 <td class="px-6 py-4 whitespace-nowrap text-gray-900">
@@ -374,7 +374,7 @@
                   <button
                     aria-label="Info"
                     class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
-                    data-csn="1"
+                    data-csn="SN1234"
                     data-cbd="2023-01-01"
                     data-fcb="6 months"
                   >
@@ -383,7 +383,7 @@
                   <button
                     aria-label="Add remarks"
                     class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
-                    data-equipment-id="1"
+                    data-equipment-id="${equipmentId}"
                   >
                     <i class="fas fa-comment-alt text-[14px]"></i>
                   </button>
@@ -662,6 +662,8 @@
                   Select Location
                 </option>
                 <option value="Gensan">Gensan</option>
+                <option value="Stock Room">Stock Room</option>
+                <option value="Stock Room 2">Stock Room 2</option>
                 <!-- Options will be populated dynamically from the database -->
               </select>
             </div>
@@ -788,7 +790,7 @@
                 id="remarksText"
                 name="remarksText"
                 rows="4"
-                placeholder="Enter your remarks here..."
+                placeholder="e.g. This equipment is in good condition."
               ></textarea>
             </div>
             <div class="flex justify-end space-x-3 pt-4">
@@ -811,7 +813,7 @@
       </div>
       <!-- End of Remarks Modal -->
 
-      <!-- Delete Chemical Modal -->
+      <!-- Delete Equipment Modal -->
       <div
         aria-labelledby="deleteEquipmentModalTitle"
         aria-modal="true"
