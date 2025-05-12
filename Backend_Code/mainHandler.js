@@ -1623,7 +1623,7 @@ export async function deleteGlasswaresRecordByItemId(itemId = 0){
 
 /**
  * Method to get all of the records on the Lab Apparatus table
- * @returns A record consisting of 7 columns (Item ID, Name, Unit, Location, Brand, Quantity, Serial No, Remarks)
+ * @returns A record consisting of 7 columns (Item ID, Name, Unit, Location, Brand, Quantity, Remarks)
  */
 export async function getAllLabApparatusRecords(){
     try{
@@ -1645,7 +1645,7 @@ export async function getAllLabApparatusRecords(){
 /**
  * Method to get one record from the Lab Apparatus table based on its item ID
  * @param {integer} itemId The primary key of the Lab Apparatus table
- * @returns A record consisting of  columns (Item ID, Name, Unit, Location, Brand, Quantity, Remarks)
+ * @returns A record consisting of 7 columns (Item ID, Name, Unit, Location, Brand, Quantity, Remarks)
  */
 export async function getLabApparatusRecordByItetmId(itemId = 0){
     try{
@@ -1681,10 +1681,10 @@ export async function getLabApparatusRecordByItetmId(itemId = 0){
  * @param {string} brandModel         Brand of the lab apparatus to be added
  * @param {string} remarks            Remarks of the chemical to be added
  */
-export async function addLabApparatusRecord(itemName, locationName, unitTypeName, brandModel = '', serial_no, remarks = ''){
+export async function addLabApparatusRecord(itemName, locationName, unitTypeName, brandModel = '', remarks = ''){
     try{
-        const [ sItemName, sLocationName, sUnitTypeName, sBrandModel, sSerialNo, sRemarks ] = converter('string', 
-            itemName, locationName, unitTypeName, brandModel, serial_no, remarks);
+        const [ sItemName, sLocationName, sUnitTypeName, sBrandModel, sRemarks ] = converter('string', 
+            itemName, locationName, unitTypeName, brandModel, remarks);
 
         if (typeof sLocationName !== 'string'){
             console.error("PARAMETER ERROR: addLabApparatusRecord's Location Name parameter must be a string.")
@@ -1698,9 +1698,6 @@ export async function addLabApparatusRecord(itemName, locationName, unitTypeName
         } else if (typeof sBrandModel !== 'string'){
             console.error("PARAMETER ERROR: addLabApparatusRecord's Brand/Model parameter must be a string.")
             return null;
-        } else if (typeof sSerialNo !== 'string'){
-            console.error("PARAMETER ERROR: addLabApparatusRecord's Remarks parameter must be a string.")
-            return null;
         } else if (typeof sRemarks !== 'string'){
             console.error("PARAMETER ERROR: addLabApparatusRecord's Remarks parameter must be a string.")
             return null;
@@ -1711,7 +1708,6 @@ export async function addLabApparatusRecord(itemName, locationName, unitTypeName
             input_location_name : sLocationName,
             input_unit_type_name : sUnitTypeName,
             input_brand_model : sBrandModel,
-            input_serial_no : sSerialNo,
             input_remarks : sRemarks
         });
         
@@ -1730,16 +1726,17 @@ export async function addLabApparatusRecord(itemName, locationName, unitTypeName
 
 /**
  * Method to add a update a record from the Lab Apparatus Table based on thier Item ID
+ * @param {string} itemId             Primary key of the lab apparatus table
  * @param {string} itemName           Name of the lab apparatus to be added
  * @param {string} unitTypeName       Unit Type of the lab apparatus (e.g. Unit, Piece)
  * @param {string} locationName       Location where the chemical will be stored
  * @param {string} brandModel         Brand of the lab apparatus to be added
  * @param {string} remarks            Remarks of the chemical to be added
  */
-export async function updateLabApparatusRecordByAll(itemId = 0, itemName, locationName, unitTypeName, brandModel = '', serialNo, remarks = ''){
+export async function updateLabApparatusRecordByAll(itemId = 0, itemName, locationName, unitTypeName, brandModel = '', remarks = ''){
     try{
         const [ sItemName, sLocationName, sUnitTypeName, sBrandModel, sSerialNo, sRemarks ] = converter('string', 
-            itemName, locationName, unitTypeName, brandModel, serialNo, remarks);
+            itemName, locationName, unitTypeName, brandModel, remarks);
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof sLocationName !== 'string'){
@@ -1753,9 +1750,6 @@ export async function updateLabApparatusRecordByAll(itemId = 0, itemName, locati
             return null;
         } else if (typeof sBrandModel !== 'string'){
             console.error("PARAMETER ERROR: addChemicalsRecord's Brand/Model parameter must be a string.")
-            return null;
-        } else if (typeof sSerialNo !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Remarks parameter must be a string.")
             return null;
         } else if (typeof sRemarks !== 'string'){
             console.error("PARAMETER ERROR: addChemicalsRecord's Remarks parameter must be a string.")
@@ -1773,7 +1767,6 @@ export async function updateLabApparatusRecordByAll(itemId = 0, itemName, locati
             input_location_name : sLocationName,
             input_unit_type_name : sUnitTypeName,
             input_brand_model : sBrandModel,
-            input_serial_no : sSerialNo,
             input_remarks : sRemarks
         });
         

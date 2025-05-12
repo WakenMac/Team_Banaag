@@ -22,43 +22,8 @@ const addChemicalUnit = document.getElementById("chemicalUnit");
 
 const editChemicalLocation = document.getElementById("editChemicalLocation");
 const editChemicalUnit = document.getElementById("editChemicalUnit");
-
-const modalBackdropEditChemical = document.getElementById(
-  "modalBackdropEditChemical"
-);
 const chemicalsTableBody = document.getElementById("chemicalsTableBody");
 
-// Remarks Modal Functionality
-const remarksModal = document.getElementById("remarksModal");
-const remarksForm = document.getElementById("remarksForm");
-const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
-const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
-
-// Edit Chemicals Functionality
-const editChemicalModal = document.getElementById("editChemicalModal");
-const editChemicalForm = document.getElementById("editChemicalForm");
-const cancelEditBtn = document.getElementById("cancelEditBtn");
-
-// Add Chemicals Functionality
-const addChemicalsBtn = document.getElementById("addChemicalsBtn");
-const addChemicalsModal = document.getElementById("addChemicalsModal");
-const addChemicalsForm = document.getElementById("addChemicalsForm");
-const cancelBtn = document.getElementById("cancelBtn");
-const modalBackdropAddChemical = document.getElementById(
-  "modalBackdropAddChemical"
-);
-
-// Delete Chemical Functionality
-const deleteChemicalModal = document.getElementById("deleteChemicalModal");
-const modalBackdropDeleteChemical = document.getElementById(
-  "modalBackdropDeleteChemical"
-);
-const cancelDeleteChemicalBtn = document.getElementById(
-  "cancelDeleteChemicalBtn"
-);
-const confirmDeleteChemicalBtn = document.getElementById(
-  "confirmDeleteChemicalBtn"
-);
 let chemicalRowToDelete = null;
 let initialQuantity = 0; // Variable used to change the initial quantity of Chemical records (For updates)
 
@@ -141,10 +106,122 @@ function setupDropdown(buttonId, menuId) {
   });
 }
 
-//=================================================================================================================================
-// CRUD Modals
+// ===================== Add Chemical Modal Logic =====================
 
-/* Edit and Add Chemicals Functionality */
+// Add Chemicals Functionality
+const addChemicalsBtn = document.getElementById("addChemicalsBtn");
+const addChemicalsModal = document.getElementById("addChemicalsModal");
+const addChemicalsForm = document.getElementById("addChemicalsForm");
+const cancelBtn = document.getElementById("cancelBtn");
+const modalBackdropAddChemical = document.getElementById(
+  "modalBackdropAddChemical"
+);
+
+
+/**
+ * Opens the add chemicals modal
+ */
+function openAddModal() {
+  addChemicalsModal.classList.remove("hidden");
+  addChemicalsModal.classList.add("flex");
+}
+
+/**
+ * Closes the add chemicals modal and resets the form
+ */
+function closeAddModal() {
+  addChemicalsModal.classList.add("hidden");
+  addChemicalsModal.classList.remove("flex");
+  addChemicalsForm.reset();
+}
+
+addChemicalsBtn.addEventListener("click", openAddModal);
+cancelBtn.addEventListener("click", closeAddModal);
+modalBackdropAddChemical.addEventListener("click", closeAddModal);
+
+/**
+ * Handles the submission of new chemical data
+ * Creates a new row in the table with the chemical information
+ * Includes functionality for remarks and additional chemical details
+ */
+addChemicalsForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  // const chemicalId = addChemicalsForm.chemicalId.value.trim();
+  const chemicalName = addChemicalsForm.chemicalName.value.trim();
+  const chemicalUnit = addChemicalsForm.chemicalUnit.value.trim();
+  const chemicalLocation = addChemicalsForm.chemicalLocation.value.trim();
+  const chemicalBrand = addChemicalsForm.chemicalBrand.value.trim();
+  const chemicalContainerSize =
+    addChemicalsForm.chemicalContainerSize.value.trim();
+  const chemicalCASNo = addChemicalsForm.chemicalCASNo.value.trim();
+  const chemicalMSDS = addChemicalsForm.chemicalMSDS.value.trim();
+  const chemicalBarCode = addChemicalsForm.chemicalBarCode.value.trim();
+
+  // Conditions that are commented are to be removed~
+  // Hindi ko lang muna tinanggal just in case may changes na gagawin - Waks
+  if (
+    !chemicalName ||
+    !chemicalUnit ||
+    !chemicalLocation ||
+    !chemicalBrand ||
+    !chemicalContainerSize
+  ) {
+    showToast("Please fill in all required fields.", true, 4000);
+    return;
+  }
+
+  let result = await dbhandler.addChemicalsRecord(
+    chemicalName,
+    chemicalLocation,
+    chemicalUnit,
+    chemicalBrand,
+    chemicalContainerSize,
+    chemicalBarCode,
+    chemicalCASNo,
+    chemicalMSDS
+  );
+
+  if (result == null) {
+    showToast(
+      `The mainHandler.addChemicalsRecord() DOESN'T return a status statement.`,
+      true, 
+      4000
+    );
+  } else if (result.includes("ERROR")) {
+    showToast(result, true, 4000);
+  } else {
+    console.log(result);
+    let newItemId = result.slice(46, result.length - 1);
+    createNewChemicalRow(
+      newItemId,
+      chemicalName,
+      chemicalUnit,
+      chemicalLocation,
+      chemicalBrand,
+      "0 " + chemicalUnit,
+      chemicalContainerSize + " " + chemicalUnit,
+      "0 " + chemicalUnit,
+      chemicalCASNo,
+      chemicalMSDS,
+      chemicalBarCode
+    );
+    closeAddModal();
+    showToast("Chemical added successfully", false, 3000);
+  }
+});
+
+
+
+// ===================== Edit Chemical Modal Logic =====================
+
+// Edit Chemicals Functionality
+const editChemicalModal = document.getElementById("editChemicalModal");
+const editChemicalForm = document.getElementById("editChemicalForm");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+const modalBackdropEditChemical = document.getElementById(
+  "modalBackdropEditChemical"
+);
 
 /**
  * Opens the edit modal and populates it with chemical data
@@ -342,100 +419,21 @@ chemicalsTableBody.addEventListener("click", (e) => {
   }
 });
 
-/**
- * Opens the add chemicals modal
- */
-function openAddModal() {
-  addChemicalsModal.classList.remove("hidden");
-  addChemicalsModal.classList.add("flex");
-}
+// ===================== Delete Chemicals Modal Logic =====================
 
-/**
- * Closes the add chemicals modal and resets the form
- */
-function closeAddModal() {
-  addChemicalsModal.classList.add("hidden");
-  addChemicalsModal.classList.remove("flex");
-  addChemicalsForm.reset();
-}
+// Delete Chemical Functionality
+const deleteChemicalModal = document.getElementById("deleteChemicalModal");
+const modalBackdropDeleteChemical = document.getElementById(
+  "modalBackdropDeleteChemical"
+);
+const cancelDeleteChemicalBtn = document.getElementById(
+  "cancelDeleteChemicalBtn"
+);
+const confirmDeleteChemicalBtn = document.getElementById(
+  "confirmDeleteChemicalBtn"
+);
 
-addChemicalsBtn.addEventListener("click", openAddModal);
-cancelBtn.addEventListener("click", closeAddModal);
-modalBackdropAddChemical.addEventListener("click", closeAddModal);
 
-/**
- * Handles the submission of new chemical data
- * Creates a new row in the table with the chemical information
- * Includes functionality for remarks and additional chemical details
- */
-addChemicalsForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  // const chemicalId = addChemicalsForm.chemicalId.value.trim();
-  const chemicalName = addChemicalsForm.chemicalName.value.trim();
-  const chemicalUnit = addChemicalsForm.chemicalUnit.value.trim();
-  const chemicalLocation = addChemicalsForm.chemicalLocation.value.trim();
-  const chemicalBrand = addChemicalsForm.chemicalBrand.value.trim();
-  const chemicalContainerSize =
-    addChemicalsForm.chemicalContainerSize.value.trim();
-  const chemicalCASNo = addChemicalsForm.chemicalCASNo.value.trim();
-  const chemicalMSDS = addChemicalsForm.chemicalMSDS.value.trim();
-  const chemicalBarCode = addChemicalsForm.chemicalBarCode.value.trim();
-
-  // Conditions that are commented are to be removed~
-  // Hindi ko lang muna tinanggal just in case may changes na gagawin - Waks
-  if (
-    !chemicalName ||
-    !chemicalUnit ||
-    !chemicalLocation ||
-    !chemicalBrand ||
-    !chemicalContainerSize
-  ) {
-    showToast("Please fill in all required fields.", true, 4000);
-    return;
-  }
-
-  let result = await dbhandler.addChemicalsRecord(
-    chemicalName,
-    chemicalLocation,
-    chemicalUnit,
-    chemicalBrand,
-    chemicalContainerSize,
-    chemicalBarCode,
-    chemicalCASNo,
-    chemicalMSDS
-  );
-
-  if (result == null) {
-    showToast(
-      `The mainHandler.addChemicalsRecord() DOESN'T return a status statement.`,
-      true, 
-      4000
-    );
-  } else if (result.includes("ERROR")) {
-    showToast(result, true, 4000);
-  } else {
-    console.log(result);
-    let newItemId = result.slice(46, result.length - 1);
-    createNewChemicalRow(
-      newItemId,
-      chemicalName,
-      chemicalUnit,
-      chemicalLocation,
-      chemicalBrand,
-      "0 " + chemicalUnit,
-      chemicalContainerSize + " " + chemicalUnit,
-      "0 " + chemicalUnit,
-      chemicalCASNo,
-      chemicalMSDS,
-      chemicalBarCode
-    );
-    closeAddModal();
-    showToast("Chemical added successfully", false, 3000);
-  }
-});
-
-// Handle Delete Buttons
 chemicalsTableBody.addEventListener("click", (e) => {
   if (
     e.target.closest("button") &&
@@ -479,8 +477,7 @@ confirmDeleteChemicalBtn.addEventListener("click", async () => {
 cancelDeleteChemicalBtn.addEventListener("click", closeDeleteChemicalModal);
 modalBackdropDeleteChemical.addEventListener("click", closeDeleteChemicalModal);
 
-//=================================================================================================================================
-// Tooltip Functionality
+// ===================== Set Tooltip Functionality Logic =====================
 
 /**
  * Tooltip Functionality for Info buttons
@@ -533,8 +530,13 @@ chemicalsTableBody.addEventListener("mouseover", function (e) {
 });
 
 
-//=================================================================================================================================
-// Remarks Modals
+// ===================== Update Remarks Modal Logic =====================
+
+// Remarks Modal Functionality
+const remarksModal = document.getElementById("remarksModal");
+const remarksForm = document.getElementById("remarksForm");
+const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
+const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
 
 /**
  * Opens the remarks modal and populates it with existing remarks if any
@@ -618,8 +620,7 @@ remarksForm.addEventListener("submit", async (e) => {
   showToast("Remarks updated successfully", false, 3000);
 });
 
-// ===============================================================================================
-// FRONT END-RELATED METHODS
+// ===================== Front-End Related Logic =====================
 
 // TODO: Add documentation
 async function createNewChemicalRow(
@@ -760,8 +761,7 @@ function updateChemicalTable(
   });
 }
 
-// ===============================================================================================
-// BACK END-RELATED METHODS
+// ===================== Database Related Logic =====================
 
 /**
  * Gets all of the chemical records from the database then proceeds to populate them to the table
@@ -843,6 +843,8 @@ async function prepareLocationDropdown() {
     console.error(generalError);
   }
 }
+
+// ===================== Set Toast Notification Logic =====================
 
 // --- Toast Notification ---
 // Shows a small message at the bottom right when something is added, edited, deleted, or an error occurs
