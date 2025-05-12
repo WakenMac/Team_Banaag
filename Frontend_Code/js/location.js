@@ -4,10 +4,20 @@ import * as dbhandler from '../../Backend_Code/mainHandler.js';
 // Modal logic
 const addLocationBtn = document.getElementById("addLocationBtn");
 const addLocationModal = document.getElementById("addLocationModal");
-const modalBackdropLocation = document.getElementById("modalBackdropLocation");
-const cancelBtn = document.getElementById("cancelBtn");
-const addLocationForm = document.getElementById("addLocationForm");
 const addLocationError = document.getElementById("addLocationError");
+const modalBackdropLocation = document.getElementById("modalBackdropLocation");
+const addLocationForm = document.getElementById('addLocationForm');
+const cancelBtn = document.getElementById("cancelBtn");
+
+// Modals for editing
+const editLocationModal = document.getElementById("editLocationModal");
+const editLocationError = document.getElementById("editLocationError");
+const editLocationForm = document.getElementById('editLocationForm');
+const cancelEditLocationBtn = document.getElementById("cancelEditLocationBtn");
+const modalBackdropEditLocation = document.getElementById(
+  "modalBackdropEditLocation"
+);
+
 const tbody = document.querySelector("tbody");
 
 // Initialize table components
@@ -49,6 +59,25 @@ function setupDropdown(buttonId, menuId) {
       menu.classList.remove("opacity-100", "visible");
     }
   });
+
+  addLocationBtn.addEventListener("click", openModal);
+  cancelBtn.addEventListener("click", () => {
+    addLocationError.classList.add('hidden');
+    addLocationError.textContent = '';
+    closeModal();
+  });
+
+  cancelEditLocationBtn.addEventListener("click", () => {
+    editLocationError.classList.add("hidden");
+    editLocationError.textContent = '';
+    closeEditModal();
+  });
+
+  modalBackdropEditLocation.addEventListener("click", () => {
+    editLocationError.classList.add("hidden");
+    editLocationError.textContent = '';
+    closeEditModal();
+  });
 }
 
 function openModal() {
@@ -62,19 +91,26 @@ function closeModal() {
   addLocationForm.reset();
 }
 
-addLocationBtn.addEventListener("click", openModal);
-cancelBtn.addEventListener("click", closeModal);
-modalBackdropLocation.addEventListener("click", closeModal);
+function openEditModal() {
+  editLocationModal.classList.remove("hidden");
+  editLocationModal.classList.add("flex");
+}
 
+function closeEditModal() {
+  editLocationModal.classList.add("hidden");
+  editLocationModal.classList.remove("flex");
+  editLocationForm.reset();
+}
+
+modalBackdropLocation.addEventListener("click", closeModal);
 addLocationForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const locationId = addLocationForm.locationId.value.trim();
   const locationName = addLocationForm.locationName.value.trim();
 
   addLocationError.classList.add("hidden");
   addLocationError.textContent = "";
-  if (!locationId || !locationName) {
+  if (!locationName) {
     addLocationError.textContent = "Please fill in all required fields.";
     addLocationError.classList.remove("hidden");
     return;
@@ -104,6 +140,56 @@ addLocationForm.addEventListener("submit", async (e) => {
 document.getElementById('locationName').addEventListener('input', () => {
   addLocationError.classList.add('hidden');
   addLocationError.textContent = '';
+});
+
+// Adds edit portion
+tbody.addEventListener("click", (e) => {
+  if (
+    e.target.closest("button") &&
+    e.target.closest("button").getAttribute("aria-label") === "Edit location"
+  ) {
+    const row = e.target.closest("tr");
+    populateEditForm(row);
+  }
+});
+
+function populateEditForm(row){
+  const cells = row.children;
+  document.getElementById("editLocationId").value = cells[0].textContent.trim();
+  document.getElementById("editLocationName").value = cells[1].textContent.trim();
+  openEditModal();
+}
+
+editLocationForm.addEventListener('submit', async (e) =>{
+  e.preventDefault();
+    const editLocationId = document.getElementById("editLocationId").value.trim();
+    const editLocationName = document.getElementById("editLocationName").value.trim();
+  
+    if (!editLocationName) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+  
+    let result = await dbhandler.updateLocationRecordName(editLocationId, editLocationName);
+  
+    if (result == null) {
+      editLocationError.textContent = `Something went wrong. Please try again.`;
+      editLocationError.classList.remove("hidden");
+      return;
+    } else if (result.includes("ERROR")) {
+      editLocationError.textContent = result.replace(/^ERROR:\s*/i, ''); // Removes the ERROR sign
+      editLocationError.classList.remove("hidden");
+      return;
+    } else {
+      // Update the row in the table
+      const rows = tbody.querySelectorAll("tr");
+      rows.forEach((row) => {
+        if (row.children[0].textContent === editLocationId) {
+          row.children[1].textContent = editLocationName;
+        }
+      });
+      closeEditModal();
+    }
 });
 
 // Optional: Add delete functionality for dynamically added rows
