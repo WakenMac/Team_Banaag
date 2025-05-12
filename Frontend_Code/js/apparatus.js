@@ -13,6 +13,32 @@
 // All changes are temporary and will reset if you reload the page since it's not connected to a database yet.
 // ----------------------------------------------------------
 
+import * as dbhandler from '../../Backend_Code/mainHandler.js';
+
+// ===================== Initialize Components =====================
+
+// Select options
+const addApparatusLocation = document.getElementById('apparatusLocation');
+const addApparatusUnit = document.getElementById('apparatusUnit');
+const editApparatusLocation = document.getElementById('editApparatusLocation');
+const editApparatusUnit = document.getElementById('editApparatusUnit');
+
+const tbody = document.querySelector("tbody");
+await initialize();
+
+async function initialize(){
+  setupDropdown("masterlistBtn", "masterlistMenu");
+  setupDropdown("consumablesBtn", "consumablesMenu");
+  setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
+  setupDropdown("propertiesBtn", "propertiesMenu");
+
+  await dbhandler.testPresence();
+  await prepareLabApparatusTable();
+
+  await prepareLocationDropdown();
+  await prepareUnitTypeDropdown();
+}
+
 /* This is the code for the dropdown menus. */
 
 function setupDropdown(buttonId, menuId) {
@@ -41,11 +67,6 @@ function setupDropdown(buttonId, menuId) {
   });
 }
 
-setupDropdown("masterlistBtn", "masterlistMenu");
-setupDropdown("consumablesBtn", "consumablesMenu");
-setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
-setupDropdown("propertiesBtn", "propertiesMenu");
-
 /* 
 -----------------------------------------------------------
 
@@ -65,7 +86,8 @@ TODO: The edit button is not yet implemented, but it will be added later.
 ------------------------------------------------------------
 */
 
-// Add Modal logic
+// ===================== Add Lab Apparatus Modal Logic =====================
+
 const addApparatusBtn = document.getElementById("addApparatusBtn");
 const addApparatusModal = document.getElementById("addApparatusModal");
 const modalBackdropApparatus = document.getElementById(
@@ -73,7 +95,6 @@ const modalBackdropApparatus = document.getElementById(
 );
 const cancelApparatusBtn = document.getElementById("cancelApparatusBtn");
 const addApparatusForm = document.getElementById("addApparatusForm");
-const tbody = document.querySelector("tbody");
 
 function openAddModal() {
   addApparatusModal.classList.remove("hidden");
@@ -93,7 +114,6 @@ modalBackdropApparatus.addEventListener("click", closeAddModal);
 addApparatusForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const apparatusId = addApparatusForm.apparatusId.value.trim();
   const apparatusName = addApparatusForm.apparatusName.value.trim();
   const apparatusUnit = addApparatusForm.apparatusUnit.value.trim();
   const apparatusLocation = addApparatusForm.apparatusLocation.value.trim();
@@ -101,7 +121,6 @@ addApparatusForm.addEventListener("submit", (e) => {
   const apparatusQuantity = addApparatusForm.apparatusQuantity.value.trim();
 
   if (
-    !apparatusId ||
     !apparatusName ||
     !apparatusUnit ||
     !apparatusLocation ||
@@ -112,31 +131,8 @@ addApparatusForm.addEventListener("submit", (e) => {
     return;
   }
 
-  // Create new row
-  const tr = document.createElement("tr");
 
-  tr.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusId}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusName}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusUnit}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusLocation}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusBrand}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusQuantity}</td>
-              <td class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3">
-              <button aria-label="Add remarks"
-                class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
-                data-apparatus-id="${apparatusId}">
-                <i class="fas fa-comment-alt text-[14px]"></i>
-              </button>
-              <button aria-label="Edit apparatus" class="text-yellow-400 hover:text-yellow-500">
-                <i class="fas fa-pencil-alt"></i>
-              </button>
-              <button aria-label="Delete apparatus" class="text-red-600 hover:text-red-700">
-                <i class="fas fa-trash-alt"></i>
-              </button>
-            </td>
-          `;
-  tbody.appendChild(tr);
+
   closeAddModal();
 });
 
@@ -348,3 +344,187 @@ remarksForm.addEventListener("submit", (e) => {
 // Close remarks modal
 cancelRemarksBtn.addEventListener("click", closeRemarksModal);
 modalBackdropRemarks.addEventListener("click", closeRemarksModal);
+
+
+// ===================== Front-End Related Logic =====================
+
+async function createNewLabApparatusRow(
+  apparatusId, apparatusName, apparatusUnit, apparatusLocation, apparatusBrand, 
+  apparatusQuantity
+){
+  // Create new row
+  const tr = document.createElement("tr");
+
+  tr.innerHTML = `
+      <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusId}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusName}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusUnit}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusLocation}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusBrand}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-gray-900">${apparatusQuantity}</td>
+      <td class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3">
+        <button aria-label="Add remarks"
+          class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
+          data-apparatus-id="${apparatusId}">
+          <i class="fas fa-comment-alt text-[14px]"></i>
+        </button>
+        <button aria-label="Edit apparatus" class="text-yellow-400 hover:text-yellow-500">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+        <button aria-label="Delete apparatus" class="text-red-600 hover:text-red-700">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </td>
+    `;
+  tbody.appendChild(tr);
+}
+
+/**
+ * Method to add a update a record from the LabApparatus Table (Front End)
+ * @param {string} editLabApparatusName          Name of the Lab Apparatus to be added
+ * @param {string} editLabApparatusUnit          Location where the Lab Apparatus will be stored
+ * @param {string} editLabApparatusLocation      Unit Type of the Lab Apparatus (e.g. Unit, Piece)
+ * @param {string} editLabApparatusBrand         Brand of the Lab Apparatus to be added
+ * @param {int} editLabApparatusQuantity         Quantity of the Lab Apparatus
+ */
+function updateLabApparatussTable(
+  cells,
+) {
+  for (const { id, idx } of apparatusFieldMap) {
+    const el = document.getElementById(id);
+    if (!el && !cells[idx]) 
+      continue;
+
+    if (id === "editLabApparatusQuantity") // skip quantity
+      cells[idx].textContent = el.value.trim() + ' ' + cells[2].textContent;
+    else
+      cells[idx].textContent = el.value.trim();
+  }
+}
+
+/**
+ * Method to add an existing remarks to the remarksText element
+ * @param {string} remarks The remarks of the chemical
+ * @param {int} apparatusId The primary key of the Chemical table.
+ */
+async function createNewRemarks(remarks, apparatusId) {
+  document.getElementById("remarksText").value = remarks;
+
+  const remarksBtn = document.querySelector(
+    `button[data-apparatus-id="${apparatusId}"]`
+  );
+
+  if (remarks) {
+    remarksBtn.classList.remove("text-gray-700", "border-gray-700");
+    remarksBtn.classList.add("text-blue-600", "border-blue-600");
+    remarksBtn.setAttribute("data-remarks", remarks);
+  } else {
+    remarksBtn.classList.remove("text-blue-600", "border-blue-600");
+    remarksBtn.classList.add("text-gray-700", "border-gray-700");
+    remarksBtn.removeAttribute("data-remarks");
+  }
+}
+
+/**
+ * Method to add a new unit to the addLabApparatusUnit and editLabApparatusUnit dropdown element
+ * @param {string} unitTypeName Name of the unit type to be added
+ */
+function createNewUnitTypeRow(unitTypeName) {
+  const tr1 = document.createElement("tr");
+  const tr2 = document.createElement("tr");
+  tr1.innerHTML = `<option value="${unitTypeName}">${unitTypeName}</option>`;
+  tr2.innerHTML = `<option value="${unitTypeName}">${unitTypeName}</option>`;
+  addApparatusUnit.appendChild(tr1);
+  editApparatusUnit.appendChild(tr2);
+}
+
+/**
+ * Method to add a new unit to the addLabApparatusLocation and editLabApparatusLocation dropdown element
+ * @param {string} locationName Name of the location to be added to the dropdown
+ */
+function createNewLocationRow(locationName) {
+  const tr1 = document.createElement("tr");
+  const tr2 = document.createElement("tr");
+
+  tr1.innerHTML = `<option value="${locationName}">${locationName}</option>`;
+  tr2.innerHTML = `<option value="${locationName}">${locationName}</option>`;
+
+  addApparatusLocation.appendChild(tr1);
+  editApparatusLocation.appendChild(tr2);
+}
+
+// ===================== Database Related Logic =====================
+
+/**
+ * Gets all of the chemical records from the database then proceeds to populate them to the table
+ * @void Returns nothing.
+ */
+async function prepareLabApparatusTable() {
+  try {
+    let data = await dbhandler.getAllLabApparatusRecords();
+
+    if (data.length == 0) {
+      console.error("Lab Apparatus table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      await createNewLabApparatusRow(
+        data[i]["Item ID"],
+        data[i]["Name"],
+        data[i]["Unit"],
+        data[i]["Location"],
+        data[i]["Brand"],
+        data[i]["Quantity"]
+      );
+
+      await createNewRemarks(data[i]["Remarks"], data[i]["Item ID"]);
+    }
+  } catch (generalError) {
+    console.error(generalError);
+  }
+}
+
+/**
+ * Gets all of the unit type records from the database then proceeds to populate them (using the unit_type_name)
+ *  to the addApparatusUnit html dropdown element
+ * @void Returns nothing.
+ */
+async function prepareUnitTypeDropdown() {
+  try {
+    let data = await dbhandler.getAllUnitTypeRecordsOrderByName();
+
+    if (data.length == 0) {
+      console.error("Unit type table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      createNewUnitTypeRow(data[i]["Name"]);
+    }
+  } catch (generalError) {
+    console.error(generalError);
+  }
+}
+
+/**
+ * Gets all of the location records from the database then proceeds to populate them (using the location_name)
+ *  to the addApparatusLocation html dropdown element
+ * @void Returns nothing.
+ */
+async function prepareLocationDropdown() {
+  try {
+    let data = await dbhandler.getAllLocationRecordsOrderByName();
+
+    if (data.length == 0) {
+      console.error("Unit type table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      createNewLocationRow(data[i]["Name"]);
+    }
+  } catch (generalError) {
+    console.error(generalError);
+  }
+}

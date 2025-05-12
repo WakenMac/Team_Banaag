@@ -37,28 +37,6 @@ async function initialize() {
   setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
   setupDropdown("propertiesBtn", "propertiesMenu");
 
-  // Prepares the modals
-
-  addUnitTypeBtn.addEventListener("click", openModal);
-  cancelBtn.addEventListener("click", () => {
-    // Once clicked, clears the error message in the modal and closes (hides) the Add Location Modal
-    addUnitTypeError.classList.add("hidden");
-    addUnitTypeError.textContent = '';
-    closeModal();
-  });
-  modalBackdropUnitType.addEventListener("click", closeModal);
-
-  cancelBtnEditUnitType.addEventListener("click", () => {
-    editUnitTypeError.classList.add("hidden");
-    editUnitTypeError.textContent = '';
-    closeEditModal();
-  });
-  modalBackdropEditUnitType.addEventListener("click", () => {
-    editUnitTypeError.classList.add("hidden");
-    editUnitTypeError.textContent = '';
-    closeEditModal();
-  });
-
   // Prepares the contents of the admin table
   await dbhandler.testPresence();
   await prepareUnitTypeTable();
@@ -91,6 +69,83 @@ function setupDropdown(buttonId, menuId) {
   });
 }
 
+// ===================== Add Glassware Modal Logic =====================
+
+function openModal() {
+  addUnitTypeModal.classList.remove("hidden");
+  addUnitTypeModal.classList.add("flex");
+}
+
+function closeModal() {
+  addUnitTypeModal.classList.add("hidden");
+  addUnitTypeModal.classList.remove("flex");
+  addUnitTypeForm.reset();
+}
+
+addUnitTypeBtn.addEventListener("click", openModal);
+cancelBtn.addEventListener("click", () => {
+  // Once clicked, clears the error message in the modal and closes (hides) the Add Location Modal
+  addUnitTypeError.classList.add("hidden");
+  addUnitTypeError.textContent = '';
+  closeModal();
+});
+modalBackdropUnitType.addEventListener("click", closeModal);
+
+// Connects the Create functionality to the Database Handler
+addUnitTypeForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const unitTypeName = document.getElementById("unitTypeName").value.trim();
+
+  addUnitTypeError.classList.add("hidden");
+  addUnitTypeError.textContent = "";
+  
+  if (!unitTypeName) {
+    addUnitTypeError.textContent = "Please fill in all required fields.";
+    addUnitTypeError.classList.remove("hidden");
+    return;
+  }
+
+  let result = await dbhandler.addUnitTypeRecord(unitTypeName);
+
+  if (result == null) {
+    addUnitTypeError.textContent = `Something went wrong. Please try again.`;
+    addUnitTypeError.classList.remove("hidden");
+    return;
+  } else if (result.includes("ERROR")) {
+    addUnitTypeError.textContent = result.replace(/^ERROR:\s*/i, ''); // Removes the ERROR sign
+    addUnitTypeError.classList.remove("hidden");
+    return;
+  } else {
+    console.log(result);
+    let newUnitTypeId = result.slice(47, result.length - 1);
+    createNewUnitTypeRow(newUnitTypeId, unitTypeName);
+    addUnitTypeError.classList.add("hidden");
+    addUnitTypeError.textContent = "";
+    closeModal();
+  }
+});
+
+// Hide error message when user starts typing in the name input
+document.getElementById('unitTypeName').addEventListener('input', () => {
+  addUnitTypeError.classList.add('hidden');
+  addUnitTypeError.textContent = '';
+});
+
+
+// ===================== Edit Glassware Modal Logic =====================
+
+cancelBtnEditUnitType.addEventListener("click", () => {
+  editUnitTypeError.classList.add("hidden");
+  editUnitTypeError.textContent = '';
+  closeEditModal();
+});
+
+modalBackdropEditUnitType.addEventListener("click", () => {
+  editUnitTypeError.classList.add("hidden");
+  editUnitTypeError.textContent = '';
+  closeEditModal();
+});
+
 /**
  * Opens the edit modal for the selected unit type
  * @param {int} unitTypeId Primary key of the unitType table
@@ -108,17 +163,6 @@ function closeEditModal() {
   editUnitTypeModal.classList.add("hidden");
   editUnitTypeModal.classList.remove("flex");
   editUnitTypeForm.reset();
-}
-
-function openModal() {
-  addUnitTypeModal.classList.remove("hidden");
-  addUnitTypeModal.classList.add("flex");
-}
-
-function closeModal() {
-  addUnitTypeModal.classList.add("hidden");
-  addUnitTypeModal.classList.remove("flex");
-  addUnitTypeForm.reset();
 }
 
 /**
@@ -175,44 +219,7 @@ tbody.addEventListener("click", (e) => {
   }
 });
 
-addUnitTypeForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const unitTypeName = document.getElementById("unitTypeName").value.trim();
-
-  addUnitTypeError.classList.add("hidden");
-  addUnitTypeError.textContent = "";
-  
-  if (!unitTypeName) {
-    addUnitTypeError.textContent = "Please fill in all required fields.";
-    addUnitTypeError.classList.remove("hidden");
-    return;
-  }
-
-  let result = await dbhandler.addUnitTypeRecord(unitTypeName);
-
-  if (result == null) {
-    addUnitTypeError.textContent = `Something went wrong. Please try again.`;
-    addUnitTypeError.classList.remove("hidden");
-    return;
-  } else if (result.includes("ERROR")) {
-    addUnitTypeError.textContent = result.replace(/^ERROR:\s*/i, ''); // Removes the ERROR sign
-    addUnitTypeError.classList.remove("hidden");
-    return;
-  } else {
-    console.log(result);
-    let newUnitTypeId = result.slice(47, result.length - 1);
-    createNewUnitTypeRow(newUnitTypeId, unitTypeName);
-    addUnitTypeError.classList.add("hidden");
-    addUnitTypeError.textContent = "";
-    closeModal();
-  }
-});
-
-// Hide error message when user starts typing in the name input
-document.getElementById('unitTypeName').addEventListener('input', () => {
-  addUnitTypeError.classList.add('hidden');
-  addUnitTypeError.textContent = '';
-});
+// ===================== Delete Glassware Modal Logic =====================
 
 // Add delete functionality for dynamically added rows
 tbody.addEventListener("click", async (e) => {
@@ -225,53 +232,6 @@ tbody.addEventListener("click", async (e) => {
     openDeleteModal(unitTypeId, row);
   }
 });
-
-// ===============================================================================================
-// FRONT END-RELATED METHODS
-
-/**
- * Method to add a new row to the table
- * @param {int} unitTypeId Primary key of the unitType table
- * @param {string} unitTypeName Name of the unitType to be added
- */
-function createNewUnitTypeRow(unitTypeId, unitTypeName) {
-  // Create new row
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900">${unitTypeId}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900">${unitTypeName}</td>
-  
-                <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
-                  <button aria-label="Edit unit type" class="text-yellow-400 hover:text-yellow-500">
-                    <i class="fas fa-pencil-alt"></i>
-                  </button>
-                  <button aria-label="Delete unit type" class="text-red-600 hover:text-red-700">
-                    <i class="fas fa-trash-alt"></i>
-                </td>
-              `;
-
-  tbody.appendChild(tr);
-}
-
-// ===============================================================================================
-// BACK END-RELATED METHODS
-
-async function prepareUnitTypeTable() {
-  try {
-    let data = await dbhandler.getAllUnitTypeRecords();
-
-    if (data.length == 0) {
-      console.error("Unit type table has no records.");
-      return;
-    }
-
-    for (let i = 0; i < data.length; i++) {
-      createNewUnitTypeRow(data[i]["Unit Type ID"], data[i]["Name"]);
-    }
-  } catch (generalError) {
-    console.error(generalError);
-  }
-}
 
 function openDeleteModal(unitTypeId, row) {
   unitTypeToDelete = unitTypeId;
@@ -304,3 +264,48 @@ confirmDeleteBtn.addEventListener("click", async () => {
     closeDeleteModal();
   }
 });
+
+// ===================== Front-end Related Logic =====================
+
+/**
+ * Method to add a new row to the table
+ * @param {int} unitTypeId Primary key of the unitType table
+ * @param {string} unitTypeName Name of the unitType to be added
+ */
+function createNewUnitTypeRow(unitTypeId, unitTypeName) {
+  // Create new row
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-gray-900">${unitTypeId}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-900">${unitTypeName}</td>
+  
+                <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
+                  <button aria-label="Edit unit type" class="text-yellow-400 hover:text-yellow-500">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button aria-label="Delete unit type" class="text-red-600 hover:text-red-700">
+                    <i class="fas fa-trash-alt"></i>
+                </td>
+              `;
+
+  tbody.appendChild(tr);
+}
+
+// ===================== Database Related Logic =====================
+
+async function prepareUnitTypeTable() {
+  try {
+    let data = await dbhandler.getAllUnitTypeRecordsOrderById();
+
+    if (data.length == 0) {
+      console.error("Unit type table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      createNewUnitTypeRow(data[i]["Unit Type ID"], data[i]["Name"]);
+    }
+  } catch (generalError) {
+    console.error(generalError);
+  }
+}
