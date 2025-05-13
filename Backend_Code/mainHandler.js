@@ -1856,7 +1856,6 @@ export async function deleteLabApparatusRecordByItemId(itemId = 0){
     }
 }
 
-
 // ======================================================================================================================================
 // Methods for Restocks
 
