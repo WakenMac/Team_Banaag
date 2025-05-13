@@ -440,6 +440,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initializeEventListeners(tbody);
   setupEventListeners();
+
+  showToast('Loaded page successfully!');
 });
 
 function setupEventListeners() {

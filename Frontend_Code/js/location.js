@@ -15,6 +15,8 @@ async function initialize() {
   // Prepares the contents of the admin table
   await dbhandler.testPresence();
   await prepareLocationTable();
+
+  showToast('Loaded page successfully');
 }
 
 // ===================== Set Dropdown Toggle Logic =====================
@@ -83,8 +85,7 @@ addLocationForm.addEventListener("submit", async (e) => {
   addLocationError.classList.add("hidden");
   addLocationError.textContent = "";
   if (!locationName) {
-    addLocationError.textContent = "Please fill in all required fields.";
-    addLocationError.classList.remove("hidden");
+    showToast("Please fill in all required fields.", true);
     return;
   }
 
@@ -92,18 +93,15 @@ addLocationForm.addEventListener("submit", async (e) => {
   let result = await dbhandler.addLocationRecord(locationName);
 
   if (result == null) {
-    addLocationError.textContent = `Something went wrong. Please try again.`;
-    addLocationError.classList.remove("hidden");
+    showToast(`Something went wrong. Please try again.`, true);
     return;
   } else if (result.includes('ERROR')) {
-    addLocationError.textContent = result.replace(/^ERROR:\s*/i, '');
-    addLocationError.classList.remove("hidden");
+    showToast(result.replace(/^ERROR:\s*/i, ''), true);
     return;
   } else {
     let correctLocationId = result.slice(46, result.length - 1)
     createNewLocationRow(correctLocationId, locationName)
-    addLocationError.classList.add("hidden");
-    addLocationError.textContent = "";
+    showToast(result, false);
     closeModal();
   }
 });
@@ -172,19 +170,17 @@ editLocationForm.addEventListener('submit', async (e) =>{
     const editLocationName = document.getElementById("editLocationName").value.trim();
   
     if (!editLocationName) {
-      alert("Please fill in all required fields.");
+      showToast("Please fill in all required fields.", true);
       return;
     }
   
     let result = await dbhandler.updateLocationRecordName(editLocationId, editLocationName);
   
     if (result == null) {
-      editLocationError.textContent = `Something went wrong. Please try again.`;
-      editLocationError.classList.remove("hidden");
+      showToast(`Something went wrong. Please try again.`, true);
       return;
     } else if (result.includes("ERROR")) {
-      editLocationError.textContent = result.replace(/^ERROR:\s*/i, ''); // Removes the ERROR sign
-      editLocationError.classList.remove("hidden");
+      showToast(result.replace(/^ERROR:\s*/i, ''), true);
       return;
     } else {
       // Update the row in the table
@@ -195,6 +191,7 @@ editLocationForm.addEventListener('submit', async (e) =>{
         }
       });
       closeEditModal();
+      showToast('Location edited successfully', false);
     }
 });
 
@@ -213,11 +210,11 @@ tbody.addEventListener("click", async (e) => {
       let result = await dbhandler.removeLocationRecordByLocationId(locationId);
 
       if (result == null)
-        alert(`The mainHandler.removeLocationByLocationId() DOESN'T return a status statement.`)
+        showToast(`The mainHandler.removeLocationByLocationId() DOESN'T return a status statement.`, true)
       else if (result.includes('ERROR'))
-        alert(result)
+        showToast(result.replace(/^ERROR:\s*/i, ''), true);
       else {
-        console.log(result);
+        showToast(result, false);
         row.remove();
       }
     }
@@ -250,6 +247,38 @@ function createNewLocationRow(locationId, locationName) {
             `;
 
   tbody.appendChild(tr);
+}
+
+function showToast(message, isError = false) {
+  let toast = document.getElementById("custom-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "custom-toast";
+    toast.style.position = "fixed";
+    toast.style.bottom = "32px";
+    toast.style.right = "32px";
+    toast.style.background = isError
+      ? "rgba(220, 38, 38, 0.95)"
+      : "rgba(44, 161, 74, 0.95)"; // Red for error, green for success
+    toast.style.color = "white";
+    toast.style.padding = "16px 28px";
+    toast.style.borderRadius = "8px";
+    toast.style.fontSize = "16px";
+    toast.style.fontWeight = "regular";
+    toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+    toast.style.opacity = "0";
+    toast.style.transition = "opacity 0.4s";
+    toast.style.zIndex = "9999";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.style.background = isError
+    ? "rgba(220, 38, 38, 0.95)"
+    : "rgba(44, 161, 74, 0.95)";
+  toast.style.opacity = "1";
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, (isError)? 4000 : 3000);
 }
 
 // ===============================================================================================
