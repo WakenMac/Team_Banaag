@@ -241,7 +241,7 @@ function closeDeleteModal() {
   consumableItemRowToDelete = null;
 }
 
-async function handleDeleteConsumableItems(e) {
+async function handleDeleteConsumableItems() {
   if (consumableItemRowToDelete) {
 
     let result = await dbhandler.deleteConsumableItemsRecordByItemId(consumableItemRowToDelete.children[0].textContent);
