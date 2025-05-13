@@ -231,7 +231,7 @@ function closeDeleteModal() {
   consumableItemRowToDelete = null;
 }
 
-function handledeleteConsumableItemss() {
+function handleDeleteConsumableItems() {
   if (consumableItemRowToDelete) {
     consumableItemRowToDelete.remove();
     closeDeleteModal();
@@ -472,14 +472,6 @@ function setupEventListeners() {
       cancelRemarksBtn.addEventListener("click", closeRemarksModal);
       modalBackdropRemarks.addEventListener("click", closeRemarksModal);
     });
-  }
-}
-
-function handleDeleteConsumableItems() {
-  if (consumableItemRowToDelete) {
-    consumableItemRowToDelete.remove();
-    closeDeleteModal();
-    showToast("Consumable item deleted successfully");
   }
 }
 

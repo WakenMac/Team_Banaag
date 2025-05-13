@@ -89,8 +89,79 @@ function setupEventListeners() {
 
   // Table Buttons
   tbody.addEventListener("click", handleTableButtonClicks);
+
+  // Remarks
+  if (tbody) {
+    tbody.addEventListener("click", (e) => {
+      const remarksBtn = e.target.closest('button[aria-label="Add remarks"]');
+      if (remarksBtn) {
+        const restockId = remarksBtn.getAttribute("data-restock-id");
+        openRemarksModal(restockId);
+      }
+    });
+  }
+
+  // Add remarks form submission
+  if (remarksForm) {
+    remarksForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const restockId = document.getElementById("remarksRestockId").value;
+      const remarks = document.getElementById("remarksText").value.trim();
+
+      const remarksBtn = document.querySelector(
+        `button[data-restock-id="${restockId}"]`
+      );
+      if (remarksBtn) {
+        if (remarks) {
+          remarksBtn.classList.remove("text-gray-700", "border-gray-700");
+          remarksBtn.classList.add("text-blue-600", "border-blue-600");
+          remarksBtn.setAttribute("data-remarks", remarks);
+        } else {
+          remarksBtn.classList.remove("text-blue-600", "border-blue-600");
+          remarksBtn.classList.add("text-gray-700", "border-gray-700");
+          remarksBtn.removeAttribute("data-remarks");
+        }
+        closeRemarksModal();
+        showToast("Remarks updated successfully", false, 3000);
+      }
+
+      cancelRemarksBtn.addEventListener("click", closeRemarksModal);
+      modalBackdropRemarks.addEventListener("click", closeRemarksModal);
+    });
+  }
 }
 
+// ------------------------ REMARKS FUNCTIONS ------------------------
+function openRemarksModal(restockId) {
+  remarksModal.classList.remove("hidden");
+  remarksModal.classList.add("flex");
+  document.getElementById("remarksRestockId").value = restockId;
+
+  // Check if there are existing remarks
+  const remarksBtn = document.querySelector(
+    `button[data-restock-id="${restockId}"]`
+  );
+  const existingRemarks = remarksBtn.getAttribute("data-remarks");
+  if (existingRemarks) {
+    document.getElementById("remarksText").value = existingRemarks;
+  } else {
+    document.getElementById("remarksText").value = "";
+  }
+}
+
+function closeRemarksModal() {
+  remarksModal.classList.add("hidden");
+  remarksModal.classList.remove("flex");
+  remarksForm.reset();
+}
+
+function populateRemarksField(remarksBtn) {
+  const remarks = remarksBtn.getAttribute("data-remarks") || "";
+  const remarksField = document.getElementById("editRemarksText");
+  if (remarksField) {
+    remarksField.value = remarks;
+  }
+}
 // ===============================================================================================
 // FRONT END-RELATED METHODS
 
@@ -180,7 +251,7 @@ function updateRestockTable(
         restockQuantity,
         restockBrand,
         restockDate,
-        restockExpirationDate
+        restockExpirationDate,
       });
       break;
     }
@@ -193,7 +264,7 @@ function updateRowContent(row, data) {
     restockQuantity,
     restockBrand,
     restockDate,
-    restockExpirationDate
+    restockExpirationDate,
   } = data;
   row.cells[1].textContent = restockItemName;
   row.cells[2].textContent = restockQuantity;
@@ -252,11 +323,7 @@ function handleAddRestockSubmit(e) {
   }
 
   // Generate random ID
-  const restockId =
-    "RST" +
-    Math.floor(Math.random() * 1000000)
-      .toString()
-      .padStart(6, "0");
+  const restockId = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
 
   createNewRestockRow(
     restockId,
@@ -326,6 +393,10 @@ function handleTableButtonClicks(e) {
     case "Delete restock":
       openDeleteModal(row);
       break;
+    case "Add remarks":
+      const restockId = button.getAttribute("data-restock-id");
+      openRemarksModal(restockId);
+      break;
   }
 }
 
@@ -360,6 +431,11 @@ function populateEditForm(row) {
     }
 
     el.value = cells[idx].textContent.trim();
+  }
+
+  const remarksBtn = document.querySelector('button[aria-label="Add remarks"]');
+  if (remarksBtn) {
+    populateRemarksField(remarksBtn);
   }
 
   // Store row index for updating
@@ -451,3 +527,131 @@ function setupDateValidation() {
     }
   });
 }
+
+// ========================== Filter Functionality ==========================
+
+function setupFilterFunctionality() {
+  const filterBySelect = document.getElementById('filterBySelect');
+  const timeFrameSelect = document.getElementById('timeFrameSelect');
+  const customDateRange = document.getElementById('customDateRange');
+  const startDate = document.getElementById('startDate');
+  const endDate = document.getElementById('endDate');
+  const searchInput = document.querySelector('input[type="search"]');
+  const clearFilterBtn = document.getElementById('clearFilterBtn');
+
+  function clearAllFilters() {
+    // Reset all filters
+    timeFrameSelect.classList.add('hidden');
+    customDateRange.classList.add('hidden');
+    searchInput.value = '';
+    startDate.value = '';
+    endDate.value = '';
+    timeFrameSelect.value = '';
+    filterBySelect.value = '';
+    clearFilterBtn.classList.add('hidden');
+    showAllRows();
+  }
+
+  // Show/hide time frame select based on filter type
+  filterBySelect.addEventListener('change', function() {
+    const selectedValue = this.value;
+    
+    if (selectedValue === 'restockDate' || selectedValue === 'expirationDate') {
+      timeFrameSelect.classList.remove('hidden');
+      customDateRange.classList.add('hidden');
+      clearFilterBtn.classList.remove('hidden');
+    } else {
+      timeFrameSelect.classList.add('hidden');
+      customDateRange.classList.add('hidden');
+      clearFilterBtn.classList.add('hidden');
+    }
+  });
+
+  // Clear filter button click handler
+  clearFilterBtn.addEventListener('click', clearAllFilters);
+
+  // Handle time frame selection
+  timeFrameSelect.addEventListener('change', function() {
+    const selectedTimeFrame = this.value;
+    if (selectedTimeFrame === 'custom') {
+      customDateRange.classList.remove('hidden');
+    } else {
+      customDateRange.classList.add('hidden');
+      applyFilter();
+    }
+  });
+
+  // Apply filter when custom date range is selected
+  startDate.addEventListener('change', applyFilter);
+  endDate.addEventListener('change', applyFilter);
+
+  function showAllRows() {
+    const rows = tbody.getElementsByTagName('tr');
+    for (let row of rows) {
+      row.style.display = '';
+    }
+  }
+
+  function applyFilter() {
+    const filterType = filterBySelect.value;
+    const timeFrame = timeFrameSelect.value;
+    const searchValue = searchInput.value.toLowerCase();
+    const rows = tbody.getElementsByTagName('tr');
+
+    for (let row of rows) {
+      let showRow = true;
+
+      // Apply date filter if a date filter type is selected
+      if (filterType === 'restockDate' || filterType === 'expirationDate') {
+        const dateCell = filterType === 'restockDate' ? row.cells[5] : row.cells[6];
+        const dateValue = new Date(dateCell.textContent);
+
+        if (timeFrame === 'custom') {
+          const start = new Date(startDate.value);
+          const end = new Date(endDate.value);
+          showRow = dateValue >= start && dateValue <= end;
+        } else {
+          const today = new Date();
+          const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+          const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+          switch (timeFrame) {
+            case 'today':
+              showRow = dateValue >= startOfDay && dateValue <= endOfDay;
+              break;
+            case 'thisWeek':
+              const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
+              const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6));
+              showRow = dateValue >= startOfWeek && dateValue <= endOfWeek;
+              break;
+            case 'thisMonth':
+              const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+              const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+              showRow = dateValue >= startOfMonth && dateValue <= endOfMonth;
+              break;
+            case 'thisYear':
+              const startOfYear = new Date(today.getFullYear(), 0, 1);
+              const endOfYear = new Date(today.getFullYear(), 11, 31);
+              showRow = dateValue >= startOfYear && dateValue <= endOfYear;
+              break;
+          }
+        }
+      }
+
+      // Apply search filter if there's a search value
+      if (searchValue && showRow) {
+        const itemName = row.cells[1].textContent.toLowerCase();
+        const brand = row.cells[4].textContent.toLowerCase();
+        showRow = itemName.includes(searchValue) || brand.includes(searchValue);
+      }
+
+      row.style.display = showRow ? '' : 'none';
+    }
+  }
+
+  // Add search input event listener
+  searchInput.addEventListener('input', applyFilter);
+}
+
+// Initialize filter functionality
+setupFilterFunctionality();
