@@ -163,7 +163,7 @@ addApparatusForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  let result = await dbhandler.addLabApparatusRecord(apparatusName, apparatusLocation, 
+  let result = await dbhandler.addLabEquipmentsRecord(apparatusName, apparatusLocation, 
     apparatusUnit, apparatusBrand, '')
 
   if (result == null) {
@@ -421,6 +421,7 @@ tbody.addEventListener("click", (e) => {
  */
 remarksForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  
   const apparatusId = document.getElementById("remarksApparatusId").value;
   const remarks = document.getElementById("remarksText").value.trim();
 
