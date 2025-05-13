@@ -114,7 +114,6 @@ const modalBackdropAddChemical = document.getElementById(
   "modalBackdropAddChemical"
 );
 
-
 /**
  * Opens the add chemicals modal
  */
@@ -182,7 +181,7 @@ addChemicalsForm.addEventListener("submit", async (e) => {
   if (result == null) {
     showToast(
       `The mainHandler.addChemicalsRecord() DOESN'T return a status statement.`,
-      true, 
+      true,
       4000
     );
   } else if (result.includes("ERROR")) {
@@ -382,7 +381,7 @@ editChemicalForm.addEventListener("submit", async (e) => {
   if (result == null)
     showToast(
       `The mainHandler.updateChemicalsRecordByAll() DOESN'T return a status statement.`,
-      true, 
+      true,
       4000
     );
   else if (result.includes("ERROR")) {
@@ -430,7 +429,6 @@ const cancelDeleteChemicalBtn = document.getElementById(
 const confirmDeleteChemicalBtn = document.getElementById(
   "confirmDeleteChemicalBtn"
 );
-
 
 chemicalsTableBody.addEventListener("click", (e) => {
   if (
@@ -526,7 +524,6 @@ chemicalsTableBody.addEventListener("mouseover", function (e) {
     btn.removeEventListener("mouseleave", removeTip);
   });
 });
-
 
 // ===================== Update Remarks Modal Logic =====================
 
@@ -717,7 +714,6 @@ async function createNewRemarks(remarks, chemicalId) {
   }
 }
 
-
 function updateChemicalTable(
   editChemicalId,
   editChemicalName,
@@ -769,7 +765,7 @@ async function prepareChemicalsTable() {
   try {
     let data = await dbhandler.getAllChemicalRecords();
 
-    console.log('Number of records: ', data.length);
+    console.log("Number of records: ", data.length);
 
     if (data.length == 0) {
       console.error("Chemical table has no records.");
