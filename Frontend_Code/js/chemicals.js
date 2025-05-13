@@ -37,30 +37,30 @@ async function initialize() {
   setupDropdown("propertiesBtn", "propertiesMenu");
 
   // Test chemical label
-  createNewChemicalRow(
-    -1,
-    "Corola",
-    "Box(es)",
-    "General Santos",
-    "Toyota",
-    "30",
-    "1000",
-    "1000"
-  );
+  // createNewChemicalRow(
+  //   -1,
+  //   "Corola",
+  //   "Box(es)",
+  //   "General Santos",
+  //   "Toyota",
+  //   "30",
+  //   "1000",
+  //   "1000"
+  // );
 
-  // Test q hehe - dave
-  createNewChemicalRow(
-    0,
-    "ChemName",
-    "ChemUnit",
-    "General Santos",
-    "Well",
-    "49",
-    "5000",
-    "N/A",
-    "N/A",
-    "N/A"
-  );
+  // // Test q hehe - dave
+  // createNewChemicalRow(
+  //   0,
+  //   "ChemName",
+  //   "ChemUnit",
+  //   "General Santos",
+  //   "Well",
+  //   "49",
+  //   "5000",
+  //   "N/A",
+  //   "N/A",
+  //   "N/A"
+  // );
 
   await dbhandler.testPresence();
   await prepareChemicalsTable();

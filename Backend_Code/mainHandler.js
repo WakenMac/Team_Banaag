@@ -2129,6 +2129,245 @@ export async function deleteLabEquipmentsRecordByItemId(itemId = 0){
     }
 }
 
+// ======================================================================================================================================
+// Methods for Consumable Items
+
+/**
+ * Method to get all of the records on the Consumable Items table
+ * @returns A record consisting of 7 columns (Item ID, Name, Unit, Location, Brand, Quantity, and Remarks)
+ */
+export async function getAllConsumableItemsRecords(){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_consumable_items_records');
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to get one record from the Consumable Items table based on its item ID
+ * @param {integer} itemId The primary key of the Consumable Items table
+ * @returns A record consisting of 7 columns (Item ID, Name, Unit, Location, Brand, Quantity, and Remarks)
+ */
+export async function getAllConsumableItemsRecordsByItetmId(itemId = 0){
+    try{
+        const [ iItemId ] = converter('int', itemId);
+
+        if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: getAllConsumableItemsRecordsByItetmId's itermID parameter must be a positive non-zero integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_consumable_items_record_by_item_id', {
+            input_item_id : iItemId
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to add a new row to the Consumable Items Table
+ * @param {string} itemName                 Name of the consumable item to be added
+ * @param {string} unitTypeName             Unit Type of the consumable item (e.g. Unit, Piece)
+ * @param {string} locationName             Location where the item will be stored
+ * @param {string} brandModel               Brand of the item to be added
+ * @param {string} remarks                  Remarks of the item
+ */
+export async function addConsumableItemsRecord(
+    itemName, locationName, unitTypeName, brandModel = '', remarks = ''
+){
+    try{
+        const [ sItemName, sLocationName, sUnitTypeName, sBrandModel, sRemarks ] = converter('string', 
+            itemName, locationName, unitTypeName, brandModel, remarks);
+
+        if (typeof sItemName !== 'string'){
+            console.error("PARAMETER ERROR: addConsumableItemsRecord's Location Name parameter must be a string.")
+            return null;
+        } else if (typeof sLocationName !== 'string'){
+            console.error("PARAMETER ERROR: addConsumableItemsRecord's Unit Type Name parameter must be a string.")
+            return null;
+        } else if (typeof sUnitTypeName !== 'string'){
+            console.error("PARAMETER ERROR: addConsumableItemsRecord's Item Name parameter must be a string.")
+            return null;
+        } else if (typeof sBrandModel !== 'string'){
+            console.error("PARAMETER ERROR: addConsumableItemsRecord's Brand/Model parameter must be a string.")
+            return null;
+        } else if (typeof sRemarks !== 'string'){
+            console.error("PARAMETER ERROR: addConsumableItemsRecord's Remarks parameter must be a string.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('main_add_consumable_items_record', {
+            input_item_name : sItemName,
+            input_location_name : sLocationName,
+            input_unit_type_name : sUnitTypeName,
+            input_brand_model : sBrandModel,
+            input_remarks : sRemarks
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to add a update a record from the Lab Equipments Table based on thier Item ID
+ * @param {int} itemId                      ID of the item to be updated
+ * @param {string} itemName                 Name of the consumable item to be added
+ * @param {string} unitTypeName             Unit Type of the consumable item (e.g. Unit, Piece)
+ * @param {string} locationName             Location where the item will be stored
+ * @param {string} brandModel               Brand of the item to be added
+ * @param {string} remarks                  Remarks of the item
+ */
+export async function updateConsumableItemsRecordByAll(
+    itemId, itemName, locationName, unitTypeName, brandModel = '', remarks = ''
+){
+    try{
+        const [ sItemName, sLocationName, sUnitTypeName, sBrandModel, sRemarks ] = converter('string', 
+            itemName, locationName, unitTypeName, brandModel, remarks);
+        const [ iItemId ] = converter('int', itemId);
+
+        if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: updateLabEquipmentsRecordByAll's Item ID parameter must be a positive non-zero integer.")
+            return null;
+        } else if (typeof sItemName !== 'string'){
+            console.error("PARAMETER ERROR: updateLabEquipmentsRecordByAll's Item Name parameter must be a string.")
+            return null;
+        } else if (typeof sLocationName !== 'string'){
+            console.error("PARAMETER ERROR: updateLabEquipmentsRecordByAll's Location Name parameter must be a string.")
+            return null;
+        } else if (typeof sUnitTypeName !== 'string'){
+            console.error("PARAMETER ERROR: updateLabEquipmentsRecordByAll's Unit Type parameter must be a string.")
+            return null;
+        } else if (typeof sBrandModel !== 'string'){
+            console.error("PARAMETER ERROR: updateLabEquipmentsRecordByAll's Brand/Model parameter must be a string.")
+            return null;
+        } else if (typeof sRemarks !== 'string'){
+            console.error("PARAMETER ERROR: updateLabEquipmentsRecordByAll's Remarks parameter must be a string.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_consumable_items_record_by_all', {
+            input_item_id : iItemId,
+            input_item_name : sItemName,
+            input_location_name : sLocationName,
+            input_unit_type_name : sUnitTypeName,
+            input_brand_model : sBrandModel,
+            input_remarks : sRemarks
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ /**
+ * Method to update an existing record's remarks in the Lab Equipments Table based on its Item ID
+ * 
+ * @param {int} itemId                  Primary key of the Consumable Items table
+ * @param {string} remarks              Remarks of one specific item
+ * 
+ * @returns A string containing the status of the deleted record (Success or Error)
+ */
+export async function updateConsumableItemsRemarkByItemId(itemId, remarks = ''){
+    try{
+        const [ sRemarks ] = converter('string', remarks);
+        const [ iItemId ] = converter('int', itemId);
+        
+        if (typeof sRemarks !== 'string'){
+            console.error("PARAMETER ERROR: updateLabConsumableItemsRemarkByItemId's Remarks parameter must be a string.")
+            return null;
+        }
+
+        if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: updateLabConsumableItemsRemarkByItemId's Item ID must be a positive non-zero integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_consumable_items_remark_by_item_id', {
+            input_item_id : iItemId,
+            input_remarks : sRemarks
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to remove a record to the Lab Equipments table
+ * @param {int} itemId The primary key of the Lab Equipments table
+ * @returns A string containing the status of the deleted record (Success or Error)
+ */
+export async function deleteConsumableItemsRecordByItemId(itemId = 0){
+    try{
+        const [ iItemId ] = converter('int', itemId);
+
+        if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: deleteConsumableItemsRecordByItemId's itemID parameter must be a positive non-zero integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('delete_consumable_items_record_by_item_id', {
+            input_item_id : iItemId
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
 
 // ======================================================================================================================================
 // Methods for Restocks
