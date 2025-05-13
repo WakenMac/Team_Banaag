@@ -40,6 +40,8 @@ async function initialize() {
   // Prepares the contents of the admin table
   await dbhandler.testPresence();
   await prepareUnitTypeTable();
+
+  showToast('Loaded page successfully');
 }
 
 // Dropdown toggle logic
@@ -100,28 +102,23 @@ addUnitTypeForm.addEventListener("submit", async (e) => {
   addUnitTypeError.textContent = "";
   
   if (!unitTypeName) {
-    addUnitTypeError.textContent = "Please fill in all required fields.";
-    addUnitTypeError.classList.remove("hidden");
+    showToast("Please fill in all required fields.", true);
     return;
   }
 
   let result = await dbhandler.addUnitTypeRecord(unitTypeName);
 
   if (result == null) {
-    addUnitTypeError.textContent = `Something went wrong. Please try again.`;
-    addUnitTypeError.classList.remove("hidden");
+    showToast(`Something went wrong. Please try again.`, true);
     return;
   } else if (result.includes("ERROR")) {
-    addUnitTypeError.textContent = result.replace(/^ERROR:\s*/i, ''); // Removes the ERROR sign
-    addUnitTypeError.classList.remove("hidden");
+    showToast(result.replace(/^ERROR:\s*/i, ''), true); // Removes the ERROR sign
     return;
   } else {
-    console.log(result);
     let newUnitTypeId = result.slice(47, result.length - 1);
     createNewUnitTypeRow(newUnitTypeId, unitTypeName);
-    addUnitTypeError.classList.add("hidden");
-    addUnitTypeError.textContent = "";
     closeModal();
+    showToast('Unit Type added successfully');
   }
 });
 
@@ -182,19 +179,17 @@ editUnitTypeForm.addEventListener("submit", async (e) => {
   const editUnitTypeName = document.getElementById("editUnitTypeName").value.trim();
 
   if (!editUnitTypeName) {
-    alert("Please fill in all required fields.");
+    showToast("Please fill in all required fields.", true);
     return;
   }
 
   let result = await dbhandler.updateUnitTypeRecordName(editUnitTypeId, editUnitTypeName);
 
   if (result == null) {
-    editUnitTypeError.textContent = `Something went wrong. Please try again.`;
-    editUnitTypeError.classList.remove("hidden");
+    showToast(`Something went wrong. Please try again.`, true);
     return;
   } else if (result.includes("ERROR")) {
-    editUnitTypeError.textContent = result.replace(/^ERROR:\s*/i, ''); // Removes the ERROR sign
-    editUnitTypeError.classList.remove("hidden");
+    showToast(result.replace(/^ERROR:\s*/i, ''), true); // Removes the ERROR sign
     return;
   } else {
     // Update the row in the table
@@ -205,6 +200,7 @@ editUnitTypeForm.addEventListener("submit", async (e) => {
       }
     });
     closeEditModal();
+    showToast('Unit Type updated successfully');
   }
 });
 
@@ -254,12 +250,12 @@ confirmDeleteBtn.addEventListener("click", async () => {
   if (unitTypeToDelete && rowToDelete) {
     let result = await dbhandler.removeUnitTypeRecordByUnitTypeId(unitTypeToDelete);
     if (result == null) {
-      alert(`The mainHandler.removeUnitTypeRecordByUnitTypeId() DOESN'T return a status statement.`);
+      showToast(`The mainHandler.removeUnitTypeRecordByUnitTypeId() DOESN'T return a status statement.`, true);
     } else if (result.includes("ERROR")) {
-      alert(result);
+      showToast(result.replace(/^ERROR:\s*/i, ''), true);
     } else {
-      console.log(result);
       rowToDelete.remove();
+      showToast('Unit type deleted successfully');
     }
     closeDeleteModal();
   }
@@ -289,6 +285,38 @@ function createNewUnitTypeRow(unitTypeId, unitTypeName) {
               `;
 
   tbody.appendChild(tr);
+}
+
+function showToast(message, isError = false) {
+  let toast = document.getElementById("custom-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "custom-toast";
+    toast.style.position = "fixed";
+    toast.style.bottom = "32px";
+    toast.style.right = "32px";
+    toast.style.background = isError
+      ? "rgba(220, 38, 38, 0.95)"
+      : "rgba(44, 161, 74, 0.95)"; // Red for error, green for success
+    toast.style.color = "white";
+    toast.style.padding = "16px 28px";
+    toast.style.borderRadius = "8px";
+    toast.style.fontSize = "16px";
+    toast.style.fontWeight = "regular";
+    toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+    toast.style.opacity = "0";
+    toast.style.transition = "opacity 0.4s";
+    toast.style.zIndex = "9999";
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.style.background = isError
+    ? "rgba(220, 38, 38, 0.95)"
+    : "rgba(44, 161, 74, 0.95)";
+  toast.style.opacity = "1";
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, (isError)? 4000 : 3000);
 }
 
 // ===================== Database Related Logic =====================

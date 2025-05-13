@@ -35,10 +35,12 @@ async function initialize() {
 
   await prepareLocationDropdown();
   await prepareUnitTypeDropdown();
+
+  showToast('Loaded page successfully!');
 }
 
 // ===================== Set Toast Messages Logic =====================
-function showToast(message, isError = false, time = 1800) {
+function showToast(message, isError = false) {
   let toast = document.getElementById("custom-toast");
   if (!toast) {
     toast = document.createElement("div");
@@ -67,7 +69,7 @@ function showToast(message, isError = false, time = 1800) {
   toast.style.opacity = "1";
   setTimeout(() => {
     toast.style.opacity = "0";
-  }, time);
+  }, (isError)? 4000 : 3000);
 }
 
 // ===================== Set Dropdown Toggle Logic =====================
@@ -136,7 +138,7 @@ addGlasswareForm.addEventListener("submit", async (e) => {
     !glasswareLocation ||
     !glasswareBrand
   ) {
-    alert("Please fill in all required fields.");
+    showToast("Please fill in all required fields.", true);
     return;
   }
 

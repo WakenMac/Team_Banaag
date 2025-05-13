@@ -28,6 +28,8 @@ async function initialize(){
 
   await dbhandler.testPresence();
   await prepareItemMasterListTable();
+
+  showToast('Loaded page successfully!');
 }
 
 /**

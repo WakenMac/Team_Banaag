@@ -37,6 +37,8 @@ async function initialize(){
 
   await prepareLocationDropdown();
   await prepareUnitTypeDropdown();
+
+  showToast('Loaded page successfully');
 }
 
 // ===================== Set Toast Messages Logic =====================
@@ -187,7 +189,7 @@ addApparatusForm.addEventListener("submit", async (e) => {
       0
     );
     closeAddModal();
-    showToast("Glassware added successfully", false, 3000);
+    showToast("Lab Apparatus added successfully", false, 3000);
   }
 });
 
@@ -316,7 +318,7 @@ confirmDeleteApparatusBtn.addEventListener("click", async () => {
     console.log(result);
     rowToDelete.remove();
     closeDeleteModal();
-    showToast("Apparatus deleted successfully");
+    showToast("Lab Apparatus deleted successfully");
   }
 
   closeDeleteModal();

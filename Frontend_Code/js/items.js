@@ -515,6 +515,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initializeRemarksListeners();
 
   setupEventListeners();
+
+  showToast('Loaded page successfully');
 });
 
 function initializeConsumableItems() {

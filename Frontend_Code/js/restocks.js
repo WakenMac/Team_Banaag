@@ -60,6 +60,8 @@ function initialize() {
   }
   setupEventListeners();
   setupDateValidation();
+
+  showToast('Loaded page successfully!');
 }
 
 function initializeRestocks() {
@@ -445,7 +447,7 @@ function populateEditForm(row) {
 }
 
 // ------------------ TOAST FUNCTIONS ------------------
-function showToast(message, isError = false, time = 1800) {
+function showToast(message, isError = false) {
   let toast = document.getElementById("custom-toast");
   if (!toast) {
     toast = document.createElement("div");
@@ -474,7 +476,7 @@ function showToast(message, isError = false, time = 1800) {
   toast.style.opacity = "1";
   setTimeout(() => {
     toast.style.opacity = "0";
-  }, time);
+  }, (isError)? 4000 : 3000);
 }
 
 // ========================== Set Dropdown Logic ==========================
