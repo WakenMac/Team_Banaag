@@ -247,7 +247,7 @@ function updateEquipmentTable(
   cells[2].textContent = equipmentUnit;
   cells[3].textContent = equipmentLocation;
   cells[4].textContent = equipmentBrand;
-  cells[5].textContent = cells[5].textContent.replace((' ' + originalUnit), '') + equipmentUnit;
+  cells[5].textContent = cells[5].textContent.replace((' ' + originalUnit), '') + ' ' + equipmentUnit;
 
   // Update the info button data attributes
   const infoBtn = equipmentRowToEdit.querySelector('button[aria-label="Info"]');
@@ -687,10 +687,6 @@ function setUpDropdownElements(){
 }
 
 // -------------------- END OF UTILITY FUNCTIONS --------------------
-
-// -------------------- REMARKS FUNCTIONS --------------------
-
-//--------------------- END OF REMARKS FUNCTIONS --------------------
 
 // -------------------- INFO BUTTON LOGIC --------------------
 function initializeInfoHovers() {

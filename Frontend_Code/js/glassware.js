@@ -20,6 +20,7 @@ const addGlasswareLocation = document.getElementById("glasswareLocation");
 const addGlasswareUnit = document.getElementById("glasswareUnit");
 const editGlasswareLocation = document.getElementById("editGlasswareLocation");
 const editGlasswareUnit = document.getElementById("editGlasswareUnit");
+const glasswareTableBody = document.getElementById("glasswareTableBody");
 
 await initialize();
 
@@ -105,7 +106,6 @@ const addGlasswareModal = document.getElementById("addGlasswareModal");
 const modalBackdrop = document.getElementById("modalBackdrop");
 const cancelBtn = document.getElementById("cancelBtn");
 const addGlasswareForm = document.getElementById("addGlasswareForm");
-const glasswareTableBody = document.getElementById("glasswareTableBody");
 
 function openModal() {
   addGlasswareModal.classList.remove("hidden");
@@ -303,27 +303,28 @@ modalBackdropDelete.addEventListener("click", closeDeleteGlasswareModal);
 
 // Confirm Delete
 confirmDeleteGlasswareBtn.addEventListener("click", async () => {
-  if (glasswareRowToDelete) {
-    const glassawareId = glasswareRowToDelete.children[0].textContent.trim();
-
-    let result = await dbhandler.deleteChemicalsRecordByItemId(glassawareId);
-    if (result && result.includes("ERROR")) {
-      showToast(result, true, 4000);
-      return;
-    }
-
-    console.log(result);
-    chemicalRowToDelete.remove();
-    closeDeleteChemicalModal();
-    showToast("Chemical deleted successfully", false, 3000);
+  if (!glasswareRowToDelete) {
+    showToast(
+      "ERROR: Unable to find row to delete (Glassware-Delete-Row)",
+      true,
+      4000
+    );
+    closeDeleteGlasswareModal();
+    return;
   }
 
-  showToast(
-    "ERROR: Unable to find row to delete (Glassware-Delete-Row)",
-    true,
-    4000
-  );
-  closeDeleteChemicalModal();
+  const glassawareId = glasswareRowToDelete.children[0].textContent.trim();
+
+  let result = await dbhandler.deleteGlasswaresRecordByItemId(glassawareId);
+  if (result && result.includes("ERROR")) {
+    showToast(result, true, 4000);
+    return;
+  }
+
+  console.log(result);
+  glasswareRowToDelete.remove();
+  closeDeleteGlasswareModal();
+  showToast("Chemical deleted successfully", false, 3000);
 });
 
 // Table row actions: Edit and Delete

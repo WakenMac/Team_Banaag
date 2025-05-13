@@ -289,7 +289,8 @@ editAdminForm.addEventListener("submit", async (e) => {
     adminId,
     firstName,
     middleName,
-    lastName
+    lastName,
+    ""
   );
   if (result && result.includes("ERROR")) {
     editAdminError.textContent = result.replace(/^ERROR:\s*/i, "");

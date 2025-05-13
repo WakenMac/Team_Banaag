@@ -1,8 +1,12 @@
 // Consumable - Items Management JS
 
 //
+
+import * as dbhandler from '../../Backend_Code/mainHandler.js';
+
 let tbody = null;
 let consumableItemRowToDelete = null;
+let consumableItemRowToEdit = null;
 
 // DOM Elements
 const editConsumableItemsLocation = document.getElementById(
@@ -71,6 +75,35 @@ const remarksForm = document.getElementById("remarksForm");
 const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
 const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
 
+// -------------------- PREPARE LOCATION & UNIT TYPE FUNCTIONS --------------------
+/**
+ * Method to add a new unit to the addEquipmentUnit and editEquipmentUnit dropdown element
+ * @param {string} unitTypeName Name of the unit type to be added
+ */
+function createNewUnitTypeRow(unitTypeName) {
+  const tr1 = document.createElement("tr");
+  const tr2 = document.createElement("tr");
+  tr1.innerHTML = `<option value="${unitTypeName}">${unitTypeName}</option>`;
+  tr2.innerHTML = `<option value="${unitTypeName}">${unitTypeName}</option>`;
+  addConsumableItemsUnit.appendChild(tr1);
+  editConsumableItemsUnit.appendChild(tr2);
+}
+
+/**
+ * Method to add a new unit to the addEquipmentLocation and editEquipmentLocation dropdown element
+ * @param {string} locationName Name of the location to be added to the dropdown
+ */
+function createNewLocationRow(locationName) {
+  const tr1 = document.createElement("tr");
+  const tr2 = document.createElement("tr");
+
+  tr1.innerHTML = `<option value="${locationName}">${locationName}</option>`;
+  tr2.innerHTML = `<option value="${locationName}">${locationName}</option>`;
+
+  addConsumableItemsLocation.appendChild(tr1);
+  editConsumableItemsLocation.appendChild(tr2);
+}
+
 // ------------------ ADD CONSUMABLE ITEMS ------------------
 function openAddModal() {
   addConsumableItemsModal.classList.remove("hidden");
@@ -107,7 +140,7 @@ function createNewConsumableItemsRow(
     <td class="px-6 py-4 whitespace-nowrap text-gray-900">${consumableItemsUnit}</td>
     <td class="px-6 py-4 whitespace-nowrap text-gray-900">${consumableItemsLocation}</td>
     <td class="px-6 py-4 whitespace-nowrap text-gray-900">${consumableItemsBrand}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${consumableItemsQuantity}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${consumableItemsQuantity} ${consumableItemsUnit}</td>
     <td class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3">
       <button 
         aria-label="Add remarks" 
@@ -180,42 +213,19 @@ function populateEditForm(row) {
 }
 
 function updateConsumableItemTable(
-  consumableItemsId,
   consumableItemsName,
   consumableItemsUnit,
   consumableItemsLocation,
   consumableItemsBrand
 ) {
-  const rows = tbody.getElementsByTagName("tr");
-  for (let row of rows) {
-    if (row.cells[0].textContent === consumableItemsId) {
-      const existingQuantity = row.cells[5].textContent.trim();
-      updateRowContent(row, {
-        consumableItemsName,
-        consumableItemsUnit,
-        consumableItemsLocation,
-        consumableItemsBrand,
-        itemQuantity: existingQuantity,
-      });
-      break;
-    }
-  }
-}
+  const cells = consumableItemRowToEdit.children;
+  const originalUnit = cells[2].textContent;
 
-function updateRowContent(row, data) {
-  const {
-    consumableItemsName,
-    consumableItemsUnit,
-    consumableItemsLocation,
-    consumableItemsBrand,
-    itemQuantity,
-  } = data;
-
-  // Update the basic fields
-  row.cells[1].textContent = consumableItemsName;
-  row.cells[2].textContent = consumableItemsUnit;
-  row.cells[3].textContent = consumableItemsLocation;
-  row.cells[4].textContent = consumableItemsBrand;
+  cells[1].textContent = consumableItemsName;
+  cells[2].textContent = consumableItemsUnit;
+  cells[3].textContent = consumableItemsLocation;
+  cells[4].textContent = consumableItemsBrand;
+  cells[5].textContent = cells[5].textContent.replace((' ' + originalUnit), '') + ' ' + consumableItemsUnit;
 }
 
 // -------------------- DELETE CONSUMABLE ITEM FUNCTIONS --------------------
@@ -231,8 +241,15 @@ function closeDeleteModal() {
   consumableItemRowToDelete = null;
 }
 
-function handledeleteConsumableItemss() {
+async function handleDeleteConsumableItems(e) {
   if (consumableItemRowToDelete) {
+
+    let result = await dbhandler.deleteConsumableItemsRecordByItemId(consumableItemRowToDelete.children[0].textContent);
+    if (result && result.includes("ERROR")) {
+      showToast(result, true, 4000);
+      return;
+    }
+
     consumableItemRowToDelete.remove();
     closeDeleteModal();
     showToast("Consumable item deleted successfully");
@@ -271,13 +288,61 @@ function populateRemarksField(remarksBtn) {
   }
 }
 
-// -------------------- EVENT HANDLERS --------------------
-function handleAddConsumableItemSubmit(e) {
-  e.preventDefault();
+// -------------------- REMARKS FUNCTIONS --------------------
 
-  // Generate temporary ID
-  const consumableItemsId = Math.floor(Math.random() * 1000000).toString();
-  const consumableItemsQuantity = Math.floor(Math.random() * 100).toString();
+/**
+ * Method to add an existing remarks to the remarksText element
+ * @param {string} remarks The remarks of the chemical
+ * @param {int} apparatusId The primary key of the Chemical table.
+ */
+async function createNewRemarks(remarks, equipmentId) {
+  document.getElementById("remarksText").value = remarks;
+
+  const remarksBtn = document.querySelector(
+    `button[data-item-id="${equipmentId}"]`
+  );
+
+  if (remarks) {
+    remarksBtn.classList.remove("text-gray-700", "border-gray-700");
+    remarksBtn.classList.add("text-blue-600", "border-blue-600");
+    remarksBtn.setAttribute("data-remarks", remarks);
+  } else {
+    remarksBtn.classList.remove("text-blue-600", "border-blue-600");
+    remarksBtn.classList.add("text-gray-700", "border-gray-700");
+    remarksBtn.removeAttribute("data-remarks");
+  }
+}
+
+// Initialize remarks event listeners
+async function initializeRemarksListeners() {
+  // Add remarks form submission
+  tbody.addEventListener("click", (e) => {
+    const remarksBtn = e.target.closest('button[aria-label="Add remarks"]');
+    if (remarksBtn) {
+      const equipmentId = remarksBtn.getAttribute("data-item-id");
+      console.log(equipmentId);
+      openRemarksModal(equipmentId);
+    }
+  });
+
+  if (remarksForm) {
+    remarksForm.addEventListener("submit", handleRemarksItemSubmit);
+  }
+
+  if (cancelRemarksBtn) {
+    cancelRemarksBtn.addEventListener("click", closeRemarksModal);
+  }
+
+  if (modalBackdropRemarks) {
+    modalBackdropRemarks.addEventListener("click", closeRemarksModal);
+  }
+}
+
+// -------------------- EVENT HANDLERS --------------------
+
+// ADD ITEM
+async function handleAddConsumableItemSubmit(e) {
+  e.preventDefault();
 
   // Get form values
   const consumableItemsName =
@@ -300,20 +365,44 @@ function handleAddConsumableItemSubmit(e) {
     return;
   }
 
-  createNewConsumableItemsRow(
-    consumableItemsId,
+  let result = await dbhandler.addConsumableItemsRecord(
     consumableItemsName,
-    consumableItemsUnit,
     consumableItemsLocation,
+    consumableItemsUnit,
     consumableItemsBrand,
-    consumableItemsQuantity
-  );
+    '')
 
-  closeAddModal();
-  showToast("Consumable item added successfully");
+  if (result == null) {
+    showToast(
+      `The mainHandler.addConsumableItemsRecord() DOESN'T return a status statement.`,
+      true,
+      4000
+    );
+  } else if (result.includes("ERROR")) {
+    showToast(result, true, 4000);
+  } else {
+    let consumableItemId = result.slice(53, result.length - 1);
+
+    // For debugging purposes
+    console.log(result);
+    console.log(result.slice(53, result.length - 1));
+
+    createNewConsumableItemsRow(
+      consumableItemId,
+      consumableItemsName,
+      consumableItemsUnit,
+      consumableItemsLocation,
+      consumableItemsBrand,
+      0
+    );
+
+    closeAddModal();
+    showToast("Consumable item added successfully");
+  }
 }
 
-function handleEditConsumableItemSubmit(e) {
+// EDIT ITEMS
+async function handleEditConsumableItemSubmit(e) {
   e.preventDefault();
 
   const editConsumableItemsId = document
@@ -331,6 +420,9 @@ function handleEditConsumableItemSubmit(e) {
   const editConsumableItemsBrand = document
     .getElementById("editConsumableItemsBrand")
     .value.trim();
+  const remarks = document
+    .querySelector(`button[data-item-id="${editConsumableItemsId}"]`)
+    .getAttribute("data-remarks");
 
   if (
     !editConsumableItemsId ||
@@ -343,17 +435,43 @@ function handleEditConsumableItemSubmit(e) {
     return;
   }
 
-  updateConsumableItemTable(
-    editConsumableItemsId,
-    editConsumableItemsName,
-    editConsumableItemsUnit,
-    editConsumableItemsLocation,
-    editConsumableItemsBrand
-  );
+  console.log(editConsumableItemsName);
 
-  closeEditModal();
-  showToast("Consumable item updated successfully");
+  let result = await dbhandler.updateConsumableItemsRecordByAll(
+      editConsumableItemsId,
+      editConsumableItemsName,
+      editConsumableItemsLocation,
+      editConsumableItemsUnit,
+      editConsumableItemsBrand,
+      remarks
+    );
+    
+    if (result == null) {
+      showToast(
+        `The mainHandler.updateLabEquipmentsRecordByAll() DOESN'T return a status statement.`,
+        true,
+        4000
+      );
+    } else if (result.includes("ERROR")) {
+      showToast(result, true, 4000);
+    } else {
+      console.log(result);
+
+      // Update the table row
+      updateConsumableItemTable(
+        editConsumableItemsId,
+        editConsumableItemsName,
+        editConsumableItemsUnit,
+        editConsumableItemsLocation,
+        editConsumableItemsBrand
+      );
+
+      closeEditModal();
+      showToast("Consumable item updated successfully", false, 3000);
+    }
 }
+
+// TBODY LISTENER
 
 function handleTableButtonClicks(e) {
   const button = e.target.closest("button");
@@ -366,9 +484,11 @@ function handleTableButtonClicks(e) {
 
   switch (action) {
     case "Edit item":
+      consumableItemRowToEdit = row;
       populateEditForm(row);
       break;
     case "Delete item":
+      consumableItemRowToDelete = row;
       openDeleteModal(row);
       break;
     case "Add remarks":
@@ -382,10 +502,17 @@ function handleTableButtonClicks(e) {
 document.addEventListener("DOMContentLoaded", () => {
   tbody = document.querySelector("#consumableItemsTableBody");
 
+  setupDropdownElements();
   if (!initializeConsumableItems()) {
     showToast("Could not initialize consumable items table", true);
     return;
   }
+
+  // Initializes Components that rely on the database's data
+  initializeConsumableItemsTable(); // Gets all of the content for the table, including remarks and others
+  initializeUnitTypeDropdown();
+  initializeLocationDropdown();
+  initializeRemarksListeners();
 
   setupEventListeners();
 });
@@ -433,54 +560,49 @@ function setupEventListeners() {
   tbody.addEventListener("click", handleTableButtonClicks);
 
   // Remarks
-  if (tbody) {
-    tbody.addEventListener("click", (e) => {
-      const remarksBtn = e.target.closest('button[aria-label="Add remarks"]');
-      if (remarksBtn) {
-        const consumableItemsId = remarksBtn.getAttribute("data-item-id");
-        openRemarksModal(consumableItemsId);
-      }
-    });
-  }
-
-  // Add remarks form submission
-  if (remarksForm) {
-    remarksForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const consumableItemsId = document.getElementById(
-        "remarksConsumableItemsId"
-      ).value;
-      const remarks = document.getElementById("remarksText").value.trim();
-
-      const remarksBtn = document.querySelector(
-        `button[data-item-id="${consumableItemsId}"]`
-      );
-      if (remarksBtn) {
-        if (remarks) {
-          remarksBtn.classList.remove("text-gray-700", "border-gray-700");
-          remarksBtn.classList.add("text-blue-600", "border-blue-600");
-          remarksBtn.setAttribute("data-remarks", remarks);
-        } else {
-          remarksBtn.classList.remove("text-blue-600", "border-blue-600");
-          remarksBtn.classList.add("text-gray-700", "border-gray-700");
-          remarksBtn.removeAttribute("data-remarks");
-        }
-        closeRemarksModal();
-        showToast("Remarks updated successfully", false, 3000);
-      }
-
-      cancelRemarksBtn.addEventListener("click", closeRemarksModal);
-      modalBackdropRemarks.addEventListener("click", closeRemarksModal);
-    });
-  }
+  initializeRemarksListeners();
 }
 
-function handleDeleteConsumableItems() {
-  if (consumableItemRowToDelete) {
-    consumableItemRowToDelete.remove();
-    closeDeleteModal();
-    showToast("Consumable item deleted successfully");
+function setupDropdownElements(){
+  setupDropdown("masterlistBtn", "masterlistMenu");
+  setupDropdown("consumablesBtn", "consumablesMenu");
+  setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
+  setupDropdown("propertiesBtn", "propertiesMenu");
+}
+
+// EDIT REMARKS
+async function handleRemarksItemSubmit(e){
+  e.preventDefault();
+
+  const consumableItemsId = document.getElementById(
+    "remarksConsumableItemsId"
+  ).value;
+  const remarks = document.getElementById("remarksText").value.trim();
+
+  const remarksBtn = document.querySelector(
+    `button[data-item-id="${consumableItemsId}"]`
+  );
+
+  let result = await dbhandler.updateConsumableItemsRemarkByItemId(consumableItemsId, remarks);
+  if (result && result.includes("ERROR")) {
+    showToast(result, true, 4000);
+    return;
   }
+
+  if (remarksBtn) {
+    if (remarks) {
+      remarksBtn.classList.remove("text-gray-700", "border-gray-700");
+      remarksBtn.classList.add("text-blue-600", "border-blue-600");
+      remarksBtn.setAttribute("data-remarks", remarks);
+    } else {
+      remarksBtn.classList.remove("text-blue-600", "border-blue-600");
+      remarksBtn.classList.add("text-gray-700", "border-gray-700");
+      remarksBtn.removeAttribute("data-remarks");
+    }
+  }
+
+  closeRemarksModal();
+  showToast("Remarks updated successfully", false, 3000);
 }
 
 // -------------------- TOAST NOTIFICATION --------------------
@@ -544,7 +666,74 @@ function setupDropdown(buttonId, menuId) {
   });
 }
 
-setupDropdown("masterlistBtn", "masterlistMenu");
-setupDropdown("consumablesBtn", "consumablesMenu");
-setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
-setupDropdown("propertiesBtn", "propertiesMenu");
+// -------------------- DATABASE CONNECTION LOGIC (Database Handler) --------------------
+
+async function initializeConsumableItemsTable() {
+  try {
+    let data = await dbhandler.getAllConsumableItemsRecords();
+
+    if (data.length == 0) {
+      console.error("Lab Equipments table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      await createNewConsumableItemsRow(
+        data[i]["Item ID"],
+        data[i]["Name"],
+        data[i]["Unit"],
+        data[i]["Location"],
+        data[i]["Brand"],
+        data[i]["Quantity"]
+      );
+
+      await createNewRemarks(data[i]["Remarks"], data[i]["Item ID"]);
+    }
+  } catch (generalError) {
+    console.error(generalError);
+  }
+}
+
+/**
+ * Gets all of the unit type records from the database then proceeds to populate them (using the unit_type_name)
+ *  to the addEquipmentUnit html dropdown element
+ * @void Returns nothing.
+ */
+async function initializeUnitTypeDropdown() {
+  try {
+    let data = await dbhandler.getAllUnitTypeRecordsOrderByName();
+
+    if (data.length == 0) {
+      console.error("Unit type table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      createNewUnitTypeRow(data[i]["Name"]);
+    }
+  } catch (generalError) {
+    console.error(generalError);
+  }
+}
+
+/**
+ * Gets all of the location records from the database then proceeds to populate them (using the location_name)
+ *  to the addEquipmentLocation html dropdown element
+ * @void Returns nothing.
+ */
+async function initializeLocationDropdown() {
+  try {
+    let data = await dbhandler.getAllLocationRecordsOrderByName();
+
+    if (data.length == 0) {
+      console.error("Unit type table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      createNewLocationRow(data[i]["Name"]);
+    }
+  } catch (generalError) {
+    console.error(generalError);
+  }
+}
