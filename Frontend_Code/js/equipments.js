@@ -5,9 +5,13 @@
  * I also set temporary values for the equipmentId and equipmentQuantity for testing purposes
  */
 
+
+import * as dbhandler from '../../Backend_Code/mainHandler.js';
+
 // Global Variables and Element References
 let tbody = null;
 let equipmentRowToDelete = null;
+let equipmentRowToEdit = null;
 
 // DOM Elements
 const editEquipmentLocation = document.getElementById("editEquipmentLocation");
@@ -53,6 +57,35 @@ const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
 
 const cancelEquipmentBtn = document.getElementById("cancelEquipmentBtn");
 
+// -------------------- PREPARE LOCATION & UNIT TYPE FUNCTIONS --------------------
+/**
+ * Method to add a new unit to the addEquipmentUnit and editEquipmentUnit dropdown element
+ * @param {string} unitTypeName Name of the unit type to be added
+ */
+function createNewUnitTypeRow(unitTypeName) {
+  const tr1 = document.createElement("tr");
+  const tr2 = document.createElement("tr");
+  tr1.innerHTML = `<option value="${unitTypeName}">${unitTypeName}</option>`;
+  tr2.innerHTML = `<option value="${unitTypeName}">${unitTypeName}</option>`;
+  addEquipmentUnit.appendChild(tr1);
+  editEquipmentUnit.appendChild(tr2);
+}
+
+/**
+ * Method to add a new unit to the addEquipmentLocation and editEquipmentLocation dropdown element
+ * @param {string} locationName Name of the location to be added to the dropdown
+ */
+function createNewLocationRow(locationName) {
+  const tr1 = document.createElement("tr");
+  const tr2 = document.createElement("tr");
+
+  tr1.innerHTML = `<option value="${locationName}">${locationName}</option>`;
+  tr2.innerHTML = `<option value="${locationName}">${locationName}</option>`;
+
+  addEquipmentLocation.appendChild(tr1);
+  editEquipmentLocation.appendChild(tr2);
+}
+
 // -------------------- ADD EQUIPMENT FUNCTIONS --------------------
 // Adding: Open and close modal
 function openEquipmentModal() {
@@ -89,7 +122,7 @@ function createNewEquipmentRow(
     <td class="px-6 py-4 whitespace-nowrap text-gray-900">${equipmentUnit}</td>
     <td class="px-6 py-4 whitespace-nowrap text-gray-900">${equipmentLocation}</td>
     <td class="px-6 py-4 whitespace-nowrap text-gray-900">${equipmentBrand}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${equipmentQuantity}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900">${equipmentQuantity} ${equipmentUnit}</td>
     <td class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3">
       <button 
         aria-label="Info" 
@@ -197,57 +230,27 @@ function populateRemarksField(remarksBtn) {
     remarksField.value = remarks;
   }
 }
+
 function updateEquipmentTable(
-  equipmentId,
   equipmentName,
   equipmentUnit,
   equipmentLocation,
   equipmentBrand,
-  // equipmentQuantity,
   equipmentSerialNumber,
   equipmentCalibrationDate,
   equipmentFreqOfCalibration
 ) {
-  const rows = tbody.getElementsByTagName("tr");
-  for (let row of rows) {
-    if (row.cells[0].textContent === equipmentId) {
-      const existingQuantity = row.cells[5].textContent.trim();
-      updateRowContent(row, {
-        equipmentName,
-        equipmentUnit,
-        equipmentLocation,
-        equipmentBrand,
-        equipmentQuantity: existingQuantity,
-        equipmentSerialNumber,
-        equipmentCalibrationDate,
-        equipmentFreqOfCalibration,
-      });
-      break;
-    }
-  }
-}
+  const cells = equipmentRowToEdit.children;
+  const originalUnit = cells[2].textContent;
 
-function updateRowContent(row, data) {
-  const {
-    equipmentName,
-    equipmentUnit,
-    equipmentLocation,
-    equipmentBrand,
-    equipmentQuantity,
-    equipmentSerialNumber,
-    equipmentCalibrationDate,
-    equipmentFreqOfCalibration,
-  } = data;
-
-  // Update the basic fields
-  row.cells[1].textContent = equipmentName;
-  row.cells[2].textContent = equipmentUnit;
-  row.cells[3].textContent = equipmentLocation;
-  row.cells[4].textContent = equipmentBrand;
-  // row.cells[5].textContent = equipmentQuantity;
+  cells[1].textContent = equipmentName;
+  cells[2].textContent = equipmentUnit;
+  cells[3].textContent = equipmentLocation;
+  cells[4].textContent = equipmentBrand;
+  cells[5].textContent = cells[5].textContent.replace((' ' + originalUnit), '') + equipmentUnit;
 
   // Update the info button data attributes
-  const infoBtn = row.querySelector('button[aria-label="Info"]');
+  const infoBtn = equipmentRowToEdit.querySelector('button[aria-label="Info"]');
   if (infoBtn) {
     infoBtn.setAttribute("data-csn", equipmentSerialNumber || "N/A");
     infoBtn.setAttribute("data-cbd", equipmentCalibrationDate || "N/A");
@@ -295,7 +298,34 @@ function closeRemarksModal() {
   remarksForm.reset();
 }
 
-remarksForm.addEventListener("submit", (e) => {
+/**
+ * Method to add an existing remarks to the remarksText element
+ * @param {string} remarks The remarks of the chemical
+ * @param {int} apparatusId The primary key of the Chemical table.
+ */
+async function createNewRemarks(remarks, equipmentId) {
+  document.getElementById("remarksText").value = remarks;
+
+  const remarksBtn = document.querySelector(
+    `button[data-equipment-id="${equipmentId}"]`
+  );
+
+  if (remarks) {
+    remarksBtn.classList.remove("text-gray-700", "border-gray-700");
+    remarksBtn.classList.add("text-blue-600", "border-blue-600");
+    remarksBtn.setAttribute("data-remarks", remarks);
+  } else {
+    remarksBtn.classList.remove("text-blue-600", "border-blue-600");
+    remarksBtn.classList.add("text-gray-700", "border-gray-700");
+    remarksBtn.removeAttribute("data-remarks");
+  }
+}
+
+// Close remarks modal
+cancelRemarksBtn.addEventListener("click", closeRemarksModal);
+modalBackdropRemarks.addEventListener("click", closeRemarksModal);
+
+async function handleRemarksEquipmentSubmit(e) {
   e.preventDefault();
   const equipmentId = document.getElementById("remarksEquipmentId").value;
   const remarks = document.getElementById("remarksText").value.trim();
@@ -305,8 +335,10 @@ remarksForm.addEventListener("submit", (e) => {
     `button[data-equipment-id="${equipmentId}"][aria-label="Add remarks"]`
   );
 
-  if (!remarksBtn) {
-    showToast("Could not find remarks button", true);
+  let result = await dbhandler.updateLabEquipmentsRemarkByItemId(equipmentId, remarks);
+    
+  if (result && result.includes("ERROR")) {
+    showToast(result, true, 4000);
     return;
   }
 
@@ -322,11 +354,31 @@ remarksForm.addEventListener("submit", (e) => {
 
   closeRemarksModal();
   showToast("Remarks updated successfully");
-});
+}
 
-// Close remarks modal
-cancelRemarksBtn.addEventListener("click", closeRemarksModal);
-modalBackdropRemarks.addEventListener("click", closeRemarksModal);
+// Initialize remarks event listeners
+async function initializeRemarksListeners() {
+  tbody.addEventListener("click", (e) => {
+    const remarksBtn = e.target.closest('button[aria-label="Add remarks"]');
+    if (remarksBtn) {
+      const equipmentId = remarksBtn.getAttribute("data-equipment-id");
+      console.log(equipmentId);
+      openRemarksModal(equipmentId);
+    }
+  });
+
+  if (remarksForm) {
+    remarksForm.addEventListener("submit", handleRemarksEquipmentSubmit);
+  }
+
+  if (cancelRemarksBtn) {
+    cancelRemarksBtn.addEventListener("click", closeRemarksModal);
+  }
+
+  if (modalBackdropRemarks) {
+    modalBackdropRemarks.addEventListener("click", closeRemarksModal);
+  }
+}
 
 // -------------------- UTILITY FUNCTIONS --------------------
 function showToast(message, isError = false) {
@@ -358,6 +410,7 @@ function createToastElement() {
 }
 
 function updateToast(toast, message, isError) {
+  const time = isError ? 4000 : 3000;
   toast.textContent = message;
   toast.style.background = isError
     ? "rgba(220, 38, 38, 0.95)"
@@ -366,20 +419,26 @@ function updateToast(toast, message, isError) {
   toast.style.opacity = "1";
   setTimeout(() => {
     toast.style.opacity = "0";
-  }, 1800);
+  }, time);
 }
 
 // -------------------- EVENT LISTENERS --------------------
 document.addEventListener("DOMContentLoaded", () => {
   tbody = document.getElementById("equipmentsTableBody");
 
+  setUpDropdownElements();
   if (!initializeEquipments()) {
     showToast("Could not initialize equipment table", true);
     return;
   }
 
+  // Initializes Components that rely on the database's data
+  initializeLabEquipmentsTable(); // Gets all of the content for the table, including remarks and others
+  initializeUnitTypeDropdown();
+  initializeLocationDropdown();
+  initializeRemarksListeners();
+
   initializeEventListeners(tbody);
-  initializeInfoHovers();
   setupEventListeners();
 });
 
@@ -408,7 +467,8 @@ function setupEventListeners() {
 }
 
 // form handlers
-function handleAddEquipmentSubmit(e) {
+// ADD EQUIPMENTS
+async function handleAddEquipmentSubmit(e) {
   e.preventDefault();
   // Generate temporary values
   const equipmentId = Math.floor(Math.random() * 1000000).toString();
@@ -431,31 +491,57 @@ function handleAddEquipmentSubmit(e) {
     !equipmentName ||
     !equipmentUnit ||
     !equipmentLocation ||
-    !equipmentBrand
+    !equipmentBrand ||
+    !equipmentSerialNumber
   ) {
     showToast("Please fill in all required fields.", true);
     return;
   }
 
-  // Create new row
-  createNewEquipmentRow(
+  let result = await dbhandler.addLabEquipmentsRecord(equipmentName,
+    equipmentLocation,
+    equipmentUnit,
+    equipmentBrand,
+    equipmentSerialNumber,
+    equipmentCalibrationDate,
+    equipmentFreqOfCalibration,
+    '')
+
+  if (result == null) {
+    showToast(
+      `The mainHandler.addLabApparatusRecord() DOESN'T return a status statement.`,
+      true,
+      4000
+    );
+  } else if (result.includes("ERROR")) {
+    showToast(result, true, 4000);
+  } else {
+    let equipmentId = result.slice(52, result.length - 1);
+
+    // For debugging purposes
+    console.log(result);
+    console.log(result.slice(52, result.length - 1));
+
+    createNewEquipmentRow(
     equipmentId,
     equipmentName,
     equipmentUnit,
     equipmentLocation,
     equipmentBrand,
-    equipmentQuantity,
+    0,
     equipmentSerialNumber,
     equipmentCalibrationDate,
     equipmentFreqOfCalibration
-  );
+    )
 
-  // Close modal and show success message
-  closeEquipmentModal();
-  showToast("Equipment added successfully");
+    // Close modal and show success message
+    closeEquipmentModal();
+    showToast("Glassware added successfully", false, 3000);
+  }
 }
 
-function handleEditEquipmentSubmit(e) {
+// EDIT EQUIPMENTS
+async function handleEditEquipmentSubmit(e) {
   e.preventDefault();
   // Get form values
   const editEquipmentId = document
@@ -473,8 +559,6 @@ function handleEditEquipmentSubmit(e) {
   const editEquipmentBrand = document
     .getElementById("editEquipmentBrand")
     .value.trim();
-  // const editEquipmentQuantity =
-  //   document.getElementById("editEquipmentQuantity").value.trim() || "";
   const editEquipmentSerialNumber =
     document.getElementById("editEquipmentSerialNumber").value.trim() || "";
   const editEquipmentCalibrationDate =
@@ -482,6 +566,9 @@ function handleEditEquipmentSubmit(e) {
   const editEquipmentFreqOfCalibration =
     document.getElementById("editEquipmentFreqOfCalibration").value.trim() ||
     "";
+  const remarks = document
+    .querySelector(`button[data-equipment-id="${editEquipmentId}"]`)
+    .getAttribute("data-remarks");
 
   // Validation
   if (
@@ -489,32 +576,60 @@ function handleEditEquipmentSubmit(e) {
     !editEquipmentName ||
     !editEquipmentUnit ||
     !editEquipmentLocation ||
-    !editEquipmentBrand
-    // !editEquipmentQuantity
+    !editEquipmentBrand ||
+    !editEquipmentSerialNumber
   ) {
     showToast("Please fill in all required fields.", true);
     return;
   }
 
-  // Update the table row
-  updateEquipmentTable(
+  let result = await dbhandler.updateLabEquipmentsRecordByAll(
     editEquipmentId,
     editEquipmentName,
-    editEquipmentUnit,
     editEquipmentLocation,
+    editEquipmentUnit,
     editEquipmentBrand,
-    // editEquipmentQuantity,
     editEquipmentSerialNumber,
     editEquipmentCalibrationDate,
-    editEquipmentFreqOfCalibration
+    editEquipmentFreqOfCalibration,
+    remarks
   );
+  
+  if (result == null) {
+    showToast(
+      `The mainHandler.updateLabEquipmentsRecordByAll() DOESN'T return a status statement.`,
+      true,
+      4000
+    );
+  } else if (result.includes("ERROR")) {
+    showToast(result, true);
+  } else {
+    // Update the table row
+    updateEquipmentTable(
+      editEquipmentName,
+      editEquipmentUnit,
+      editEquipmentLocation,
+      editEquipmentBrand,
+      editEquipmentSerialNumber,
+      editEquipmentCalibrationDate,
+      editEquipmentFreqOfCalibration
+    );
 
-  closeEditModal();
-  showToast("Equipment updated successfully");
+    closeEditModal();
+    showToast("Equipment updated successfully");
+  }
 }
 
-function handleDeleteEquipment() {
+// DELETE EQUIPMENTS
+async function handleDeleteEquipment() {
   if (equipmentRowToDelete) {
+
+    let result = await dbhandler.deleteLabEquipmentsRecordByItemId(equipmentRowToDelete.children[0].textContent);
+    if (result && result.includes("ERROR")) {
+      showToast(result, true, 4000);
+      return;
+    }
+
     equipmentRowToDelete.remove();
     closeDeleteModal();
     showToast("Equipment deleted successfully");
@@ -533,6 +648,7 @@ function initializeEventListeners(tbody) {
   tbody.addEventListener("click", handleTableButtonClicks);
 }
 
+// Function that indicates the action of the tbody event listener under the initializeEventListeners() function
 function handleTableButtonClicks(e) {
   const button = e.target.closest("button");
   if (!button) return;
@@ -544,6 +660,7 @@ function handleTableButtonClicks(e) {
 
   switch (action) {
     case "Edit equipment":
+      equipmentRowToEdit = row;
       populateEditForm(row);
       openEditModal();
       break;
@@ -561,55 +678,18 @@ function handleTableButtonClicks(e) {
       break;
   }
 }
+
+function setUpDropdownElements(){
+  setupDropdown("masterlistBtn", "masterlistMenu");
+  setupDropdown("consumablesBtn", "consumablesMenu");
+  setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
+  setupDropdown("propertiesBtn", "propertiesMenu");
+}
+
 // -------------------- END OF UTILITY FUNCTIONS --------------------
 
 // -------------------- REMARKS FUNCTIONS --------------------
-function handleRemarksEquipmentSubmit(e) {
-  e.preventDefault();
-  const equipmentId = document.getElementById("remarksEquipmentId").value;
-  const remarks = document.getElementById("remarksText").value.trim();
 
-  // Update the remarks button color and store remarks
-  const remarksBtn = document.querySelector(
-    `button[data-equipment-id="${equipmentId}"][aria-label="Add remarks"]`
-  );
-
-  if (remarks) {
-    remarksBtn.classList.remove("text-gray-700", "border-gray-700");
-    remarksBtn.classList.add("text-blue-600", "border-blue-600");
-    remarksBtn.setAttribute("data-remarks", remarks);
-  } else {
-    remarksBtn.classList.remove("text-blue-600", "border-blue-600");
-    remarksBtn.classList.add("text-gray-700", "border-gray-700");
-    remarksBtn.removeAttribute("data-remarks");
-  }
-
-  closeRemarksModal();
-  showToast("Remarks updated successfully");
-}
-
-// Initialize remarks event listeners
-function initializeRemarksListeners() {
-  tbody.addEventListener("click", (e) => {
-    const remarksBtn = e.target.closest('button[aria-label="Add remarks"]');
-    if (remarksBtn) {
-      const equipmentId = remarksBtn.getAttribute("data-equipment-id");
-      openRemarksModal(equipmentId);
-    }
-  });
-
-  if (remarksForm) {
-    remarksForm.addEventListener("submit", handleRemarksEquipmentSubmit);
-  }
-
-  if (cancelRemarksBtn) {
-    cancelRemarksBtn.addEventListener("click", closeRemarksModal);
-  }
-
-  if (modalBackdropRemarks) {
-    modalBackdropRemarks.addEventListener("click", closeRemarksModal);
-  }
-}
 //--------------------- END OF REMARKS FUNCTIONS --------------------
 
 // -------------------- INFO BUTTON LOGIC --------------------
@@ -673,7 +753,7 @@ function initializeInfoHovers() {
 function setupDropdown(buttonId, menuId) {
   const btn = document.getElementById(buttonId);
   const menu = document.getElementById(menuId);
-
+  
   btn.addEventListener("click", () => {
     const expanded = btn.getAttribute("aria-expanded") === "true";
     btn.setAttribute("aria-expanded", !expanded);
@@ -685,7 +765,7 @@ function setupDropdown(buttonId, menuId) {
       menu.classList.remove("opacity-100", "visible");
     }
   });
-
+  
   // Close dropdown if clicked outside
   document.addEventListener("click", (e) => {
     if (!btn.contains(e.target) && !menu.contains(e.target)) {
@@ -696,7 +776,77 @@ function setupDropdown(buttonId, menuId) {
   });
 }
 
-setupDropdown("masterlistBtn", "masterlistMenu");
-setupDropdown("consumablesBtn", "consumablesMenu");
-setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
-setupDropdown("propertiesBtn", "propertiesMenu");
+// -------------------- DATABASE CONNECTION LOGIC (Database Handler) --------------------
+
+async function initializeLabEquipmentsTable() {
+  try {
+    let data = await dbhandler.getAllLabEquipmentsRecords();
+
+    if (data.length == 0) {
+      console.error("Lab Equipments table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      await createNewEquipmentRow(
+        data[i]["Item ID"],
+        data[i]["Name"],
+        data[i]["Unit"],
+        data[i]["Location"],
+        data[i]["Brand"],
+        data[i]["Quantity"],
+        data[i]["Serial No"],
+        data[i]["Calibration Date"],
+        data[i]["Frequency of Calibration"]
+      );
+
+      await createNewRemarks(data[i]["Remarks"], data[i]["Item ID"]);
+    }
+  } catch (generalError) {
+    console.error(generalError);
+  }
+}
+
+/**
+ * Gets all of the unit type records from the database then proceeds to populate them (using the unit_type_name)
+ *  to the addEquipmentUnit html dropdown element
+ * @void Returns nothing.
+ */
+async function initializeUnitTypeDropdown() {
+  try {
+    let data = await dbhandler.getAllUnitTypeRecordsOrderByName();
+
+    if (data.length == 0) {
+      console.error("Unit type table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      createNewUnitTypeRow(data[i]["Name"]);
+    }
+  } catch (generalError) {
+    console.error(generalError);
+  }
+}
+
+/**
+ * Gets all of the location records from the database then proceeds to populate them (using the location_name)
+ *  to the addEquipmentLocation html dropdown element
+ * @void Returns nothing.
+ */
+async function initializeLocationDropdown() {
+  try {
+    let data = await dbhandler.getAllLocationRecordsOrderByName();
+
+    if (data.length == 0) {
+      console.error("Unit type table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      createNewLocationRow(data[i]["Name"]);
+    }
+  } catch (generalError) {
+    console.error(generalError);
+  }
+}
