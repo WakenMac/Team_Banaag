@@ -1,10 +1,21 @@
+<!--
+  Restocks Management Page
+  
+  This page handles the management of restocks in the inventory system.
+  Features:
+  - Navigation menu with dropdowns
+  - Restock listing table
+  - Add/Edit restock modals
+  - Delete confirmation modal
+  - Search and filter functionality
+-->
+
 <!DOCTYPE html>
-<!-- TO BE EDITED, STILL UNSURE UNSA ANG FINAL INPUT FOR ADDING -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <title>CARES | CAS Automated Resource and Equipment System</title>
+    <title>CARES | Restocks Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
@@ -16,7 +27,6 @@
     />
     <link rel="stylesheet" href="/Frontend_Code/css/admin.css" />
   </head>
-
   <body class="bg-[#f3f7f7] min-h-screen">
     <nav
       class="flex items-center justify-between px-4 md:px-8 lg:px-12 h-20 border-b border-gray-300 bg-[#f3f7f7]"
@@ -44,6 +54,7 @@
         </div>
         <div class="border-l border-black/40 h-10 ml-4"></div>
       </a>
+
       <!-- Right side: Navigation Links -->
       <ul class="flex space-x-8 text-[13px] font-normal text-black">
         <li>
@@ -246,6 +257,7 @@
         </li>
       </ul>
     </nav>
+
     <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 mt-6">
       <div
         class="flex flex-col sm:flex-row justify-between items-center w-full gap-3 sm:gap-0"
@@ -266,19 +278,26 @@
             <option value="" disabled selected class="placeholder-option">
               Filter by
             </option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
           </select>
         </div>
         <button
-          aria-controls="addRestocksModal"
+          aria-controls="addRestockModal"
           aria-haspopup="dialog"
           class="custom-btn"
-          id="addApparatusBtn"
+          id="addRestockBtn"
           type="button"
         >
           Add Restock
         </button>
       </div>
-      <h2 class="font-semibold text-gray-900 text-sm mb-3 mt-4">Restocks</h2>
+
+      <h2 class="font-semibold text-gray-900 text-sm mb-3 mt-4">
+        Restock History
+      </h2>
+
       <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
         <table class="min-w-full divide-y divide-gray-200 text-sm">
           <thead class="bg-white">
@@ -293,13 +312,7 @@
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Name
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Brand
+                Item Name
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
@@ -311,13 +324,13 @@
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Remaining Quantity
+                Used Quantity
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Used Quantity
+                Brand
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
@@ -337,63 +350,27 @@
               ></th>
             </tr>
           </thead>
-          <tbody class="bg-white">
+          <tbody id="restocksTableBody" class="bg-white">
+            <!-- Sample row -->
             <tr>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">1</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Beaker</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Corning</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">50</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">30</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">20</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                2023-10-01
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                2025-10-01
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
-                <button
-                  aria-label="Edit restock"
-                  class="text-yellow-400 hover:text-yellow-500"
-                  data-id="1"
-                >
-                  <i class="fas fa-pencil-alt"></i>
-                </button>
-                <button
-                  aria-label="Delete restock"
-                  class="text-red-600 hover:text-red-700"
-                  data-id="1"
-                >
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-              </td>
-            </tr>
-            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">RST000001</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Acetone</td>
               <td class="px-6 py-4 whitespace-nowrap text-gray-900">5</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Flask</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Pyrex</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">100</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">70</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">30</td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                2024-01-15
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-                2026-01-15
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
-                <button
-                  aria-label="Edit restock"
-                  class="text-yellow-400 hover:text-yellow-500"
-                  data-id="5"
-                >
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">2</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">Merck</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">2024-03-20</td>
+              <td class="px-6 py-4 whitespace-nowrap text-gray-900">2025-03-20</td>
+              <td class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3">
+                  <button 
+                    aria-label="Add remarks" 
+                    class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100" 
+                    data-item-id="${consumableItemsId}"
+                  >
+                    <i class="fas fa-comment-alt text-[14px]"></i>
+                <button aria-label="Edit restock" class="text-yellow-400 hover:text-yellow-500">
                   <i class="fas fa-pencil-alt"></i>
                 </button>
-                <button
-                  aria-label="Delete restock"
-                  class="text-red-600 hover:text-red-700"
-                  data-id="5"
-                >
+                <button aria-label="Delete restock" class="text-red-600 hover:text-red-700">
                   <i class="fas fa-trash-alt"></i>
                 </button>
               </td>
@@ -403,7 +380,7 @@
       </div>
     </main>
 
-    <!-- Add Restocks Modal -->
+    <!-- Add Restock Modal -->
     <div
       aria-labelledby="modalTitle"
       aria-modal="true"
@@ -413,7 +390,7 @@
     >
       <div
         class="modal-backdrop fixed inset-0 bg-black opacity-50"
-        id="modalBackdropRestock"
+        id="modalBackdropAddRestock"
       ></div>
       <div
         class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
@@ -428,114 +405,122 @@
             <span class="font-black text-3xl text-black">Add Restock</span>
           </div>
         </div>
-        <form class="space-y-4" id="addRestockForm">
+
+        <form id="addRestockForm" class="space-y-4">
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="restockName"
+              for="restockItemName"
             >
-              Name <span class="text-red-500">*</span>
+              Item Name <span class="text-red-500">*</span>
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="restockName"
-              name="restockName"
-              required=""
+              id="restockItemName"
+              name="restockItemName"
+              required
               type="text"
-              placeholder="e.g. Erlenmeyer Flask"
+              placeholder="Enter item name"
             />
           </div>
+
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="restockUnit"
+              for="restockQuantity"
             >
-              Unit <span class="text-red-500">*</span>
+              Quantity <span class="text-red-500">*</span>
             </label>
-            <select
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 placeholder-gray-400"
-              id="restockUnit"
-              name="restockUnit"
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="restockQuantity"
+              name="restockQuantity"
               required
-            >
-              <option value="" disabled selected class="placeholder-option">
-                - Select Unit -
-              </option>
-              <option value="mL">mL</option>
-              <option value="pcs">pcs</option>
-              <!-- Options will be populated dynamically from the database -->
-              <!-- ~The dynamic options have been implemented~  -->
-            </select>
+              type="number"
+              min="1"
+              placeholder="Enter quantity"
+            />
           </div>
+
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="apparatusLocation"
-            >
-              Location <span class="text-red-500">*</span>
-            </label>
-            <select
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent custom-select"
-              id="apparatusLocation"
-              name="apparatusLocation"
-              required
-            >
-              <option value="" disabled selected class="placeholder-option">
-                - Select Location -
-              </option>
-              <option value="General Santos">General Santos</option>
-              <option value="Stock Room">Stock Room</option>
-              <option value="Lab Drawer">Lab Drawer</option>
-              <!-- Options will be populated dynamically from the database -->
-              <!-- ~The dynamic options have been implemented~  -->
-            </select>
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="apparatusBrand"
+              for="restockBrand"
             >
               Brand <span class="text-red-500">*</span>
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="apparatusBrand"
-              name="apparatusBrand"
-              required=""
+              id="restockBrand"
+              name="restockBrand"
+              required
               type="text"
-              placeholder="e.g. Brand Name"
+              placeholder="Enter brand name"
             />
           </div>
-          <div class="flex justify-end space-x-3 pt-4">
+
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="restockDate"
+            >
+              Restock Date <span class="text-red-500">*</span>
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="restockDate"
+              name="restockDate"
+              required
+              type="date"
+            />
+          </div>
+
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="restockExpirationDate"
+            >
+              Expiration Date <span class="text-red-500">*</span>
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="restockExpirationDate"
+              name="restockExpirationDate"
+              required
+              type="date"
+            />
+          </div>
+
+          <div class="flex justify-end gap-3 mt-6">
             <button
-              class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-              id="cancelApparatusBtn"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2ca14a]"
+              id="cancelRestockBtn"
               type="button"
             >
               Cancel
             </button>
             <button
-              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
+              class="px-4 py-2 text-sm font-medium text-white bg-[#2ca14a] border border-transparent rounded-md hover:bg-[#2ca14a]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2ca14a]"
               type="submit"
             >
-              Save
+              Add Restock
             </button>
           </div>
         </form>
       </div>
     </div>
 
-    <!-- Edit Restocks Modal -->
+    <!-- Edit Restock Modal -->
     <div
       aria-labelledby="editModalTitle"
       aria-modal="true"
       class="fixed inset-0 z-50 hidden items-center justify-center"
-      id="editRestocksModal"
+      id="editRestockModal"
       role="dialog"
     >
       <div
         class="modal-backdrop fixed inset-0 bg-black opacity-50"
-        id="modalBackdrpEditRestocks"
+        id="modalBackdropEditRestock"
       ></div>
       <div
         class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
@@ -547,42 +532,46 @@
               alt="CARES logo"
               class="w-12 h-12 object-contain"
             />
-            <span class="font-black text-3xl text-black">Edit restock</span>
+            <span class="font-black text-3xl text-black">Edit Restock</span>
           </div>
         </div>
-        <form class="space-y-4" id="editApparatusForm">
+
+        <form id="editRestockForm" class="space-y-4">
+          <input type="hidden" id="editRestockId" />
+          
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="editRestockId"
+              for="editRestockItemName"
             >
-              Restock ID
+              Item Name <span class="text-red-500">*</span>
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="editRestockId"
-              name="editRestockId"
-              type="text"
-              readonly
-              placeholder="Enter restock ID"
-            />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="editRestockName"
-            >
-              Name
-            </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="editRestockName"
-              name="editRestockName"
+              id="editRestockItemName"
+              name="editRestockItemName"
               required
               type="text"
-              placeholder="Enter apparatus name"
+              placeholder="Enter item name"
             />
           </div>
+
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="editRestockQuantity"
+            >
+              Quantity
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent bg-gray-50"
+              id="editRestockQuantity"
+              name="editRestockQuantity"
+              readonly
+              type="number"
+            />
+          </div>
+
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
@@ -591,108 +580,74 @@
               Brand
             </label>
             <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent bg-gray-50"
               id="editRestockBrand"
               name="editRestockBrand"
-              required
+              readonly
               type="text"
-              placeholder="Enter brand"
             />
           </div>
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="editInitialQuantity"
-            >
-              Initial Quantity
-            </label>
-            <input class="w-full rounded-md border border-gray-300 px-3 py-2
-            focus:outline-none focus:ring-2 focus:ring-[#2ca14a]
-            focus:border-transparent" id="editInitialQuantity"
-            name="editInitialQuantity"" required type="text" placeholder="Enter
-            initial quantity" />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="editInitialQuantity"
-            >
-              Remaining Quantity
-            </label>
-            <input class="w-full rounded-md border border-gray-300 px-3 py-2
-            focus:outline-none focus:ring-2 focus:ring-[#2ca14a]
-            focus:border-transparent" id="editRemainingQuantity"
-            name="editRemainingQuantity"" required type="text" readonly />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="editRemainingQuantity"
-            >
-              Used Quantity
-            </label>
-            <input class="w-full rounded-md border border-gray-300 px-3 py-2
-            focus:outline-none focus:ring-2 focus:ring-[#2ca14a]
-            focus:border-transparent" id="editUsedQuantity"
-            name="editUsedQuantity"" required type="text" readonly />
-          </div>
-          <div>
-            <label
-              class="block text-sm font-medium text-gray-700 mb-1"
-              for="editUsedQuantity"
+              for="editRestockDate"
             >
               Restock Date
             </label>
-            <input class="w-full rounded-md border border-gray-300 px-3 py-2
-            focus:outline-none focus:ring-2 focus:ring-[#2ca14a]
-            focus:border-transparent" id="editRestockDate"
-            name="editRestockDate"" required type="text" placeholder="Enter
-            brand" />
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent bg-gray-50"
+              id="editRestockDate"
+              name="editRestockDate"
+              readonly
+              type="date"
+            />
           </div>
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
-              for="editExpirationDate"
+              for="editRestockExpirationDate"
             >
               Expiration Date
             </label>
-            <input class="w-full rounded-md border border-gray-300 px-3 py-2
-            focus:outline-none focus:ring-2 focus:ring-[#2ca14a]
-            focus:border-transparent" id="editExpirationDate"
-            name="editExpirationDate"" required type="text" placeholder="Enter
-            brand" />
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent bg-gray-50"
+              id="editRestockExpirationDate"
+              name="editRestockExpirationDate"
+              readonly
+              type="date"
+            />
           </div>
-          <div class="flex justify-end space-x-3 pt-4">
+
+          <div class="flex justify-end gap-3 mt-6">
             <button
-              class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2ca14a]"
               id="cancelEditBtn"
               type="button"
             >
               Cancel
             </button>
             <button
-              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
+              class="px-4 py-2 text-sm font-medium text-white bg-[#2ca14a] border border-transparent rounded-md hover:bg-[#2ca14a]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2ca14a]"
               type="submit"
             >
-              Save
+              Update Restock
             </button>
           </div>
         </form>
       </div>
     </div>
-    <!-- End of Edit Modal-->
 
-    <!-- Delete Apparatus Modal -->
+    <!-- Delete Restock Modal -->
     <div
-      aria-labelledby="deleteApparatusModalTitle"
+      aria-labelledby="deleteModalTitle"
       aria-modal="true"
       class="fixed inset-0 z-50 hidden items-center justify-center"
-      id="deleteApparatusModal"
+      id="deleteRestockModal"
       role="dialog"
     >
       <div
         class="modal-backdrop fixed inset-0 bg-black opacity-50"
-        id="modalBackdropDeleteApparatus"
+        id="modalBackdropDeleteRestock"
       ></div>
       <div
         class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
@@ -704,24 +659,25 @@
               alt="CARES logo"
               class="w-12 h-12 object-contain"
             />
-            <span class="font-black text-3xl text-black">Delete Apparatus</span>
+            <span class="font-black text-3xl text-black">Delete Restock</span>
           </div>
         </div>
-        <p class="text-gray-700 mb-6">
-          Are you sure you want to delete this apparatus? This action cannot be
-          undone.
+
+        <p class="text-gray-600 mb-6">
+          Are you sure you want to delete this restock record? This action cannot be undone.
         </p>
-        <div class="flex justify-end space-x-3">
+
+        <div class="flex justify-end gap-3">
           <button
             class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-            id="cancelDeleteApparatusBtn"
+            id="cancelDeleteRestockBtn"
             type="button"
           >
             Cancel
           </button>
           <button
             class="px-4 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-            id="confirmDeleteApparatusBtn"
+            id="confirmDeleteRestockBtn"
             type="button"
           >
             Delete
@@ -729,8 +685,73 @@
         </div>
       </div>
     </div>
-    <!-- End of Delete Apparatus Modal -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module" src="/Frontend_Code/js/apparatus.js"></script>
+
+    <!-- Remarks Modal -->
+    <div
+    aria-labelledby="remarksModalTitle"
+    aria-modal="true"
+    class="fixed inset-0 z-50 hidden items-center justify-center"
+    id="remarksModal"
+    role="dialog"
+  >
+    <div
+      class="modal-backdrop fixed inset-0 bg-black opacity-50"
+      id="modalBackdropRemarks"
+    ></div>
+    <div
+      class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+    >
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <img
+            src="/Frontend_Code/images/cas_logo.png"
+            alt="CARES logo"
+            class="w-12 h-12 object-contain"
+          />
+          <span class="font-black text-3xl text-black">Add Remarks</span>
+        </div>
+      </div>
+      <form class="space-y-4" id="remarksForm">
+        <input
+          type="hidden"
+          id="remarksRestockId"
+          name="remarksRestockId"
+        />
+        <div>
+          <label
+            class="block text-sm font-medium text-gray-700 mb-1"
+            for="remarksText"
+          >
+            Remarks
+          </label>
+          <textarea
+            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+            id="remarksText"
+            name="remarksText"
+            rows="4"
+            placeholder="e.g. This restock is to replenish the stock of the item."
+          ></textarea>
+        </div>
+        <div class="flex justify-end space-x-3 pt-4">
+          <button
+            class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+            id="cancelRemarksBtn"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
+            type="submit"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- End of Add Remarks Modal -->
+
+    <script type="module" src="/Frontend_Code/js/restocks.js"></script>
   </body>
 </html>

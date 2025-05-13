@@ -13,17 +13,17 @@
  * - All user feedback is shown as a toast at the bottom right (no more alert popups)
  */
 
-import * as dbhandler from '../../Backend_Code/mainHandler.js';
+import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
 // Initialize Components
-const addGlasswareLocation = document.getElementById('glasswareLocation');
-const addGlasswareUnit = document.getElementById('glasswareUnit');
-const editGlasswareLocation = document.getElementById('editGlasswareLocation');
-const editGlasswareUnit = document.getElementById('editGlasswareUnit');
+const addGlasswareLocation = document.getElementById("glasswareLocation");
+const addGlasswareUnit = document.getElementById("glasswareUnit");
+const editGlasswareLocation = document.getElementById("editGlasswareLocation");
+const editGlasswareUnit = document.getElementById("editGlasswareUnit");
 
 await initialize();
 
-async function initialize(){
+async function initialize() {
   setupDropdown("masterlistBtn", "masterlistMenu");
   setupDropdown("consumablesBtn", "consumablesMenu");
   setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
@@ -31,7 +31,7 @@ async function initialize(){
 
   await dbhandler.testPresence();
   await prepareGlasswaresTable();
-  
+
   await prepareLocationDropdown();
   await prepareUnitTypeDropdown();
 }
@@ -140,7 +140,12 @@ addGlasswareForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  let result = await dbhandler.addGlasswaresRecord(glasswareName, glasswareLocation, glasswareUnit, glasswareBrand);
+  let result = await dbhandler.addGlasswaresRecord(
+    glasswareName,
+    glasswareLocation,
+    glasswareUnit,
+    glasswareBrand
+  );
 
   if (result == null) {
     showToast(
@@ -159,7 +164,7 @@ addGlasswareForm.addEventListener("submit", async (e) => {
       glasswareUnit,
       glasswareLocation,
       glasswareBrand,
-      0,
+      0
     );
     closeModal();
     showToast("Glassware added successfully", false, 3000);
@@ -174,9 +179,7 @@ const editGlasswareForm = document.getElementById("editGlasswareForm");
 const cancelEditGlasswareBtn = document.getElementById(
   "cancelEditGlasswareBtn"
 );
-const modalBackdropEdit = document.getElementById(
-  "modalEditBackdrop"
-);
+const modalBackdropEdit = document.getElementById("modalEditBackdrop");
 var glasswareRowToEdit = null;
 
 // Open Edit Modal and populate fields
@@ -186,10 +189,12 @@ function openEditGlasswareModal(row) {
   for (const { id, idx } of glasswareFieldMap) {
     const el = document.getElementById(id);
     if (el && cells[idx]) {
-      if (idx != 5)
-        el.value = cells[idx].textContent.trim();
+      if (idx != 5) el.value = cells[idx].textContent.trim();
       else
-        el.value = cells[idx].textContent.replace((' ' + cells[2].textContent.trim()), ''); // Removes the unit type portion on quantity
+        el.value = cells[idx].textContent.replace(
+          " " + cells[2].textContent.trim(),
+          ""
+        ); // Removes the unit type portion on quantity
     }
   }
   editGlasswareModal.classList.remove("hidden");
@@ -209,7 +214,7 @@ modalBackdropEdit.addEventListener("click", closeEditGlasswareModal);
 // Save changes on Edit
 editGlasswareForm.addEventListener("submit", async function (e) {
   e.preventDefault();
-  
+
   const editGlasswareId = glasswareRowToEdit.children[0].textContent.trim();
   const editGlasswareName = document
     .getElementById("editGlasswareName")
@@ -230,8 +235,14 @@ editGlasswareForm.addEventListener("submit", async function (e) {
 
   if (!glasswareRowToEdit) return;
 
-  let result = await dbhandler.updateGlasswaresRecordByAll(editGlasswareId, editGlasswareName, editGlasswareLocation, 
-    editGlasswareUnit, editGlasswareBrand, remarks);
+  let result = await dbhandler.updateGlasswaresRecordByAll(
+    editGlasswareId,
+    editGlasswareName,
+    editGlasswareLocation,
+    editGlasswareUnit,
+    editGlasswareBrand,
+    remarks
+  );
 
   if (result == null) {
     showToast(
@@ -262,9 +273,7 @@ const cancelDeleteGlasswareBtn = document.getElementById(
 const confirmDeleteGlasswareBtn = document.getElementById(
   "confirmDeleteGlasswareBtn"
 );
-const modalBackdropDelete = document.getElementById(
-  "modalDeleteBackdrop"
-);
+const modalBackdropDelete = document.getElementById("modalDeleteBackdrop");
 var glasswareRowToDelete = null;
 
 // Field mapping for edit modal and table columns
@@ -296,20 +305,24 @@ modalBackdropDelete.addEventListener("click", closeDeleteGlasswareModal);
 confirmDeleteGlasswareBtn.addEventListener("click", async () => {
   if (glasswareRowToDelete) {
     const glassawareId = glasswareRowToDelete.children[0].textContent.trim();
-    
+
     let result = await dbhandler.deleteChemicalsRecordByItemId(glassawareId);
     if (result && result.includes("ERROR")) {
       showToast(result, true, 4000);
       return;
     }
-    
+
     console.log(result);
     chemicalRowToDelete.remove();
     closeDeleteChemicalModal();
     showToast("Chemical deleted successfully", false, 3000);
   }
 
-  showToast("ERROR: Unable to find row to delete (Glassware-Delete-Row)", true, 4000);
+  showToast(
+    "ERROR: Unable to find row to delete (Glassware-Delete-Row)",
+    true,
+    4000
+  );
   closeDeleteChemicalModal();
 });
 
@@ -393,7 +406,10 @@ remarksForm.addEventListener("submit", async (e) => {
   );
 
   // Updates the remarks in the database
-  let result = await dbhandler.updateGlasswaresRemarkByItemId(glasswareId, remarks);
+  let result = await dbhandler.updateGlasswaresRemarkByItemId(
+    glasswareId,
+    remarks
+  );
 
   if (result && result.includes("ERROR")) {
     showToast(result, true, 4000);
@@ -422,7 +438,7 @@ async function createNewGlasswareRow(
   glasswareUnit,
   glasswareLocation,
   glasswareBrand,
-  glasswareQuantity,
+  glasswareQuantity
 ) {
   const tr = document.createElement("tr");
   tr.innerHTML = `
@@ -483,18 +499,15 @@ function createNewLocationRow(locationName) {
  * @param {string} editGlasswareBrand         Brand of the glassware to be added
  * @param {int} editGlasswareQuantity         Quantity of the glassware
  */
-function updateGlasswaresTable(
-  cells,
-) {
+function updateGlasswaresTable(cells) {
   for (const { id, idx } of glasswareFieldMap) {
     const el = document.getElementById(id);
-    if (!el && !cells[idx]) 
-      continue;
+    if (!el && !cells[idx]) continue;
 
-    if (id === "editGlasswareQuantity") // skip quantity
-      cells[idx].textContent = el.value.trim() + ' ' + cells[2].textContent;
-    else
-      cells[idx].textContent = el.value.trim();
+    if (id === "editGlasswareQuantity")
+      // skip quantity
+      cells[idx].textContent = el.value.trim() + " " + cells[2].textContent;
+    else cells[idx].textContent = el.value.trim();
   }
 }
 
@@ -543,7 +556,7 @@ async function prepareGlasswaresTable() {
         data[i]["Unit"],
         data[i]["Location"],
         data[i]["Brand"],
-        data[i]["Quantity"],
+        data[i]["Quantity"]
       );
 
       await createNewRemarks(data[i]["Remarks"], data[i]["Item ID"]);
