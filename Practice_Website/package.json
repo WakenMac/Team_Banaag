@@ -1,0 +1,16 @@
+{
+  "name": "practice_website",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node Backend_Code/server.js",
+    "dev": "nodemon Backend_Code/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

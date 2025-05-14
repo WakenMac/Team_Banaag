@@ -41,7 +41,7 @@ async function initialize() {
   await dbhandler.testPresence();
   await prepareUnitTypeTable();
 
-  showToast('Loaded page successfully');
+  showToast('Loaded page successfully!');
 }
 
 // Dropdown toggle logic
