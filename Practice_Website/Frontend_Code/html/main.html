@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<!-- NOTE: and # sa href kay mostly placeholders lang, and will be replaced with actual source path for that specific function -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>CARES | CAS Automated Resource and Equipment System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome for icons -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Font Poppins -->
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-[#f3f7f7]">
+    <nav
+      class="flex items-center justify-between px-4 md:px-8 lg:px-12 h-20 border-b border-gray-300 bg-[#f3f7f7]"
+    >
+      <!-- Left side: Logo and Title -->
+      <a
+        href="/Frontend_Code/html/main.html"
+        class="flex items-center space-x-3 group"
+      >
+        <img
+          alt="CAS Lab logo with green and yellow colors, circular emblem with text"
+          class="w-12 h-12 object-contain transition-transform"
+          height="48"
+          src="/Frontend_Code/images/cas_logo.png"
+          width="48"
+        />
+        <div class="flex flex-col leading-tight">
+          <span class="font-semibold text-black text-sm"> CARES. </span>
+          <span class="text-[9px] font-semibold text-black/80 tracking-tight">
+            CENTRALIZED RESOURCE
+          </span>
+          <span class="text-[9px] font-semibold text-black/80 tracking-tight">
+            AND EQUIPMENT SYSTEM
+          </span>
+        </div>
+        <div class="border-l border-black/40 h-10 ml-4"></div>
+      </a>
+
+      <!-- Right side: Navigation Links; TODO: Make individual html pages -->
+      <ul class="flex space-x-8 text-[13px] font-normal text-black">
+        <li>
+          <a
+            class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none"
+            href="/Frontend_Code/html/main.html"
+            >Dashboard</a
+          >
+        </li>
+        <li class="relative">
+          <button
+            aria-expanded="false"
+            aria-haspopup="true"
+            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
+            id="masterlistBtn"
+            type="button"
+          >
+            Masterlist
+            <i class="fas fa-chevron-down ml-1 text-black text-xs"></i>
+          </button>
+          <ul
+            aria-labelledby="masterlistBtn"
+            class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+            id="masterlistMenu"
+            role="menu"
+          >
+            <li role="none">
+              <a
+                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                href="/Frontend_Code/html/components/admins.html"
+                role="menuitem"
+                tabindex="-1"
+                >Admins</a
+              >
+            </li>
+            <li role="none">
+              <a
+                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                href="/Frontend_Code/html/components/inventory.html"
+                role="menuitem"
+                tabindex="-1"
+                >Inventory</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <!-- Dropdowns for Consumables and Non-consumables; TODO: make individual html pages -->
+        <li class="relative">
+          <button
+            aria-expanded="false"
+            aria-haspopup="true"
+            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
+            id="consumablesBtn"
+            type="button"
+          >
+            Consumables
+            <i class="fas fa-chevron-down ml-1 text-black text-xs"></i>
+          </button>
+          <ul
+            aria-labelledby="consumablesBtn"
+            class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+            id="consumablesMenu"
+            role="menu"
+          >
+            <li role="none">
+              <a
+                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                href="/Frontend_Code/html/components/chemicals.html"
+                role="menuitem"
+                tabindex="-1"
+                >Chemicals</a
+              >
+            </li>
+            <li role="none">
+              <a
+                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                href="/Frontend_Code/html/components/items.html"
+                role="menuitem"
+                tabindex="-1"
+                >Items</a
+              >
+            </li>
+          </ul>
+        </li>
+        <li class="relative">
+          <button
+            aria-expanded="false"
+            aria-haspopup="true"
+            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
+            id="nonconsumablesBtn"
+            type="button"
+          >
+            Non-consumables
+            <i class="fas fa-chevron-down ml-1 text-black text-xs"></i>
+          </button>
+          <ul
+            aria-labelledby="nonconsumablesBtn"
+            class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+            id="nonconsumablesMenu"
+            role="menu"
+          >
+            <li role="none">
+              <a
+                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                href="../../Frontend_Code/html/components/equipments.html"
+                role="menuitem"
+                tabindex="-1"
+                >Equipment</a
+              >
+            </li>
+            <li role="none">
+              <a
+                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                href="/Frontend_Code/html/components/apparatus.html"
+                role="menuitem"
+                tabindex="-1"
+                >Apparatus
+              </a>
+            </li>
+            <li role="none">
+              <a
+                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                href="/Frontend_Code/html/components/glassware.html"
+                role="menuitem"
+                tabindex="-1"
+                >Glassware</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <!-- Dropdown for Properties; TODO: Make individual html pages -->
+        <li class="relative">
+          <button
+            aria-expanded="false"
+            aria-haspopup="true"
+            class="inline-flex items-center cursor-pointer select-none focus:outline-none"
+            id="propertiesBtn"
+            type="button"
+          >
+            Properties
+            <i class="fas fa-chevron-down ml-1 text-black text-xs"></i>
+          </button>
+          <ul
+            aria-labelledby="propertiesBtn"
+            class="absolute left-0 top-full mt-1 w-40 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+            id="propertiesMenu"
+            role="menu"
+          >
+            <li role="none">
+              <a
+                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                href="/Frontend_Code/html/components/unitType.html"
+                role="menuitem"
+                tabindex="-1"
+                >Unit Type</a
+              >
+            </li>
+            <li role="none">
+              <a
+                class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
+                href="/Frontend_Code/html/components/location.html"
+                role="menuitem"
+                tabindex="-1"
+                >Location</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <!-- one page links; TODO: change href, create html files for individual pages -->
+        <li>
+          <a
+            class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]"
+            href="/Frontend_Code/html/components/restocks.html"
+          >
+            Restocks
+          </a>
+        </li>
+        <li>
+          <a
+            class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]"
+            href="/Frontend_Code/html/components/transactions.html"
+          >
+            Transactions
+          </a>
+        </li>
+        <li>
+          <a
+            class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]"
+            href="/Frontend_Code/html/components/statistics.html"
+          >
+            Statistics
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <!-- Script to access the supabase API -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="/Frontend_Code/js/script.js"></script>
+  </body>
+</html>

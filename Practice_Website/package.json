@@ -1,0 +1,17 @@
+{
+  "name": "practice_website",
+  "version": "1.0.0",
+  "description": "Team Banaag Web App",
+  "main": "Backend_Code/server.js",
+  "scripts": {
+    "start": "node Backend_Code/server.js",
+    "dev": "nodemon Backend_Code/server.js"
+  },
+  "keywords": [],
+  "author": "Dave Shanna Gigawin - Jeff Ronyl Pausal - Waken Maclang - Allan Tagle",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  }
+}
