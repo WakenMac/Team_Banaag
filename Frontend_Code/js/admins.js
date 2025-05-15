@@ -37,6 +37,8 @@ async function initialize() {
   // Prepares the contents of the admin table
   await dbhandler.testPresence();
   await prepareAdminTable();
+
+  showToast('Loaded page successfully!');
 }
 
 // Dropdown toggle logic
@@ -316,7 +318,7 @@ confirmDeleteAdminBtn.addEventListener("click", async () => {
     const adminId = adminRowToDelete.children[0].textContent;
     let result = await dbhandler.removeAdminRecordByAdminId(adminId);
     if (result && result.includes("ERROR")) {
-      alert(result);
+      showToast(result.replace(/^ERROR:\s*/i, ''), true);
       return;
     }
     adminRowToDelete.remove();
@@ -356,7 +358,7 @@ function showToast(message, isError = false) {
   toast.style.opacity = "1";
   setTimeout(() => {
     toast.style.opacity = "0";
-  }, 1800);
+  }, (isError)? 4000 : 3000);
 }
 
 // SEARCH BAR-RELATED METHODS

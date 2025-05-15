@@ -67,6 +67,8 @@ async function initialize() {
 
   await prepareUnitTypeDropdown();
   await prepareLocationDropdown();
+
+  showToast('Loaded page successfully!');
 }
 
 //=======================================================================================================================================
