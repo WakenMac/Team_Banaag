@@ -1,5 +1,5 @@
 // import modules
-import * as dbhandler from '../../Backend_Code/mainHandler.js';
+import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
 const tbody = document.querySelector("tbody");
 
@@ -16,7 +16,7 @@ async function initialize() {
   await dbhandler.testPresence();
   await prepareLocationTable();
 
-  showToast('Loaded page successfully!');
+  showToast("Loaded page successfully!");
 }
 
 // ===================== Set Dropdown Toggle Logic =====================
@@ -45,7 +45,6 @@ function setupDropdown(buttonId, menuId) {
       menu.classList.remove("opacity-100", "visible");
     }
   });
-
 }
 
 // ===================== Add Glassware Modal Logic =====================
@@ -55,13 +54,13 @@ const addLocationBtn = document.getElementById("addLocationBtn");
 const addLocationModal = document.getElementById("addLocationModal");
 const addLocationError = document.getElementById("addLocationError");
 const modalBackdropLocation = document.getElementById("modalBackdropLocation");
-const addLocationForm = document.getElementById('addLocationForm');
+const addLocationForm = document.getElementById("addLocationForm");
 const cancelBtn = document.getElementById("cancelBtn");
 
 addLocationBtn.addEventListener("click", openModal);
 cancelBtn.addEventListener("click", () => {
-  addLocationError.classList.add('hidden');
-  addLocationError.textContent = '';
+  addLocationError.classList.add("hidden");
+  addLocationError.textContent = "";
   closeModal();
 });
 
@@ -95,21 +94,21 @@ addLocationForm.addEventListener("submit", async (e) => {
   if (result == null) {
     showToast(`Something went wrong. Please try again.`, true);
     return;
-  } else if (result.includes('ERROR')) {
-    showToast(result.replace(/^ERROR:\s*/i, ''), true);
+  } else if (result.includes("ERROR")) {
+    showToast(result.replace(/^ERROR:\s*/i, ""), true);
     return;
   } else {
-    let correctLocationId = result.slice(46, result.length - 1)
-    createNewLocationRow(correctLocationId, locationName)
+    let correctLocationId = result.slice(46, result.length - 1);
+    createNewLocationRow(correctLocationId, locationName);
     showToast(result, false);
     closeModal();
   }
 });
 
 // Hide error message when user starts typing in the name input
-document.getElementById('locationName').addEventListener('input', () => {
-  addLocationError.classList.add('hidden');
-  addLocationError.textContent = '';
+document.getElementById("locationName").addEventListener("input", () => {
+  addLocationError.classList.add("hidden");
+  addLocationError.textContent = "";
 });
 
 // ===================== Edit Glassware Modal Logic =====================
@@ -117,7 +116,7 @@ document.getElementById('locationName').addEventListener('input', () => {
 // Modals for editing
 const editLocationModal = document.getElementById("editLocationModal");
 const editLocationError = document.getElementById("editLocationError");
-const editLocationForm = document.getElementById('editLocationForm');
+const editLocationForm = document.getElementById("editLocationForm");
 const cancelEditLocationBtn = document.getElementById("cancelEditLocationBtn");
 const modalBackdropEditLocation = document.getElementById(
   "modalBackdropEditLocation"
@@ -125,13 +124,13 @@ const modalBackdropEditLocation = document.getElementById(
 
 cancelEditLocationBtn.addEventListener("click", () => {
   editLocationError.classList.add("hidden");
-  editLocationError.textContent = '';
+  editLocationError.textContent = "";
   closeEditModal();
 });
 
 modalBackdropEditLocation.addEventListener("click", () => {
   editLocationError.classList.add("hidden");
-  editLocationError.textContent = '';
+  editLocationError.textContent = "";
   closeEditModal();
 });
 
@@ -157,42 +156,48 @@ tbody.addEventListener("click", (e) => {
   }
 });
 
-function populateEditForm(row){
+function populateEditForm(row) {
   const cells = row.children;
   document.getElementById("editLocationId").value = cells[0].textContent.trim();
-  document.getElementById("editLocationName").value = cells[1].textContent.trim();
+  document.getElementById("editLocationName").value =
+    cells[1].textContent.trim();
   openEditModal();
 }
 
-editLocationForm.addEventListener('submit', async (e) =>{
+editLocationForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-    const editLocationId = document.getElementById("editLocationId").value.trim();
-    const editLocationName = document.getElementById("editLocationName").value.trim();
-  
-    if (!editLocationName) {
-      showToast("Please fill in all required fields.", true);
-      return;
-    }
-  
-    let result = await dbhandler.updateLocationRecordName(editLocationId, editLocationName);
-  
-    if (result == null) {
-      showToast(`Something went wrong. Please try again.`, true);
-      return;
-    } else if (result.includes("ERROR")) {
-      showToast(result.replace(/^ERROR:\s*/i, ''), true);
-      return;
-    } else {
-      // Update the row in the table
-      const rows = tbody.querySelectorAll("tr");
-      rows.forEach((row) => {
-        if (row.children[0].textContent === editLocationId) {
-          row.children[1].textContent = editLocationName;
-        }
-      });
-      closeEditModal();
-      showToast('Location edited successfully', false);
-    }
+  const editLocationId = document.getElementById("editLocationId").value.trim();
+  const editLocationName = document
+    .getElementById("editLocationName")
+    .value.trim();
+
+  if (!editLocationName) {
+    showToast("Please fill in all required fields.", true);
+    return;
+  }
+
+  let result = await dbhandler.updateLocationRecordName(
+    editLocationId,
+    editLocationName
+  );
+
+  if (result == null) {
+    showToast(`Something went wrong. Please try again.`, true);
+    return;
+  } else if (result.includes("ERROR")) {
+    showToast(result.replace(/^ERROR:\s*/i, ""), true);
+    return;
+  } else {
+    // Update the row in the table
+    const rows = tbody.querySelectorAll("tr");
+    rows.forEach((row) => {
+      if (row.children[0].textContent === editLocationId) {
+        row.children[1].textContent = editLocationName;
+      }
+    });
+    closeEditModal();
+    showToast("Location edited successfully", false);
+  }
 });
 
 // ===================== Delete Glassware Modal Logic =====================
@@ -204,15 +209,18 @@ tbody.addEventListener("click", async (e) => {
     e.target.closest("button").getAttribute("aria-label") === "Delete location"
   ) {
     const row = e.target.closest("tr");
-    const locationId = row.querySelectorAll('td')[0].textContent; // Selects the ID
+    const locationId = row.querySelectorAll("td")[0].textContent; // Selects the ID
 
     if (row) {
       let result = await dbhandler.removeLocationRecordByLocationId(locationId);
 
       if (result == null)
-        showToast(`The mainHandler.removeLocationByLocationId() DOESN'T return a status statement.`, true)
-      else if (result.includes('ERROR'))
-        showToast(result.replace(/^ERROR:\s*/i, ''), true);
+        showToast(
+          `The mainHandler.removeLocationByLocationId() DOESN'T return a status statement.`,
+          true
+        );
+      else if (result.includes("ERROR"))
+        showToast(result.replace(/^ERROR:\s*/i, ""), true);
       else {
         showToast(result, false);
         row.remove();
@@ -220,14 +228,52 @@ tbody.addEventListener("click", async (e) => {
     }
   }
 });
+// ===============================================================================================
+// SEARCH BAR FUNCTION
+function searchLocation() {
+  const searchValue = searchInput.value.toLowerCase();
+  const rows = tbody.querySelectorAll("tr:not(.no-result-row)");
+  let hasResult = false;
+
+  const existingNoResults = tbody.querySelector(".no-result-row");
+  if (existingNoResults) {
+    existingNoResults.remove();
+  }
+
+  rows.forEach((row) => {
+    const locationName = row.children[1].textContent.toLowerCase();
+    const showRow = !searchValue || locationName.includes(searchValue);
+    row.style.display = showRow ? "" : "none";
+    if (showRow) hasResult = true;
+  });
+
+  if (!hasResult && searchValue) {
+    const noResultRow = document.createElement("tr");
+    noResultRow.className = "no-result-row";
+    noResultRow.innerHTML = `
+      <td colspan="7" class="px-6 py-16 text-center w-full">
+        <div class="flex flex-col items-center justify-center space-y-4 max-w-sm mx-auto">
+          <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <p class="text-gray-500 text-lg font-medium">No location found matching "${searchValue}"</p>
+          <p class="text-gray-400 text-base">Try adjusting your search term</p>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(noResultRow);
+  }
+}
+// Add event listener to the search input
+searchInput.addEventListener("input", searchLocation);
 
 // ===============================================================================================
 // FRONT END-RELATED METHODS
 
 /**
  * Method to add a new row to the table
- * @param {int} locationId 
- * @param {string} locationName 
+ * @param {int} locationId
+ * @param {string} locationName
  */
 function createNewLocationRow(locationId, locationName) {
   const tr = document.createElement("tr");
@@ -276,9 +322,12 @@ function showToast(message, isError = false) {
     ? "rgba(220, 38, 38, 0.95)"
     : "rgba(44, 161, 74, 0.95)";
   toast.style.opacity = "1";
-  setTimeout(() => {
-    toast.style.opacity = "0";
-  }, (isError)? 4000 : 3000);
+  setTimeout(
+    () => {
+      toast.style.opacity = "0";
+    },
+    isError ? 4000 : 3000
+  );
 }
 
 // ===============================================================================================
@@ -289,17 +338,13 @@ async function prepareLocationTable() {
     let data = await dbhandler.getAllLocationRecordsOrderById();
 
     if (data.length == 0) {
-      console.error('Location table has no records.')
+      console.error("Location table has no records.");
       return;
     }
 
     for (let i = 0; i < data.length; i++) {
-      createNewLocationRow(
-        data[i]['Location ID'],
-        data[i]['Name']
-      )
+      createNewLocationRow(data[i]["Location ID"], data[i]["Name"]);
     }
-
   } catch (generalError) {
     console.error(generalError);
   }

@@ -36,7 +36,7 @@ async function initialize() {
   await prepareLocationDropdown();
   await prepareUnitTypeDropdown();
 
-  showToast('Loaded page successfully!');
+  showToast("Loaded page successfully!");
 }
 
 // ===================== Set Toast Messages Logic =====================
@@ -67,9 +67,12 @@ function showToast(message, isError = false) {
     ? "rgba(220, 38, 38, 0.95)"
     : "rgba(44, 161, 74, 0.95)";
   toast.style.opacity = "1";
-  setTimeout(() => {
-    toast.style.opacity = "0";
-  }, (isError)? 4000 : 3000);
+  setTimeout(
+    () => {
+      toast.style.opacity = "0";
+    },
+    isError ? 4000 : 3000
+  );
 }
 
 // ===================== Set Dropdown Toggle Logic =====================
@@ -432,6 +435,50 @@ remarksForm.addEventListener("submit", async (e) => {
   closeRemarksModal();
   showToast("Remarks updated successfully", false, 3000);
 });
+
+// ===================== SEARCH BAR FUNCTION (search by brand or name, can be adjusted if necessary) =====================
+function searchGlassware() {
+  const searchValue = searchInput.value.toLowerCase();
+  const tbody = document.getElementById("glasswareTableBody");
+  const rows = tbody.querySelectorAll("tr:not(.no-result-row)");
+  let hasResult = false;
+
+  const existingNoResults = tbody.querySelector(".no-result-row");
+  if (existingNoResults) {
+    existingNoResults.remove();
+  }
+
+  rows.forEach((row) => {
+    const itemName = row.children[1].textContent.toLowerCase();
+    const itemBrand = row.children[4].textContent.toLowerCase();
+    const showRow =
+      !searchValue ||
+      itemName.includes(searchValue) ||
+      itemBrand.includes(searchValue);
+    row.style.display = showRow ? "" : "none";
+    if (showRow) hasResult = true;
+  });
+
+  if (!hasResult && searchValue) {
+    const noResultRow = document.createElement("tr");
+    noResultRow.className = "no-result-row";
+    noResultRow.innerHTML = `
+      <td colspan="7" class="px-6 py-16 text-center w-full">
+        <div class="flex flex-col items-center justify-center space-y-4 max-w-sm mx-auto">
+          <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <p class="text-gray-500 text-lg font-medium">No glassware found matching "${searchValue}"</p>
+          <p class="text-gray-400 text-base">Try adjusting your search term</p>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(noResultRow);
+  }
+}
+// Add event listener to the search input
+// const searchInput = document.getElementById("searchInput");
+searchInput.addEventListener("input", searchGlassware);
 
 // ===================== Front-End Related Logic =====================
 

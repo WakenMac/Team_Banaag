@@ -13,20 +13,20 @@
 // All changes are temporary and will reset if you reload the page since it's not connected to a database yet.
 // ----------------------------------------------------------
 
-import * as dbhandler from '../../Backend_Code/mainHandler.js';
+import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
 // ===================== Initialize Components =====================
 
 // Select options
-const addApparatusLocation = document.getElementById('apparatusLocation');
-const addApparatusUnit = document.getElementById('apparatusUnit');
-const editApparatusLocation = document.getElementById('editApparatusLocation');
-const editApparatusUnit = document.getElementById('editApparatusUnit');
+const addApparatusLocation = document.getElementById("apparatusLocation");
+const addApparatusUnit = document.getElementById("apparatusUnit");
+const editApparatusLocation = document.getElementById("editApparatusLocation");
+const editApparatusUnit = document.getElementById("editApparatusUnit");
 
 const tbody = document.querySelector("tbody");
 await initialize();
 
-async function initialize(){
+async function initialize() {
   setupDropdown("masterlistBtn", "masterlistMenu");
   setupDropdown("consumablesBtn", "consumablesMenu");
   setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
@@ -38,7 +38,7 @@ async function initialize(){
   await prepareLocationDropdown();
   await prepareUnitTypeDropdown();
 
-  showToast('Loaded page successfully!');
+  showToast("Loaded page successfully!");
 }
 
 // ===================== Set Toast Messages Logic =====================
@@ -150,10 +150,12 @@ modalBackdropApparatus.addEventListener("click", closeAddModal);
 addApparatusForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const apparatusName = document.getElementById('apparatusName').value.trim();
-  const apparatusUnit = document.getElementById('apparatusUnit').value.trim();
-  const apparatusLocation = document.getElementById('apparatusLocation').value.trim();
-  const apparatusBrand = document.getElementById('apparatusBrand').value.trim();
+  const apparatusName = document.getElementById("apparatusName").value.trim();
+  const apparatusUnit = document.getElementById("apparatusUnit").value.trim();
+  const apparatusLocation = document
+    .getElementById("apparatusLocation")
+    .value.trim();
+  const apparatusBrand = document.getElementById("apparatusBrand").value.trim();
 
   if (
     !apparatusName ||
@@ -165,8 +167,13 @@ addApparatusForm.addEventListener("submit", async (e) => {
     return;
   }
 
-  let result = await dbhandler.addLabEquipmentsRecord(apparatusName, apparatusLocation, 
-    apparatusUnit, apparatusBrand, '')
+  let result = await dbhandler.addLabEquipmentsRecord(
+    apparatusName,
+    apparatusLocation,
+    apparatusUnit,
+    apparatusBrand,
+    ""
+  );
 
   if (result == null) {
     showToast(
@@ -179,10 +186,10 @@ addApparatusForm.addEventListener("submit", async (e) => {
   } else {
     console.log(result);
     let newItemId = result.slice(51, result.length - 1);
-    console.log(result.slice(51, result.length - 1))
+    console.log(result.slice(51, result.length - 1));
     createNewLabApparatusRow(
       newItemId,
-      apparatusName, 
+      apparatusName,
       apparatusUnit,
       apparatusLocation,
       apparatusBrand,
@@ -210,7 +217,7 @@ const apparatusFieldMap = [
   { id: "editApparatusLocation", idx: 3 },
   { id: "editApparatusBrand", idx: 4 },
   { id: "editApparatusQuantity", idx: 5 },
-]
+];
 
 function openEditModal(row) {
   rowBeingEdited = row;
@@ -219,10 +226,12 @@ function openEditModal(row) {
   for (const { id, idx } of apparatusFieldMap) {
     const el = document.getElementById(id);
     if (el && cells[idx]) {
-      if (idx != 5)
-        el.value = cells[idx].textContent.trim();
+      if (idx != 5) el.value = cells[idx].textContent.trim();
       else
-        el.value = cells[idx].textContent.replace((' ' + cells[2].textContent.trim()), ''); // Removes the unit type portion on quantity
+        el.value = cells[idx].textContent.replace(
+          " " + cells[2].textContent.trim(),
+          ""
+        ); // Removes the unit type portion on quantity
     }
   }
 
@@ -241,21 +250,30 @@ modalBackdropEditApparatus.addEventListener("click", closeEditModal);
 // Edit form submit: update the row in the table
 editApparatusForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  
+
   if (!rowBeingEdited) return;
 
   // Get new values
   const editApparatusId = document.getElementById("editApparatusId").value;
   const editApparatusName = document.getElementById("editApparatusName").value;
   const editApparatusUnit = document.getElementById("editApparatusUnit").value;
-  const editApparatusLocation = document.getElementById("editApparatusLocation").value;
-  const editApparatusBrand = document.getElementById("editApparatusBrand").value;
+  const editApparatusLocation = document.getElementById(
+    "editApparatusLocation"
+  ).value;
+  const editApparatusBrand =
+    document.getElementById("editApparatusBrand").value;
   const remarks = document
     .querySelector(`button[data-apparatus-id="${editApparatusId}"]`)
     .getAttribute("data-remarks");
 
-  let result = await dbhandler.updateLabApparatusRecordByAll(editApparatusId, editApparatusName, editApparatusLocation, 
-    editApparatusUnit, editApparatusBrand, remarks);
+  let result = await dbhandler.updateLabApparatusRecordByAll(
+    editApparatusId,
+    editApparatusName,
+    editApparatusLocation,
+    editApparatusUnit,
+    editApparatusBrand,
+    remarks
+  );
 
   if (result == null) {
     showToast(
@@ -308,13 +326,14 @@ modalBackdropDeleteApparatus.addEventListener("click", closeDeleteModal);
 // Confirm deletion
 confirmDeleteApparatusBtn.addEventListener("click", async () => {
   if (rowToDelete) {
-
-    let result = await dbhandler.deleteLabApparatusRecordByItemId(rowToDelete.children[0].textContent);
+    let result = await dbhandler.deleteLabApparatusRecordByItemId(
+      rowToDelete.children[0].textContent
+    );
     if (result && result.includes("ERROR")) {
       showToast(result, true, 4000);
       return;
     }
-        
+
     console.log(result);
     rowToDelete.remove();
     closeDeleteModal();
@@ -332,7 +351,6 @@ tbody.addEventListener("click", (e) => {
 
   const row = btn.closest("tr");
   if (!row) return;
-
 
   // Delete apparatus
   if (btn.getAttribute("aria-label") === "Delete apparatus")
@@ -423,7 +441,7 @@ tbody.addEventListener("click", (e) => {
  */
 remarksForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  
+
   const apparatusId = document.getElementById("remarksApparatusId").value;
   const remarks = document.getElementById("remarksText").value.trim();
 
@@ -432,8 +450,11 @@ remarksForm.addEventListener("submit", async (e) => {
     `button[data-apparatus-id="${apparatusId}"]`
   );
 
-  let result = await dbhandler.updateLabApparatusRemarkByItemId(apparatusId, remarks);
-  
+  let result = await dbhandler.updateLabApparatusRemarkByItemId(
+    apparatusId,
+    remarks
+  );
+
   if (result && result.includes("ERROR")) {
     showToast(result, true, 4000);
     return;
@@ -457,13 +478,16 @@ remarksForm.addEventListener("submit", async (e) => {
 cancelRemarksBtn.addEventListener("click", closeRemarksModal);
 modalBackdropRemarks.addEventListener("click", closeRemarksModal);
 
-
 // ===================== Front-End Related Logic =====================
 
 async function createNewLabApparatusRow(
-  apparatusId, apparatusName, apparatusUnit, apparatusLocation, apparatusBrand, 
+  apparatusId,
+  apparatusName,
+  apparatusUnit,
+  apparatusLocation,
+  apparatusBrand,
   apparatusQuantity
-){
+) {
   // Create new row
   const tr = document.createElement("tr");
 
@@ -499,20 +523,21 @@ async function createNewLabApparatusRow(
  * @param {string} editLabApparatusBrand         Brand of the Lab Apparatus to be added
  * @param {int} editLabApparatusQuantity         Quantity of the Lab Apparatus
  */
-function updateLabApparatusTable(
-  cells,
-) {
+function updateLabApparatusTable(cells) {
   let originalUnit = cells[2].textContent;
 
   for (const { id, idx } of apparatusFieldMap) {
     const el = document.getElementById(id);
 
-    if (!el && !cells[idx]) 
-      continue;
-    if (id === "editApparatusQuantity") // skip quantity
-      cells[idx].textContent = cells[idx].textContent.replace((' ' + originalUnit), '') + ' ' + cells[2].textContent;
-    else{
-      console.log('Update Lab Apparatus Error:', id)
+    if (!el && !cells[idx]) continue;
+    if (id === "editApparatusQuantity")
+      // skip quantity
+      cells[idx].textContent =
+        cells[idx].textContent.replace(" " + originalUnit, "") +
+        " " +
+        cells[2].textContent;
+    else {
+      console.log("Update Lab Apparatus Error:", id);
       cells[idx].textContent = el.value.trim();
     }
   }
@@ -569,6 +594,47 @@ function createNewLocationRow(locationName) {
   editApparatusLocation.appendChild(tr2);
 }
 
+// SEARCH BAR METHODS - finds by brand and name - please adjust if necessary
+function searchApparatus() {
+  const searchValue = searchInput.value.toLowerCase();
+  const rows = tbody.querySelectorAll("tr:not(.no-result-row)");
+  let hasResult = false;
+
+  const existingNoResults = tbody.querySelector(".no-result-row");
+  if (existingNoResults) {
+    existingNoResults.remove();
+  }
+
+  rows.forEach((row) => {
+    const itemName = row.children[1].textContent.toLowerCase();
+    const itemBrand = row.children[4].textContent.toLowerCase();
+    const showRow =
+      !searchValue ||
+      itemName.includes(searchValue) ||
+      itemBrand.includes(searchValue);
+    row.style.display = showRow ? "" : "none";
+    if (showRow) hasResult = true;
+  });
+
+  if (!hasResult && searchValue) {
+    const noResultRow = document.createElement("tr");
+    noResultRow.className = "no-result-row";
+    noResultRow.innerHTML = `
+      <td colspan="7" class="px-6 py-16 text-center w-full">
+        <div class="flex flex-col items-center justify-center space-y-4 max-w-sm mx-auto">
+          <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <p class="text-gray-500 text-lg font-medium">No apparatus found matching "${searchValue}"</p>
+          <p class="text-gray-400 text-base">Try adjusting your search term</p>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(noResultRow);
+  }
+}
+// Add event listener to the search input
+searchInput.addEventListener("input", searchApparatus);
 // ===================== Database Related Logic =====================
 
 /**

@@ -57,7 +57,7 @@ const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
 const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
 
 // Initialize table components
-await initialize();
+initialize();
 
 async function initialize() {
   setupDropdownElements();
@@ -74,7 +74,7 @@ async function initialize() {
   setupEventListeners();
   setupDateValidation();
 
-  showToast('Loaded page successfully!');
+  showToast("Loaded page successfully!");
 }
 
 function initializeRestocks() {
@@ -169,7 +169,9 @@ function setupEventListeners() {
       }
     });
 
-    cancelRemarksBtn.addEventListener("click", closeRemarksModal);
+    if (cancelRemarksBtn) {
+      cancelRemarksBtn.addEventListener("click", closeRemarksModal);
+    }
     modalBackdropRemarks.addEventListener("click", closeRemarksModal);
   }
 }
@@ -715,9 +717,12 @@ function showToast(message, isError = false) {
     ? "rgba(220, 38, 38, 0.95)"
     : "rgba(44, 161, 74, 0.95)";
   toast.style.opacity = "1";
-  setTimeout(() => {
-    toast.style.opacity = "0";
-  }, (isError)? 4000 : 3000);
+  setTimeout(
+    () => {
+      toast.style.opacity = "0";
+    },
+    isError ? 4000 : 3000
+  );
 }
 
 // ========================== Set Dropdown Logic ==========================
@@ -775,26 +780,214 @@ function setupDateValidation() {
 
 // ========================== Filter Functionality ==========================
 
+// function setupFilterFunctionality() {
+//   const filterBySelect = document.getElementById("filterBySelect");
+//   const timeFrameSelect = document.getElementById("timeFrameSelect");
+//   const customDateRange = document.getElementById("customDateRange");
+//   const startDate = document.getElementById("startDate");
+//   const endDate = document.getElementById("endDate");
+//   const searchInput = document.querySelector('input[type="search"]');
+//   const clearFilterBtn = document.getElementById("clearFilterBtn");
+
+//   function clearAllFilters() {
+//     // Reset all filters
+//     timeFrameSelect.classList.add("hidden");
+//     customDateRange.classList.add("hidden");
+//     searchInput.value = "";
+//     startDate.value = "";
+//     endDate.value = "";
+//     timeFrameSelect.value = "";
+//     filterBySelect.value = "";
+//     clearFilterBtn.classList.add("hidden");
+//     showAllRows();
+//   }
+
+//   // Show/hide time frame select based on filter type
+//   filterBySelect.addEventListener("change", function () {
+//     const selectedValue = this.value;
+
+//     if (selectedValue === "restockDate" || selectedValue === "expirationDate") {
+//       timeFrameSelect.classList.remove("hidden");
+//       customDateRange.classList.add("hidden");
+//       clearFilterBtn.classList.remove("hidden");
+//     } else {
+//       timeFrameSelect.classList.add("hidden");
+//       customDateRange.classList.add("hidden");
+//       clearFilterBtn.classList.add("hidden");
+//     }
+//   });
+
+//   // Clear filter button click handler
+//   clearFilterBtn.addEventListener("click", clearAllFilters);
+
+//   // Handle time frame selection
+//   timeFrameSelect.addEventListener("change", function () {
+//     const selectedTimeFrame = this.value;
+//     if (selectedTimeFrame === "custom") {
+//       customDateRange.classList.remove("hidden");
+//     } else {
+//       customDateRange.classList.add("hidden");
+//       applyFilter();
+//     }
+//   });
+
+//   // Apply filter when custom date range is selected
+//   startDate.addEventListener("change", applyFilter);
+//   endDate.addEventListener("change", applyFilter);
+
+//   function showAllRows() {
+//     const rows = tbody.getElementsByTagName("tr");
+//     for (let row of rows) {
+//       row.style.display = "";
+//     }
+//   }
+
+//   function applyFilter() {
+//     const filterType = filterBySelect.value;
+//     const timeFrame = timeFrameSelect.value;
+//     const searchValue = searchInput.value.toLowerCase();
+//     const rows = tbody.getElementsByTagName("tr");
+
+//     for (let row of rows) {
+//       let showRow = true;
+
+//       // Apply date filter if a date filter type is selected
+//       if (filterType === "restockDate" || filterType === "expirationDate") {
+//         const dateCell =
+//           filterType === "restockDate" ? row.cells[5] : row.cells[6];
+//         const dateValue = new Date(dateCell.textContent);
+
+//         if (timeFrame === "custom") {
+//           const start = new Date(startDate.value);
+//           const end = new Date(endDate.value);
+//           showRow = dateValue >= start && dateValue <= end;
+//         } else {
+//           const today = new Date();
+//           const startOfDay = new Date(
+//             today.getFullYear(),
+//             today.getMonth(),
+//             today.getDate()
+//           );
+//           const endOfDay = new Date(
+//             today.getFullYear(),
+//             today.getMonth(),
+//             today.getDate(),
+//             23,
+//             59,
+//             59
+//           );
+
+//           switch (timeFrame) {
+//             case "today":
+//               showRow = dateValue >= startOfDay && dateValue <= endOfDay;
+//               break;
+//             case "thisWeek":
+//               const startOfWeek = new Date(
+//                 today.setDate(today.getDate() - today.getDay())
+//               );
+//               const endOfWeek = new Date(
+//                 today.setDate(today.getDate() - today.getDay() + 6)
+//               );
+//               showRow = dateValue >= startOfWeek && dateValue <= endOfWeek;
+//               break;
+//             case "thisMonth":
+//               const startOfMonth = new Date(
+//                 today.getFullYear(),
+//                 today.getMonth(),
+//                 1
+//               );
+//               const endOfMonth = new Date(
+//                 today.getFullYear(),
+//                 today.getMonth() + 1,
+//                 0
+//               );
+//               showRow = dateValue >= startOfMonth && dateValue <= endOfMonth;
+//               break;
+//             case "thisYear":
+//               const startOfYear = new Date(today.getFullYear(), 0, 1);
+//               const endOfYear = new Date(today.getFullYear(), 11, 31);
+//               showRow = dateValue >= startOfYear && dateValue <= endOfYear;
+//               break;
+//           }
+//         }
+//       }
+
+//       // Apply search filter if there's a search value
+//       if (searchValue && showRow) {
+//         const itemName = row.cells[1].textContent.toLowerCase();
+//         const brand = row.cells[4].textContent.toLowerCase();
+//         showRow = itemName.includes(searchValue) || brand.includes(searchValue);
+//       }
+
+//       row.style.display = showRow ? "" : "none";
+
+//       const rows = tbody.getElementsByTagName("tr");
+//       let hasResults = false;
+
+//       // Remove existing no results message if present
+//       const existingMessage = tbody.querySelector(".no-result-row");
+//       if (existingMessage) {
+//         existingMessage.remove();
+//       }
+
+//       for (let row of rows) {
+//         let showRow = true;
+
+//         row.style.display = showRow ? "" : "none";
+//         if (showRow) hasResults = true;
+//       }
+
+//       // Show no results message if needed
+//       if (!hasResults) {
+//         const noResultRow = document.createElement("tr");
+//         noResultRow.className = "no-result-row";
+//         noResultRow.innerHTML = `
+//           <td colspan="8" class="px-6 py-16 text-center w-full">
+//             <div class="flex flex-col items-center justify-center space-y-4 max-w-sm mx-auto">
+//               <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+//               </svg>
+//               <p class="text-gray-500 text-lg font-medium">No restocks found${
+//                 searchValue ? ` matching "${searchValue}"` : ""
+//               }</p>
+//               <p class="text-gray-400 text-base">Try adjusting your filters</p>
+//             </div>
+//           </td>
+//         `;
+//         tbody.appendChild(noResultRow);
+//       }
+//     }
+//   }
+
+//   // Add search input event listener
+//   searchInput.addEventListener("input", applyFilter);
+// }
+
+// // Initialize filter functionality
+// setupFilterFunctionality();
 function setupFilterFunctionality() {
-  const filterBySelect = document.getElementById('filterBySelect');
-  const timeFrameSelect = document.getElementById('timeFrameSelect');
-  const customDateRange = document.getElementById('customDateRange');
-  const startDate = document.getElementById('startDate');
-  const endDate = document.getElementById('endDate');
-  const searchInput = document.querySelector('input[type="search"]');
-  const clearFilterBtn = document.getElementById('clearFilterBtn');
+  const elements = {
+    filterBySelect: document.getElementById("filterBySelect"),
+    timeFrameSelect: document.getElementById("timeFrameSelect"),
+    customDateRange: document.getElementById("customDateRange"),
+    startDate: document.getElementById("startDate"),
+    endDate: document.getElementById("endDate"),
+    searchInput: document.querySelector('input[type="search"]'),
+    clearFilterBtn: document.getElementById("clearFilterBtn"),
+    tbody: document.getElementById("restocksTableBody"),
+  };
 
   function clearAllFilters() {
-    // Reset all filters
-    timeFrameSelect.classList.add('hidden');
-    customDateRange.classList.add('hidden');
-    searchInput.value = '';
-    startDate.value = '';
-    endDate.value = '';
-    timeFrameSelect.value = '';
-    filterBySelect.value = '';
-    clearFilterBtn.classList.add('hidden');
+    elements.timeFrameSelect.classList.add("hidden");
+    elements.customDateRange.classList.add("hidden");
+    elements.searchInput.value = "";
+    elements.startDate.value = "";
+    elements.endDate.value = "";
+    elements.timeFrameSelect.value = "";
+    elements.filterBySelect.value = "";
+    elements.clearFilterBtn.classList.add("hidden");
     showAllRows();
+    removeNoResultsMessage();
   }
 
   // Show/hide time frame select based on filter type
@@ -831,72 +1024,129 @@ function setupFilterFunctionality() {
   endDate.addEventListener('change', applyFilter);
 
   function showAllRows() {
-    const rows = tbody.getElementsByTagName('tr');
-    for (let row of rows) {
-      row.style.display = '';
-    }
+    const rows = elements.tbody.getElementsByTagName("tr");
+    Array.from(rows).forEach((row) => (row.style.display = ""));
   }
 
-  // TODO: Understnad what this is for?
   function applyFilter() {
-    const filterType = filterBySelect.value;
-    const timeFrame = timeFrameSelect.value;
-    const searchValue = searchInput.value.toLowerCase();
-    const rows = tbody.getElementsByTagName('tr');
+    const filterType = elements.filterBySelect.value;
+    const timeFrame = elements.timeFrameSelect.value;
+    const searchValue = elements.searchInput.value.toLowerCase();
+    const rows = elements.tbody.getElementsByTagName("tr");
+    let hasResults = false;
 
-    for (let row of rows) {
+    removeNoResultsMessage();
+
+    Array.from(rows).forEach((row) => {
       let showRow = true;
 
-      // Apply date filter if a date filter type is selected
-      if (filterType === 'restockDate' || filterType === 'expirationDate') {
-        const dateCell = filterType === 'restockDate' ? row.cells[5] : row.cells[6];
+      // Apply date filter
+      if (filterType === "restockDate" || filterType === "expirationDate") {
+        const dateCell =
+          filterType === "restockDate" ? row.cells[5] : row.cells[6];
         const dateValue = new Date(dateCell.textContent);
-
-        if (timeFrame === 'custom') {
-          const start = new Date(startDate.value);
-          const end = new Date(endDate.value);
-          showRow = dateValue >= start && dateValue <= end;
-        } else {
-          const today = new Date();
-          const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-          const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
-
-          switch (timeFrame) {
-            case 'today':
-              showRow = dateValue >= startOfDay && dateValue <= endOfDay;
-              break;
-            case 'thisWeek':
-              const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-              const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6));
-              showRow = dateValue >= startOfWeek && dateValue <= endOfWeek;
-              break;
-            case 'thisMonth':
-              const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-              const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-              showRow = dateValue >= startOfMonth && dateValue <= endOfMonth;
-              break;
-            case 'thisYear':
-              const startOfYear = new Date(today.getFullYear(), 0, 1);
-              const endOfYear = new Date(today.getFullYear(), 11, 31);
-              showRow = dateValue >= startOfYear && dateValue <= endOfYear;
-              break;
-          }
-        }
+        showRow = isDateInRange(dateValue, timeFrame);
       }
 
-      // Apply search filter if there's a search value
+      // Apply search filter
       if (searchValue && showRow) {
         const itemName = row.cells[1].textContent.toLowerCase();
         const brand = row.cells[4].textContent.toLowerCase();
         showRow = itemName.includes(searchValue) || brand.includes(searchValue);
       }
 
-      row.style.display = showRow ? '' : 'none';
+      row.style.display = showRow ? "" : "none";
+      if (showRow) hasResults = true;
+    });
+
+    if (!hasResults) {
+      showNoResultsMessage(searchValue, filterType, timeFrame);
     }
   }
 
-  // Add search input event listener
-  searchInput.addEventListener('input', applyFilter);
+  function isDateInRange(date, timeFrame) {
+    if (timeFrame === "custom") {
+      const start = elements.startDate.value
+        ? new Date(elements.startDate.value)
+        : null;
+      const end = elements.endDate.value
+        ? new Date(elements.endDate.value)
+        : null;
+      return (!start || date >= start) && (!end || date <= end);
+    }
+
+    const today = new Date();
+    const ranges = {
+      today: {
+        start: new Date(today.setHours(0, 0, 0, 0)),
+        end: new Date(today.setHours(23, 59, 59, 999)),
+      },
+      thisWeek: {
+        start: new Date(today.setDate(today.getDate() - today.getDay())),
+        end: new Date(today.setDate(today.getDate() + 6)),
+      },
+      thisMonth: {
+        start: new Date(today.getFullYear(), today.getMonth(), 1),
+        end: new Date(today.getFullYear(), today.getMonth() + 1, 0),
+      },
+      thisYear: {
+        start: new Date(today.getFullYear(), 0, 1),
+        end: new Date(today.getFullYear(), 11, 31),
+      },
+    };
+
+    const range = ranges[timeFrame];
+    return range ? date >= range.start && date <= range.end : true;
+  }
+
+  function removeNoResultsMessage() {
+    const existingMessage = elements.tbody.querySelector(".no-result-row");
+    if (existingMessage) {
+      existingMessage.remove();
+    }
+  }
+
+  function showNoResultsMessage(searchValue, filterType, timeFrame) {
+    const noResultRow = document.createElement("tr");
+    noResultRow.className = "no-result-row";
+    noResultRow.innerHTML = `
+      <td colspan="8" class="px-6 py-16 text-center w-full">
+        <div class="flex flex-col items-center justify-center space-y-4 max-w-sm mx-auto">
+          <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <p class="text-gray-500 text-lg font-medium">No restocks found${
+            searchValue ? ` matching "${searchValue}"` : ""
+          }</p>
+          <p class="text-gray-400 text-base">Try adjusting your filters</p>
+        </div>
+      </td>
+    `;
+    elements.tbody.appendChild(noResultRow);
+  }
+
+  // Event Listeners
+  elements.filterBySelect.addEventListener("change", function () {
+    const showTimeFrame =
+      this.value === "restockDate" || this.value === "expirationDate";
+    elements.timeFrameSelect.classList.toggle("hidden", !showTimeFrame);
+    elements.customDateRange.classList.add("hidden");
+    elements.clearFilterBtn.classList.toggle("hidden", !this.value);
+    applyFilter();
+  });
+
+  elements.timeFrameSelect.addEventListener("change", function () {
+    elements.customDateRange.classList.toggle(
+      "hidden",
+      this.value !== "custom"
+    );
+    if (this.value !== "custom") applyFilter();
+  });
+
+  elements.searchInput.addEventListener("input", applyFilter);
+  elements.startDate.addEventListener("change", applyFilter);
+  elements.endDate.addEventListener("change", applyFilter);
+  elements.clearFilterBtn.addEventListener("click", clearAllFilters);
 }
 
 // Initialize filter functionality

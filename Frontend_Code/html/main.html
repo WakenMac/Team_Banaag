@@ -15,6 +15,7 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="/Frontend_Code/css/admin.css" />
     <!-- Font Poppins -->
     <style>
       body {
@@ -22,7 +23,7 @@
       }
     </style>
   </head>
-  <body class="bg-[#f3f7f7]">
+  <body class="bg-[#f3f7f7] min-h-screen">
     <nav
       class="flex items-center justify-between px-4 md:px-8 lg:px-12 h-20 border-b border-gray-300 bg-[#f3f7f7]"
     >
@@ -220,8 +221,6 @@
             </li>
           </ul>
         </li>
-
-        <!-- one page links; TODO: change href, create html files for individual pages -->
         <li>
           <a
             class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]"
@@ -248,6 +247,138 @@
         </li>
       </ul>
     </nav>
+    <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 mt-6">
+      <div class="flex justify-end items-center w-full">
+        <button
+          aria-controls="addTransactionModal"
+          aria-haspopup="dialog"
+          class="custom-btn mr-4"
+          id="addTransactionBtn"
+          type="button"
+        >
+          New Transaction
+        </button>
+      </div>
+    </main>
+
+    <!-- Add Transaction Modal -->
+    <div
+      aria-labelledby="modalTitle"
+      aria-modal="true"
+      class="fixed inset-0 z-50 hidden items-center justify-center"
+      id="addAdminModal"
+      role="dialog"
+    >
+      <div
+        class="modal-backdrop fixed inset-0 bg-black opacity-50"
+        id="modalBackdrop"
+      ></div>
+      <div
+        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img
+              src="/Frontend_Code/images/cas_logo.png"
+              alt="CARES logo"
+              class="w-12 h-12 object-contain"
+            />
+            <span class="font-black text-3xl text-black">New Transaction</span>
+          </div>
+        </div>
+        <form class="space-y-4" id="addAdminForm">
+          <div
+            id="addAdminError"
+            class="hidden mb-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded px-3 py-2"
+          ></div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="adminId"
+            >
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="adminId"
+              name="adminId"
+              required=""
+              type="text"
+              placeholder="e.g. 123456"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="firstName"
+            >
+              First Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="firstName"
+              name="firstName"
+              required=""
+              type="text"
+              placeholder="e.g. John"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="middleName"
+            >
+              Middle Name
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="middleName"
+              name="middleName"
+              type="text"
+              placeholder="e.g. Doe"
+            />
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="lastName"
+            >
+              Last Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="lastName"
+              name="lastName"
+              required=""
+              type="text"
+              placeholder="e.g. Smith"
+            />
+          </div>
+          <div class="flex justify-end space-x-3 pt-4">
+            <button
+              class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+              id="cancelBtn"
+              type="button"
+            >
+              Cancel
+            </button>
+            <button
+              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
+              type="submit"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- End of New Transaction Modal -->
+
+    <!-- Type of Transaction (Borrow or Return) -->
+
+    <!-- Verify Admin for Transaction Modal -->
+
     <!-- Script to access the supabase API -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="/Frontend_Code/js/script.js"></script>
