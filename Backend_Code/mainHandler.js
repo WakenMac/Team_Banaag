@@ -2522,7 +2522,7 @@ export async function addRestocksRecord(
             return null;
         }
 
-        const {data, error: supabaseError} = await supabaseClient.rpc('add_restocks_record', {
+        const {data, error: supabaseError} = await supabaseClient.rpc('main_add_restocks_record', {
             input_item_id : iItemId,
             input_restock_date : sRestockDate,
             input_expiry_date : sExpiryDate, 
@@ -2601,7 +2601,7 @@ export async function updateRestocksRecordByAll(
  * 
  * @returns A string containing the status of the deleted record (Success or Error)
  */
-export async function updateRestocksRemarksByItemId(restockId, remarks = ''){
+export async function updateRestocksRemarksByRestockId(restockId, remarks = ''){
     try{
         const [ sRemarks ] = converter('string', remarks);
         const [ iRestockId ] = converter('int', restockId);
@@ -2611,7 +2611,7 @@ export async function updateRestocksRemarksByItemId(restockId, remarks = ''){
             return null;
         }
 
-        if (typeof iItemId !== 'number' || iItemId < 1){
+        if (typeof iRestockId !== 'number' || iRestockId < 1){
             console.error("PARAMETER ERROR: updateRestocksRemarksByItemId's Restock ID must be a positive non-zero integer.")
             return null;
         }
@@ -2644,7 +2644,7 @@ export async function removeRestocksRecordByRestockId(restockId = 0){
         const [ iRestockId ] = converter('int', restockId);
 
         if (typeof iRestockId !== 'number' || iRestockId < 1){
-            console.error("PARAMETER ERROR: deleteRestocksRecordByItemId's Restock ID's parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: removeRestocksRecordByRestockId's Restock ID's parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -2679,7 +2679,9 @@ export function converter(condition = '', ...objectArray){
         throw new Error('Kindly specify the condition for this method')
     }
 
+    // TODO: Remove once everything is implemented.
     console.log(objectArray);
+
     let newArray = new Array(objectArray.length);
 
     for (let i = 0; i < objectArray.length; i++){

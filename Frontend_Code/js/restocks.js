@@ -97,10 +97,16 @@ function setupEventListeners() {
     
     if (searchIndex != -1){
       populateAddBrandSelector(searchIndex, addRestockItemName.value.toLowerCase());
+
+      if (referenceTable[searchIndex]["Item Type"] === 'Chemicals')
+        addRestockForm.restockQuantity.step = "0.01";
+      else 
+        addRestockForm.restockQuantity.step = "1";
+
     } else {
       resetBrandOption();
+      addRestockForm.restockQuantity.step = "1";
       console.error("Unable to find item name:", addRestockItemName.value + " in the inventory.");
-      return;
     }
   });
 
@@ -139,6 +145,14 @@ function setupEventListeners() {
       const remarksBtn = document.querySelector(
         `button[data-restock-id="${restockId}"]`
       );
+
+      let result = await dbhandler.updateRestocksRemarksByRestockId(restockId, remarks);
+          
+      if (result && result.includes("ERROR")) {
+        showToast(result, true);
+        return;
+      }
+
       if (remarksBtn) {
         if (remarks) {
           remarksBtn.classList.remove("text-gray-700", "border-gray-700");
@@ -149,6 +163,7 @@ function setupEventListeners() {
           remarksBtn.classList.add("text-gray-700", "border-gray-700");
           remarksBtn.removeAttribute("data-remarks");
         }
+
         closeRemarksModal();
         showToast("Remarks updated successfully", false, 3000);
       }
@@ -267,8 +282,8 @@ function createNewRestockRow(
 function createNewOption(itemName) {
   const op1 = document.createElement("option");
   const op2 = document.createElement("option");
-  op1.innerHTML = `<option value="${itemName}"></option>`;
-  op2.innerHTML = `<option value="${itemName}"></option>`;
+  op1.value = itemName;
+  op2.value = itemName;
   addDataList.appendChild(op1);
   // editDataList.appendChild(tr2);
 }
@@ -280,10 +295,10 @@ function createNewBrandOption(itemBrand){
 }
 
 function resetBrandOption(){
+  addRestockBrand.value = addRestockBrand.options[0].value;
   const options = addRestockBrand.options;
   for (let i = 1; i < options.length; i++)
     options.remove(i);
-  addRestockBrand.value = addRestockBrand.options[0].value;
 }
 
 // ------------------ ADD RESTOCK ------------------
@@ -311,6 +326,19 @@ function closeEditModal() {
   editRestockForm.reset();
 }
 
+function prepareEditElements(row){
+  let itemName = row.children[1].textContent.trim();
+  let brand = row.children[4].textContent.trim();
+
+  let itemType = findItemType(itemName, brand);
+  
+  if (itemType === 'Chemicals')
+    editRestockForm.editRestockQuantity.step = '0.01';
+  else
+    editRestockForm.editRestockQuantity.step = '1';
+}
+
+// TODO: Find a way to compensate for the missing unit type 
 function updateRestockTable(
   restockId,
   restockItemName,
@@ -376,6 +404,7 @@ function populateAddRestockDate(){
 }
 
 function findItemIndex(searchTerm){
+  searchTerm = String(searchTerm).toLowerCase();
   // Performs binary search
   let low = 0;
   let high = referenceTable.length - 1;
@@ -424,11 +453,6 @@ function populateAddBrandSelector(searchIndex, searchTerm){
   addRestockBrand.value = addRestockBrand.options[0].value;
 }
 
-function disableAddElements(brandIsDisabled, expiryDateIsDisabled){
-  addRestockBrand.disabled = brandIsDisabled;
-  addRestockForm.restockExpirationDate.disabled = expiryDateIsDisabled;
-}
-
 // ADD Restock
 async function handleAddRestockSubmit(e) {
   e.preventDefault();
@@ -462,14 +486,14 @@ async function handleAddRestockSubmit(e) {
     return;
   }
 
-  let [ restockId, unitType ] = findItemRecord(restockItemName, restockBrand);
-  if (!restockId || !unitType) {
+  let [ itemId, unitType ] = findItemRecord(restockItemName, restockBrand);
+  if (!itemId || !unitType) {
     showToast("Unable to find the item " + restockItemName + " in the inventory.", true);
     return;
   }
 
   let result = await dbhandler.addRestocksRecord(
-    restockId,
+    itemId,
     restockDate,
     restockExpirationDate,
     restockQuantity,
@@ -483,19 +507,57 @@ async function handleAddRestockSubmit(e) {
     );
   } else if (result.includes("ERROR")) {
     showToast(result, true, 4000);
+  } else if (result.includes("Iterated")){
+    console.log(result);
+
+    result = result.replace('SUCCESS: Added new restocks record with ID of ', "");
+    console.log(result);
+    result = result.replace('with a container_size of ', "")
+    console.log(result);
+    result = result.replace("Iterated ", "")
+    console.log(result);
+    result = result.replace(" times.", "");
+    console.log(result);
+
+    let [ restockId, container_size, iterations ] = result.split(" ");
+    let currentQuantity = restockQuantity;
+    let temp;
+
+    for (let i = iterations - 1; i >= 0; i--){
+      if (container_size < currentQuantity)
+        temp = container_size;
+      else
+        temp = currentQuantity;
+
+      createNewRestockRow(
+        Number(restockId) - Number(i),
+        restockItemName,
+        temp + ' ' + unitType,
+        temp + ' ' + unitType,
+        restockBrand,
+        restockDate,
+        restockExpirationDate
+      );
+
+      if (container_size < currentQuantity)
+        currentQuantity -= container_size;
+      else 
+        currentQuantity = 0;
+    }
+
+    closeAddModal();
+    showToast("Restock added successfully");
   } else {
     let restockId = result.slice(46, result.length - 1);
-
     createNewRestockRow(
-      restockId,
-      restockItemName,
-      restockQuantity + ' ' + unitType,
-      restockQuantity + ' ' + unitType,
-      restockBrand,
-      restockDate,
-      restockExpirationDate
-    );
-
+        restockId,
+        restockItemName,
+        restockQuantity + ' ' + unitType,
+        restockQuantity + ' ' + unitType,
+        restockBrand,
+        restockDate,
+        restockExpirationDate
+      );
     closeAddModal();
     showToast("Restock added successfully");
   }
@@ -514,6 +576,7 @@ function handleEditRestockSubmit(e) {
     "editRestockExpirationDate"
   ).value;
 
+  // TODO: Update this to edit quantity and both dates
   if (!restockId || !restockItemName) {
     showToast("Please fill in all required fields.", true);
     return;
@@ -527,6 +590,9 @@ function handleEditRestockSubmit(e) {
     showToast("Expiration date cannot be before restock date.", true);
     return;
   }
+
+  // TODO: Add quantity validation (new quantity >= used quantity)
+  // Quantity validation 
 
   updateRestockTable(
     restockId,
@@ -553,6 +619,7 @@ function handleTableButtonClicks(e) {
   switch (action) {
     case "Edit restock":
       populateEditForm(row);
+      prepareEditElements(row);
       break;
     case "Delete restock":
       openDeleteModal(row);
@@ -566,8 +633,14 @@ function handleTableButtonClicks(e) {
 }
 
 // DELETE
-function handleDeleteRestock() {
+async function handleDeleteRestock() {
   if (restockRowToDelete) {
+    let result = await dbhandler.removeRestocksRecordByRestockId(restockRowToDelete.children[0].textContent.trim());
+    if (result && result.includes("ERROR")) {
+      showToast(result, true);
+      return;
+    }
+
     restockRowToDelete.remove();
     closeDeleteModal();
     showToast("Restock deleted successfully");
@@ -597,7 +670,10 @@ function populateEditForm(row) {
       continue;
     }
 
-    el.value = cells[idx].textContent.trim();
+    if (idx !== 2)
+      el.value = cells[idx].textContent.trim();
+    else
+      el.value = cells[idx].textContent.split(" ")[0];
   }
 
   const remarksBtn = document.querySelector('button[aria-label="Add remarks"]');
@@ -827,6 +903,7 @@ function setupFilterFunctionality() {
 setupFilterFunctionality();
 
 // -------------------- HELPER METHODS --------------------
+
 function findItemRecord(itemName, itemBrand){
   itemName = itemName.toLowerCase();
   itemBrand = itemBrand.toLowerCase();
@@ -839,7 +916,7 @@ function findItemRecord(itemName, itemBrand){
     const guess = [ referenceTable[mid]["Name"].toLowerCase(), referenceTable[mid]["Brand"].toLowerCase() ]; 
 
     if (guess[0] === itemName & guess[1] === itemBrand)
-        return [ referenceTable[mid]["Restock ID"], referenceTable[mid]["Unit Type"] ];
+        return [ referenceTable[mid]["Item ID"], referenceTable[mid]["Unit Type"] ];
     else if (guess[0] === itemName & guess[1] < itemBrand || guess[0] < itemName)
       low = mid + 1;
     else if (guess[0] === itemName & guess[1] > itemBrand || guess[0] > itemName)
@@ -849,6 +926,27 @@ function findItemRecord(itemName, itemBrand){
   return [ null, null ];
 }
 
+function findItemType(itemName, itemBrand){
+  itemName = itemName.toLowerCase();
+  itemBrand = itemBrand.toLowerCase();
+
+  let low = 0;
+  let high = referenceTable.length - 1;
+
+  while (low <= high){
+    const mid = Math.floor((low + high) / 2);
+    const guess = [ referenceTable[mid]["Name"].toLowerCase(), referenceTable[mid]["Brand"].toLowerCase() ]; 
+
+    if (guess[0] === itemName & guess[1] === itemBrand)
+        return [ referenceTable[mid]["Item Type"] ];
+    else if (guess[0] === itemName & guess[1] < itemBrand || guess[0] < itemName)
+      low = mid + 1;
+    else if (guess[0] === itemName & guess[1] > itemBrand || guess[0] > itemName)
+      high = mid - 1;
+  }
+
+  return [ null, null ];
+}
 // -------------------- DATABASE CONNECTION LOGIC (Database Handler) --------------------
 
 async function initializeRestocksTable() {
@@ -887,8 +985,10 @@ async function initializeDataList(){
       return;
     }
 
-    for (let i = 0; i < data.length; i++)
-      await createNewOption(data[i]["Name"]);
+    for (let i = 0; i < data.length; i++){
+      console.log(data[i]["Name"]);
+      createNewOption(data[i]["Name"]);
+    }
     
 
   } catch (generalError) {
