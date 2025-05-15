@@ -271,19 +271,36 @@
             placeholder="Search brand or name..."
             type="search"
           />
-          <div class="flex items-center gap-2">
+          <div class="relative max-w-xs w-full sm:w-48">
             <select
               aria-label="Filter by"
               class="appearance-none w-full rounded-md border border-gray-300 bg-white py-2 px-3 pr-10 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
               id="filterBySelect"
             >
-              <option value="" disabled selected class="placeholder-option">
+              <option value="" disabled selected class="text-gray-400">
                 Filter by
               </option>
               <option value="restockDate">Restock Date</option>
               <option value="expirationDate">Expiration Date</option>
             </select>
-
+            <div
+              class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19 9l-7 7-7-7"
+                ></path>
+              </svg>
+            </div>
             <button
               id="clearFilterBtn"
               class="hidden text-gray-500 hover:text-gray-700 focus:outline-none"
@@ -306,7 +323,24 @@
             <option value="thisYear">This Year</option>
             <option value="custom">Custom Range</option>
           </select>
-
+          <div
+            class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </div>
           <div id="customDateRange" class="hidden flex gap-2">
             <input
               type="date"

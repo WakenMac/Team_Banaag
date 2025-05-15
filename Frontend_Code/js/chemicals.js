@@ -873,3 +873,56 @@ function showToast(message, isError = false, time = 1800) {
     toast.style.opacity = "0";
   }, time);
 }
+
+// ===================== Search Functionality Logic =====================
+// Search Functionality
+function searchChemicalsTable() {
+  const tbody = document.getElementById("chemicalsTableBody");
+  const searchInput = document.getElementById("searchInput");
+  const searchValue = searchInput.value.toLowerCase();
+  const rows = tbody.querySelectorAll("tr:not(.no-result-row)");
+  let hasResult = false;
+
+  const existingNoResults = chemicalsTableBody.querySelector(".no-result-row");
+  if (existingNoResults) {
+    existingNoResults.remove();
+  }
+
+  rows.forEach((row) => {
+    const itemName = row.children[1].textContent.toLowerCase();
+    const itemLocation = row.children[3].textContent.toLowerCase();
+    const itemBrand = row.children[4].textContent.toLowerCase();
+    const showRow =
+      !searchValue ||
+      itemName.includes(searchValue) ||
+      itemName.startsWith(searchValue) ||
+      itemLocation.includes(searchValue) ||
+      itemLocation.startsWith(searchValue) ||
+      itemBrand.includes(searchValue) ||
+      itemBrand.startsWith(searchValue);
+
+    row.style.display = showRow ? "" : "none";
+    if (showRow) {
+      hasResult = true;
+    }
+  });
+
+  if (!hasResult && searchValue) {
+    const noResultRow = document.createElement("tr");
+    noResultRow.className = "no-result-row";
+    noResultRow.innerHTML = `
+      <td colspan="4" class="px-6 py-8 text-center">
+        <div class="flex flex-col items-center justify-center space-y-2">
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <p class="text-gray-500 text-lg">No chemical found matching "${searchValue}"</p>
+        </div>
+      </td>
+      `;
+    tbody.appendChild(noResultRow);
+  }
+}
+
+// Add event listener for search input
+searchInput.addEventListener("input", searchChemicalsTable);

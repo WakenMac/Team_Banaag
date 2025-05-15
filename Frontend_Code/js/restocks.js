@@ -124,10 +124,12 @@ function setupEventListeners() {
         closeRemarksModal();
         showToast("Remarks updated successfully", false, 3000);
       }
-
-      cancelRemarksBtn.addEventListener("click", closeRemarksModal);
-      modalBackdropRemarks.addEventListener("click", closeRemarksModal);
     });
+
+    if (cancelRemarksBtn) {
+      cancelRemarksBtn.addEventListener("click", closeRemarksModal);
+    }
+    modalBackdropRemarks.addEventListener("click", closeRemarksModal);
   }
 }
 
@@ -323,7 +325,9 @@ function handleAddRestockSubmit(e) {
   }
 
   // Generate random ID
-  const restockId = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+  const restockId = Math.floor(Math.random() * 1000000)
+    .toString()
+    .padStart(6, "0");
 
   createNewRestockRow(
     restockId,
@@ -531,64 +535,64 @@ function setupDateValidation() {
 // ========================== Filter Functionality ==========================
 
 function setupFilterFunctionality() {
-  const filterBySelect = document.getElementById('filterBySelect');
-  const timeFrameSelect = document.getElementById('timeFrameSelect');
-  const customDateRange = document.getElementById('customDateRange');
-  const startDate = document.getElementById('startDate');
-  const endDate = document.getElementById('endDate');
+  const filterBySelect = document.getElementById("filterBySelect");
+  const timeFrameSelect = document.getElementById("timeFrameSelect");
+  const customDateRange = document.getElementById("customDateRange");
+  const startDate = document.getElementById("startDate");
+  const endDate = document.getElementById("endDate");
   const searchInput = document.querySelector('input[type="search"]');
-  const clearFilterBtn = document.getElementById('clearFilterBtn');
+  const clearFilterBtn = document.getElementById("clearFilterBtn");
 
   function clearAllFilters() {
     // Reset all filters
-    timeFrameSelect.classList.add('hidden');
-    customDateRange.classList.add('hidden');
-    searchInput.value = '';
-    startDate.value = '';
-    endDate.value = '';
-    timeFrameSelect.value = '';
-    filterBySelect.value = '';
-    clearFilterBtn.classList.add('hidden');
+    timeFrameSelect.classList.add("hidden");
+    customDateRange.classList.add("hidden");
+    searchInput.value = "";
+    startDate.value = "";
+    endDate.value = "";
+    timeFrameSelect.value = "";
+    filterBySelect.value = "";
+    clearFilterBtn.classList.add("hidden");
     showAllRows();
   }
 
   // Show/hide time frame select based on filter type
-  filterBySelect.addEventListener('change', function() {
+  filterBySelect.addEventListener("change", function () {
     const selectedValue = this.value;
-    
-    if (selectedValue === 'restockDate' || selectedValue === 'expirationDate') {
-      timeFrameSelect.classList.remove('hidden');
-      customDateRange.classList.add('hidden');
-      clearFilterBtn.classList.remove('hidden');
+
+    if (selectedValue === "restockDate" || selectedValue === "expirationDate") {
+      timeFrameSelect.classList.remove("hidden");
+      customDateRange.classList.add("hidden");
+      clearFilterBtn.classList.remove("hidden");
     } else {
-      timeFrameSelect.classList.add('hidden');
-      customDateRange.classList.add('hidden');
-      clearFilterBtn.classList.add('hidden');
+      timeFrameSelect.classList.add("hidden");
+      customDateRange.classList.add("hidden");
+      clearFilterBtn.classList.add("hidden");
     }
   });
 
   // Clear filter button click handler
-  clearFilterBtn.addEventListener('click', clearAllFilters);
+  clearFilterBtn.addEventListener("click", clearAllFilters);
 
   // Handle time frame selection
-  timeFrameSelect.addEventListener('change', function() {
+  timeFrameSelect.addEventListener("change", function () {
     const selectedTimeFrame = this.value;
-    if (selectedTimeFrame === 'custom') {
-      customDateRange.classList.remove('hidden');
+    if (selectedTimeFrame === "custom") {
+      customDateRange.classList.remove("hidden");
     } else {
-      customDateRange.classList.add('hidden');
+      customDateRange.classList.add("hidden");
       applyFilter();
     }
   });
 
   // Apply filter when custom date range is selected
-  startDate.addEventListener('change', applyFilter);
-  endDate.addEventListener('change', applyFilter);
+  startDate.addEventListener("change", applyFilter);
+  endDate.addEventListener("change", applyFilter);
 
   function showAllRows() {
-    const rows = tbody.getElementsByTagName('tr');
+    const rows = tbody.getElementsByTagName("tr");
     for (let row of rows) {
-      row.style.display = '';
+      row.style.display = "";
     }
   }
 
@@ -596,40 +600,64 @@ function setupFilterFunctionality() {
     const filterType = filterBySelect.value;
     const timeFrame = timeFrameSelect.value;
     const searchValue = searchInput.value.toLowerCase();
-    const rows = tbody.getElementsByTagName('tr');
+    const rows = tbody.getElementsByTagName("tr");
 
     for (let row of rows) {
       let showRow = true;
 
       // Apply date filter if a date filter type is selected
-      if (filterType === 'restockDate' || filterType === 'expirationDate') {
-        const dateCell = filterType === 'restockDate' ? row.cells[5] : row.cells[6];
+      if (filterType === "restockDate" || filterType === "expirationDate") {
+        const dateCell =
+          filterType === "restockDate" ? row.cells[5] : row.cells[6];
         const dateValue = new Date(dateCell.textContent);
 
-        if (timeFrame === 'custom') {
+        if (timeFrame === "custom") {
           const start = new Date(startDate.value);
           const end = new Date(endDate.value);
           showRow = dateValue >= start && dateValue <= end;
         } else {
           const today = new Date();
-          const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-          const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+          const startOfDay = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate()
+          );
+          const endOfDay = new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate(),
+            23,
+            59,
+            59
+          );
 
           switch (timeFrame) {
-            case 'today':
+            case "today":
               showRow = dateValue >= startOfDay && dateValue <= endOfDay;
               break;
-            case 'thisWeek':
-              const startOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-              const endOfWeek = new Date(today.setDate(today.getDate() - today.getDay() + 6));
+            case "thisWeek":
+              const startOfWeek = new Date(
+                today.setDate(today.getDate() - today.getDay())
+              );
+              const endOfWeek = new Date(
+                today.setDate(today.getDate() - today.getDay() + 6)
+              );
               showRow = dateValue >= startOfWeek && dateValue <= endOfWeek;
               break;
-            case 'thisMonth':
-              const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-              const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            case "thisMonth":
+              const startOfMonth = new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                1
+              );
+              const endOfMonth = new Date(
+                today.getFullYear(),
+                today.getMonth() + 1,
+                0
+              );
               showRow = dateValue >= startOfMonth && dateValue <= endOfMonth;
               break;
-            case 'thisYear':
+            case "thisYear":
               const startOfYear = new Date(today.getFullYear(), 0, 1);
               const endOfYear = new Date(today.getFullYear(), 11, 31);
               showRow = dateValue >= startOfYear && dateValue <= endOfYear;
@@ -645,12 +673,12 @@ function setupFilterFunctionality() {
         showRow = itemName.includes(searchValue) || brand.includes(searchValue);
       }
 
-      row.style.display = showRow ? '' : 'none';
+      row.style.display = showRow ? "" : "none";
     }
   }
 
   // Add search input event listener
-  searchInput.addEventListener('input', applyFilter);
+  searchInput.addEventListener("input", applyFilter);
 }
 
 // Initialize filter functionality

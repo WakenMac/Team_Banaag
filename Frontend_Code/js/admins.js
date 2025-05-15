@@ -358,3 +358,60 @@ function showToast(message, isError = false) {
     toast.style.opacity = "0";
   }, 1800);
 }
+
+// SEARCH BAR-RELATED METHODS
+function searchAdminTable() {
+  const searchInput = document.getElementById("searchInput");
+  const searchValue = searchInput.value.toLowerCase();
+  const rows = tbody.querySelectorAll("tr:not(.no-result-row)");
+  let hasResult = false;
+
+  const existingNoResults = tbody.querySelector(".no-result-row");
+  if (existingNoResults) {
+    existingNoResults.remove();
+  }
+
+  rows.forEach((row) => {
+    const adminId = row.children[0].textContent.toLowerCase();
+    const firstName = row.children[1].textContent.toLowerCase();
+    const middleName = row.children[2].textContent.toLowerCase();
+    const lastName = row.children[3].textContent.toLowerCase();
+    const showRow =
+      !searchValue ||
+      adminId.includes(searchValue) ||
+      firstName.includes(searchValue) ||
+      middleName.includes(searchValue) ||
+      lastName.includes(searchValue);
+
+    if (showRow) {
+      row.classList.remove("hidden");
+      hasResult = true;
+    } else {
+      row.classList.add("hidden");
+    }
+  });
+
+  if (!hasResult) {
+    const noResultRow = document.createElement("tr");
+    noResultRow.classList.add("no-result-row");
+    noResultRow.innerHTML = `
+      <td colspan="4" class="px-6 py-8 text-center">
+        <div class="flex flex-col items-center justify-center space-y-2">
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <p class="text-gray-500 text-lg">No admin found matching "${searchValue}"</p>
+        </div>
+      </td>
+      `;
+    tbody.appendChild(noResultRow);
+  }
+  if (searchValue === "") {
+    const noResultRow = tbody.querySelector(".no-result-row");
+    if (noResultRow) {
+      noResultRow.remove();
+    }
+  }
+}
+
+searchInput.addEventListener("input", searchAdminTable);
