@@ -36,7 +36,7 @@ async function initialize() {
   await prepareLocationDropdown();
   await prepareUnitTypeDropdown();
 
-  showToast('Loaded page successfully!');
+  showToast("Loaded page successfully!");
 }
 
 // ===================== Set Toast Messages Logic =====================
@@ -67,9 +67,12 @@ function showToast(message, isError = false) {
     ? "rgba(220, 38, 38, 0.95)"
     : "rgba(44, 161, 74, 0.95)";
   toast.style.opacity = "1";
-  setTimeout(() => {
-    toast.style.opacity = "0";
-  }, (isError)? 4000 : 3000);
+  setTimeout(
+    () => {
+      toast.style.opacity = "0";
+    },
+    isError ? 4000 : 3000
+  );
 }
 
 // ===================== Set Dropdown Toggle Logic =====================
