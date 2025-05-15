@@ -5,7 +5,7 @@ const addAdminBtn = document.getElementById("addAdminBtn");
 const addAdminModal = document.getElementById("addAdminModal");
 const modalBackdrop = document.getElementById("modalBackdrop");
 const cancelBtn = document.getElementById("cancelBtn");
-const addEquipmentForm = document.getElementById("addAdminForm");
+const addAdminForm = document.getElementById("addAdminForm");
 const tbody = document.querySelector("tbody");
 const addAdminError = document.getElementById("addAdminError"); // for error message
 
@@ -76,20 +76,20 @@ async function openModal() {
 function closeModal() {
   addAdminModal.classList.add("hidden");
   addAdminModal.classList.remove("flex");
-  addEquipmentForm.reset();
+  addAdminForm.reset();
 }
 
 addAdminBtn.addEventListener("click", openModal);
 cancelBtn.addEventListener("click", closeModal);
 modalBackdrop.addEventListener("click", closeModal);
 
-addEquipmentForm.addEventListener("submit", async (e) => {
+addAdminForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const adminId = addEquipmentForm.adminId.value.trim();
-  const firstName = addEquipmentForm.firstName.value.trim();
-  const middleName = addEquipmentForm.middleName.value.trim();
-  const lastName = addEquipmentForm.lastName.value.trim();
+  const adminId = addAdminForm.adminId.value.trim();
+  const firstName = addAdminForm.firstName.value.trim();
+  const middleName = addAdminForm.middleName.value.trim();
+  const lastName = addAdminForm.lastName.value.trim();
 
   document
     .getElementById("addAdminForm")
@@ -147,7 +147,7 @@ addEquipmentForm.addEventListener("submit", async (e) => {
     });
 
   // Hide error message when user starts typing in any input
-  [...addEquipmentForm.querySelectorAll("input")].forEach((input) => {
+  [...addAdminForm.querySelectorAll("input")].forEach((input) => {
     input.addEventListener("input", () => {
       addAdminError.classList.add("hidden");
       addAdminError.textContent = "";
@@ -456,3 +456,29 @@ document
       e.target.classList.remove("border-red-500");
     }
   });
+
+// =====================================================================================================
+// BACKEND-RELATED METHODS
+
+async function prepareAdminTable(){
+  try {
+    let data = await dbhandler.getAllAdmins();
+
+    if (data.length == 0){
+      console.log("Admins table has no records.");
+      return;
+    }
+
+    for (let i = 0; i < data.length; i++){
+      createNewAdminRow(
+        data[i]['Admin ID'],
+        data[i]['First Name'],
+        data[i]['Middle Name'],
+        data[i]['Last Name']
+      );
+    }
+
+  } catch (error){
+      console.error(error);
+  }
+}
