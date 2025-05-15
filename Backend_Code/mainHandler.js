@@ -805,6 +805,48 @@ export async function   getAllItemMasterListRecords(){
 }
 
 /**
+ * Method to get all of the records from the Item Master List table
+ * @returns A record consisting of 1 column (Name)
+ */
+export async function   getAllItemMasterListNameRecords(){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_item_master_list_name_records');
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to get all of the records from the Item Master List table
+ * @returns A record consisting of 2 columns (Name, Brand)
+ */
+export async function   getAllItemMasterListNameBrandRecords(){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_item_master_list_name_brand_records');
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
  * Method to get a record from the item master list table based on the item id
  * @param {integer} itemId The primary key of the item master list table
  * @returns A record consisting of 4 columns (Item ID, Name, Type, Quantity)
@@ -1410,12 +1452,12 @@ export async function getAllGlasswaresRecords(){
  * @param {integer} itemId The primary key of the Glasswares table
  * @returns A record consisting of  columns (Item ID, Name, Unit, Location, Brand, Quantity, Remarks)
  */
-export async function getGlasswaresRecordByItetmId(itemId = 0){
+export async function getGlasswaresRecordByItemId(itemId = 0){
     try{
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getGlasswaresRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: getGlasswaresRecordByItemmId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -1502,24 +1544,24 @@ export async function updateGlasswaresRecordByAll(itemId = 0, itemName, location
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof sLocationName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Location Name parameter must be a string.")
+            console.error("PARAMETER ERROR: updateGlasswaresRecordByAll's Location Name parameter must be a string.")
             return null;
         } else if (typeof sUnitTypeName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Unit Type Name parameter must be a string.")
+            console.error("PARAMETER ERROR: updateGlasswaresRecordByAll's Unit Type Name parameter must be a string.")
             return null;
         } else if (typeof sItemName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Item Name parameter must be a string.")
+            console.error("PARAMETER ERROR: updateGlasswaresRecordByAll's Item Name parameter must be a string.")
             return null;
         } else if (typeof sBrandModel !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Brand/Model parameter must be a string.")
+            console.error("PARAMETER ERROR: updateGlasswaresRecordByAll's Brand/Model parameter must be a string.")
             return null;
         } else if (typeof sRemarks !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Remarks parameter must be a string.")
+            console.error("PARAMETER ERROR: updateGlasswaresRecordByAll's Remarks parameter must be a string.")
             return null;
         }
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getGlasswaresRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: updateGlasswaresRecordByAll's itemID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -1597,7 +1639,7 @@ export async function deleteGlasswaresRecordByItemId(itemId = 0){
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getGlasswaresRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: deleteGlasswaresRecordByItemId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -1647,12 +1689,12 @@ export async function getAllLabApparatusRecords(){
  * @param {integer} itemId The primary key of the Lab Apparatus table
  * @returns A record consisting of 7 columns (Item ID, Name, Unit, Location, Brand, Quantity, Remarks)
  */
-export async function getLabApparatusRecordByItetmId(itemId = 0){
+export async function getLabApparatusRecordByItemId(itemId = 0){
     try{
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getLabApparatusRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: getLabApparatusRecordByItemId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -1740,24 +1782,24 @@ export async function updateLabApparatusRecordByAll(itemId = 0, itemName, locati
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof sLocationName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Location Name parameter must be a string.")
+            console.error("PARAMETER ERROR: updateLabApparatusRecordByAll's Location Name parameter must be a string.")
             return null;
         } else if (typeof sUnitTypeName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Unit Type Name parameter must be a string.")
+            console.error("PARAMETER ERROR: updateLabApparatusRecordByAll's Unit Type Name parameter must be a string.")
             return null;
         } else if (typeof sItemName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Item Name parameter must be a string.")
+            console.error("PARAMETER ERROR: updateLabApparatusRecordByAll's Item Name parameter must be a string.")
             return null;
         } else if (typeof sBrandModel !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Brand/Model parameter must be a string.")
+            console.error("PARAMETER ERROR: updateLabApparatusRecordByAll's Brand/Model parameter must be a string.")
             return null;
         } else if (typeof sRemarks !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Remarks parameter must be a string.")
+            console.error("PARAMETER ERROR: updateLabApparatusRecordByAll's Remarks parameter must be a string.")
             return null;
         }
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getLabApparatusRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: updateLabApparatusRecordByAll's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -1835,7 +1877,7 @@ export async function deleteLabApparatusRecordByItemId(itemId = 0){
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getLabApparatusRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: deleteLabApparatusRecordByItemId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -1887,12 +1929,12 @@ export async function getAllLabEquipmentsRecords(){
  * @returns A record consisting of 10 columns (Item ID, Name, Unit, Location, Brand, Quantity, Serial No, 
  *  Calibration Date, Frequency of Calibration, and Remarks)
  */
-export async function getLabEquipmentsRecordByItetmId(itemId = 0){
+export async function getLabEquipmentsRecordByItemId(itemId = 0){
     try{
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getLabEquipmentsRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: getLabEquipmentsRecordByItemId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -2158,12 +2200,12 @@ export async function getAllConsumableItemsRecords(){
  * @param {integer} itemId The primary key of the Consumable Items table
  * @returns A record consisting of 7 columns (Item ID, Name, Unit, Location, Brand, Quantity, and Remarks)
  */
-export async function getAllConsumableItemsRecordsByItetmId(itemId = 0){
+export async function getAllConsumableItemsRecordsByItemId(itemId = 0){
     try{
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getAllConsumableItemsRecordsByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: getAllConsumableItemsRecordsByItemId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -2372,46 +2414,257 @@ export async function deleteConsumableItemsRecordByItemId(itemId = 0){
 // ======================================================================================================================================
 // Methods for Restocks
 
+/**
+ * Method to get all of the records on the Consumable Items table
+ * @returns A record consisting of 7 columns (Restock ID, Name, Initial Quantity, Used Quantity, Brand, Restock Date, and Expiry Date)
+ */
 export async function getAllRestocksRecords(){
     try{
-        const {data, error} = await supabaseClient.rpc('get_all_restocks_records');
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_restocks_records');
         
-        if (error){
-            console.error(`Supabase Error:`, error.message);
-            return;
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
         }
-
-        console.log(data);
+        
         return data;
         
-    } catch (error) {
-        console.error("General error", error)
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
     }
 }
 
-export async function getRestocksRecordByRestockID(restockID = 0){
+/**
+ * Method to get one record from the Consumable Items table based on its item ID
+ * @param {integer} itemId The primary key of the Consumable Items table
+ * @returns A record consisting of 7 columns (Restock ID, Name, Initial Quantity, Used Quantity, Brand, Restock Date, and Expiry Date)
+ */
+export async function getRestocksRecordsByItemId(itemId = 0){
     try{
-        if (typeof restockID !== "number"){
-            console.error("PARAMETER ERROR: getItemMasterListByID's item_id parameter must be a positive integer from 1 onwards.")
-            return;
+        const [ iItemId ] = converter('int', itemId);
+
+        if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: getAllRestocksRecordsByItetmId's itermID parameter must be a positive non-zero integer.")
+            return null;
         }
 
-        const {data, error} = await supabaseClient.rpc('get_restocks_record_by_restock_id', {
-            input_restock_id : restockID
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_restocks_record_by_restock_id', {
+            input_item_id : iItemId
         });
         
-        if (error){
-            console.error(`Supabase Error:`, error.message);
-            return;
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
         }
-
-        console.log(data);
+        
         return data;
         
-    } catch (error) {
-        console.error("General error", error)
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
     }
 }
+
+/**
+ * Gets all valid restocks to set to the restocks table (Front End)
+ * @param {integer} itemId The primary key of the Consumable Items table
+ * @returns A record consisting of 7 columns (Restock ID, Name, Initial Quantity, Used Quantity, Brand, Restock Date, and Expiry Date)
+ */
+export async function getAllValidRestocksRecords(){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_valid_restocks_record_view', {
+            input_item_id : iItemId
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to add a new row to the Restocks Table
+ * @param {number} itemId               Primary Key of the item, to determince which item will be restocked
+ * @param {string} restockDate          When you received the restock
+ * @param {string} expiryDate           Expiration date of the restock
+ * @param {number} initialQuantity      Quantity of the restock
+ */
+export async function addRestocksRecord(
+    itemId, restockDate, expiryDate, initialQuantity, remarks
+){
+    try{
+        const [ sRestockDate, sExpiryDate, sRemarks ] = converter('string', restockDate, expiryDate, remarks);
+        const [ iItemId ] = converter('int', itemId);
+        const [ iInitialQuantity ] = converter('float', initialQuantity);
+
+        if (typeof sRestockDate !== 'string'){
+            console.error("PARAMETER ERROR: addRestocksRecord's Brand/Model parameter must be a date.") // Must be a string
+            return null;
+        } else if (typeof sExpiryDate !== 'string'){
+            console.error("PARAMETER ERROR: addRestocksRecord's Expiry Date must be a date.") // Must be a string
+            return null;
+        } else if (typeof sRemarks !== 'string'){
+            console.error("PARAMETER ERROR: addRestocksRecord's Remarks parameter must be a date.") // Must be a string
+            return null;
+        } else if (typeof iInitialQuantity !== 'number' || iInitialQuantity < 1){
+            console.error("PARAMETER ERROR: addRestocksRecord's Initial Quantity must be a positive non-zero integer.")
+            return null;
+        } else if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: addRestocksRecord's Item ID must be a positive non-zero integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('add_restocks_record', {
+            input_item_id : iItemId,
+            input_restock_date : sRestockDate,
+            input_expiry_date : sExpiryDate, 
+            initial_quantity : iInitialQuantity,
+            input_remarks : sRemarks
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to add a update a record from the Lab Equipments Table based on thier Item ID
+ * @param {number} itemId               Primary Key of the item, to determince which item will be restocked
+ * @param {string} restockDate          When you received the restock
+ * @param {string} expiryDate           Expiration date of the restock
+ * @param {number} initialQuantity      Quantity of the restock
+ */
+export async function updateRestocksRecordByAll(
+    itemId, restockDate, expiryDate, initial_quantity
+){
+    try{
+        const [ sRestockDate, sExpiryDate ] = converter('string', restockDate, expiryDate);
+        const [ iItemId ] = converter('int', itemId);
+        const [ iInitialQuantity ] = converter('float', iInitialQuantity);
+
+        if (typeof sRestockDate !== 'string'){
+            console.error("PARAMETER ERROR: updateRestocksRecordByAll's Brand/Model parameter must be a date.") // Must be a string
+            return null;
+        } else if (typeof sExpiryDate !== 'string'){
+            console.error("PARAMETER ERROR: updateRestocksRecordByAll's Expiry Date must be a date.") // Must be a string
+            return null;
+        } else if (typeof iInitialQuantity !== 'number' || iInitialQuantity < 1){
+            console.error("PARAMETER ERROR: updateRestocksRecordByAll's Initial Quantity must be a positive non-zero integer.")
+            return null;
+        } else if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: updateRestocksRecordByAll's Item ID must be a positive non-zero integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('updateRestocksRecordByAll', {
+            input_item_id : iItemId,
+            input_restock_date : sRestockDate,
+            input_expiry_date : sExpiryDate, 
+            initial_quantity : iInitialQuantity
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ /**
+ * Method to update an existing record's remarks in the Restocks Table based on its restock ID
+ * 
+ * @param {int} restockId               Primary key of the Restocks table
+ * @param {string} remarks              Remarks of one specific item
+ * 
+ * @returns A string containing the status of the deleted record (Success or Error)
+ */
+export async function updateRestocksRemarksByItemId(restockId, remarks = ''){
+    try{
+        const [ sRemarks ] = converter('string', remarks);
+        const [ iRestockId ] = converter('int', restockId);
+        
+        if (typeof sRemarks !== 'string'){
+            console.error("PARAMETER ERROR: updateRestocksRemarksByItemId's Remarks parameter must be a string.")
+            return null;
+        }
+
+        if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: updateRestocksRemarksByItemId's Restock ID must be a positive non-zero integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_restocks_remarks_by_restock_id', {
+            input_restock_id : iRestockId,
+            input_remarks : sRemarks
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to remove a record to the Lab Equipments table
+ * @param {int} restockId The primary key of the Lab Equipments table
+ * @returns A string containing the status of the deleted record (Success or Error)
+ */
+export async function removeRestocksRecordByRestockId(restockId = 0){
+    try{
+        const [ iRestockId ] = converter('int', restockId);
+
+        if (typeof iRestockId !== 'number' || iRestockId < 1){
+            console.error("PARAMETER ERROR: deleteRestocksRecordByItemId's Restock ID's parameter must be a positive non-zero integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('remove_restocks_record_by_restock_id', {
+            input_restock_id : iRestockId
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
 
 //=======================================================================================================================================
 // HELPER METHODS

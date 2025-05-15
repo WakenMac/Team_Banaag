@@ -423,7 +423,7 @@ function updateToast(toast, message, isError) {
 }
 
 // -------------------- EVENT LISTENERS --------------------
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   tbody = document.getElementById("equipmentsTableBody");
 
   setUpDropdownElements();
@@ -433,9 +433,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Initializes Components that rely on the database's data
-  initializeLabEquipmentsTable(); // Gets all of the content for the table, including remarks and others
-  initializeUnitTypeDropdown();
-  initializeLocationDropdown();
+  await initializeLabEquipmentsTable(); // Gets all of the content for the table, including remarks and others
+  await initializeUnitTypeDropdown();
+  await initializeLocationDropdown();
   initializeRemarksListeners();
 
   initializeEventListeners(tbody);
