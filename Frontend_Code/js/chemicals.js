@@ -68,7 +68,7 @@ async function initialize() {
   await prepareUnitTypeDropdown();
   await prepareLocationDropdown();
 
-  showToast('Loaded page successfully!');
+  showToast("Loaded page successfully!");
 }
 
 //=======================================================================================================================================
@@ -913,12 +913,13 @@ function searchChemicalsTable() {
     const noResultRow = document.createElement("tr");
     noResultRow.className = "no-result-row";
     noResultRow.innerHTML = `
-      <td colspan="4" class="px-6 py-8 text-center">
-        <div class="flex flex-col items-center justify-center space-y-2">
-          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <td colspan="8" class="px-6 py-16 text-center w-full">
+        <div class="flex flex-col items-center justify-center space-y-4 max-w-sm mx-auto">
+          <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
-          <p class="text-gray-500 text-lg">No chemical found matching "${searchValue}"</p>
+          <p class="text-gray-500 text-lg font-medium">No chemicals found matching "${searchValue}"</p>
+          <p class="text-gray-400 text-base">Try adjusting your search term</p>
         </div>
       </td>
       `;

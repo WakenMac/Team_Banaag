@@ -5,8 +5,7 @@
  * I also set temporary values for the equipmentId and equipmentQuantity for testing purposes
  */
 
-
-import * as dbhandler from '../../Backend_Code/mainHandler.js';
+import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
 // Global Variables and Element References
 let tbody = null;
@@ -247,7 +246,8 @@ function updateEquipmentTable(
   cells[2].textContent = equipmentUnit;
   cells[3].textContent = equipmentLocation;
   cells[4].textContent = equipmentBrand;
-  cells[5].textContent = cells[5].textContent.replace((' ' + originalUnit), '') + ' ' + equipmentUnit;
+  cells[5].textContent =
+    cells[5].textContent.replace(" " + originalUnit, "") + " " + equipmentUnit;
 
   // Update the info button data attributes
   const infoBtn = equipmentRowToEdit.querySelector('button[aria-label="Info"]');
@@ -335,8 +335,11 @@ async function handleRemarksEquipmentSubmit(e) {
     `button[data-equipment-id="${equipmentId}"][aria-label="Add remarks"]`
   );
 
-  let result = await dbhandler.updateLabEquipmentsRemarkByItemId(equipmentId, remarks);
-    
+  let result = await dbhandler.updateLabEquipmentsRemarkByItemId(
+    equipmentId,
+    remarks
+  );
+
   if (result && result.includes("ERROR")) {
     showToast(result, true, 4000);
     return;
@@ -441,7 +444,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initializeEventListeners(tbody);
   setupEventListeners();
 
-  showToast('Loaded page successfully!');
+  showToast("Loaded page successfully!");
 });
 
 function setupEventListeners() {
@@ -500,14 +503,16 @@ async function handleAddEquipmentSubmit(e) {
     return;
   }
 
-  let result = await dbhandler.addLabEquipmentsRecord(equipmentName,
+  let result = await dbhandler.addLabEquipmentsRecord(
+    equipmentName,
     equipmentLocation,
     equipmentUnit,
     equipmentBrand,
     equipmentSerialNumber,
     equipmentCalibrationDate,
     equipmentFreqOfCalibration,
-    '')
+    ""
+  );
 
   if (result == null) {
     showToast(
@@ -525,16 +530,16 @@ async function handleAddEquipmentSubmit(e) {
     console.log(result.slice(52, result.length - 1));
 
     createNewEquipmentRow(
-    equipmentId,
-    equipmentName,
-    equipmentUnit,
-    equipmentLocation,
-    equipmentBrand,
-    0,
-    equipmentSerialNumber,
-    equipmentCalibrationDate,
-    equipmentFreqOfCalibration
-    )
+      equipmentId,
+      equipmentName,
+      equipmentUnit,
+      equipmentLocation,
+      equipmentBrand,
+      0,
+      equipmentSerialNumber,
+      equipmentCalibrationDate,
+      equipmentFreqOfCalibration
+    );
 
     // Close modal and show success message
     closeEquipmentModal();
@@ -596,7 +601,7 @@ async function handleEditEquipmentSubmit(e) {
     editEquipmentFreqOfCalibration,
     remarks
   );
-  
+
   if (result == null) {
     showToast(
       `The mainHandler.updateLabEquipmentsRecordByAll() DOESN'T return a status statement.`,
@@ -625,8 +630,9 @@ async function handleEditEquipmentSubmit(e) {
 // DELETE EQUIPMENTS
 async function handleDeleteEquipment() {
   if (equipmentRowToDelete) {
-
-    let result = await dbhandler.deleteLabEquipmentsRecordByItemId(equipmentRowToDelete.children[0].textContent);
+    let result = await dbhandler.deleteLabEquipmentsRecordByItemId(
+      equipmentRowToDelete.children[0].textContent
+    );
     if (result && result.includes("ERROR")) {
       showToast(result, true, 4000);
       return;
@@ -681,7 +687,7 @@ function handleTableButtonClicks(e) {
   }
 }
 
-function setUpDropdownElements(){
+function setUpDropdownElements() {
   setupDropdown("masterlistBtn", "masterlistMenu");
   setupDropdown("consumablesBtn", "consumablesMenu");
   setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
@@ -751,7 +757,7 @@ function initializeInfoHovers() {
 function setupDropdown(buttonId, menuId) {
   const btn = document.getElementById(buttonId);
   const menu = document.getElementById(menuId);
-  
+
   btn.addEventListener("click", () => {
     const expanded = btn.getAttribute("aria-expanded") === "true";
     btn.setAttribute("aria-expanded", !expanded);
@@ -763,7 +769,7 @@ function setupDropdown(buttonId, menuId) {
       menu.classList.remove("opacity-100", "visible");
     }
   });
-  
+
   // Close dropdown if clicked outside
   document.addEventListener("click", (e) => {
     if (!btn.contains(e.target) && !menu.contains(e.target)) {
@@ -773,6 +779,50 @@ function setupDropdown(buttonId, menuId) {
     }
   });
 }
+
+// SEARCH BAR METHODS - finds by brand and name - please adjust if necessary
+function searchEquipment() {
+  const searchValue = searchInput.value.toLowerCase();
+  const rows = tbody.querySelectorAll("tr:not(.no-result-row)");
+  let hasResult = false;
+
+  const existingNoResults = tbody.querySelector(".no-result-row");
+  if (existingNoResults) {
+    existingNoResults.remove();
+  }
+
+  rows.forEach((row) => {
+    const itemName = row.children[1].textContent.toLowerCase();
+    const itemBrand = row.children[4].textContent.toLowerCase();
+    const showRow =
+      !searchValue ||
+      itemName.includes(searchValue) ||
+      itemBrand.includes(searchValue);
+    row.style.display = showRow ? "" : "none";
+    if (showRow) hasResult = true;
+  });
+
+  if (!hasResult && searchValue) {
+    const noResultRow = document.createElement("tr");
+    noResultRow.className = "no-result-row";
+    noResultRow.innerHTML = `
+      <td colspan="7" class="px-6 py-16 text-center w-full">
+        <div class="flex flex-col items-center justify-center space-y-4 max-w-sm mx-auto">
+          <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <p class="text-gray-500 text-lg font-medium">No equipment found matching "${searchValue}"</p>
+          <p class="text-gray-400 text-base">Try adjusting your search term</p>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(noResultRow);
+  }
+}
+// Add event listener to the search input
+// const searchInput = document.getElementById("searchInput");
+searchInput.addEventListener("input", searchEquipment);
+// END OF SEARCH BAR METHODS
 
 // -------------------- DATABASE CONNECTION LOGIC (Database Handler) --------------------
 

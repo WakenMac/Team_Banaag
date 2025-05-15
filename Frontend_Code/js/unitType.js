@@ -21,7 +21,9 @@ const modalBackdropEditUnitType = document.getElementById(
 
 // Delete Confirmation Modal
 const deleteUnitTypeModal = document.getElementById("deleteUnitTypeModal");
-const modalBackdropDeleteUnitType = document.getElementById("modalBackdropDeleteUnitType");
+const modalBackdropDeleteUnitType = document.getElementById(
+  "modalBackdropDeleteUnitType"
+);
 const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
 const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
 let unitTypeToDelete = null;
@@ -41,7 +43,7 @@ async function initialize() {
   await dbhandler.testPresence();
   await prepareUnitTypeTable();
 
-  showToast('Loaded page successfully!');
+  showToast("Loaded page successfully!");
 }
 
 // Dropdown toggle logic
@@ -88,7 +90,7 @@ addUnitTypeBtn.addEventListener("click", openModal);
 cancelBtn.addEventListener("click", () => {
   // Once clicked, clears the error message in the modal and closes (hides) the Add Location Modal
   addUnitTypeError.classList.add("hidden");
-  addUnitTypeError.textContent = '';
+  addUnitTypeError.textContent = "";
   closeModal();
 });
 modalBackdropUnitType.addEventListener("click", closeModal);
@@ -100,7 +102,7 @@ addUnitTypeForm.addEventListener("submit", async (e) => {
 
   addUnitTypeError.classList.add("hidden");
   addUnitTypeError.textContent = "";
-  
+
   if (!unitTypeName) {
     showToast("Please fill in all required fields.", true);
     return;
@@ -112,34 +114,33 @@ addUnitTypeForm.addEventListener("submit", async (e) => {
     showToast(`Something went wrong. Please try again.`, true);
     return;
   } else if (result.includes("ERROR")) {
-    showToast(result.replace(/^ERROR:\s*/i, ''), true); // Removes the ERROR sign
+    showToast(result.replace(/^ERROR:\s*/i, ""), true); // Removes the ERROR sign
     return;
   } else {
     let newUnitTypeId = result.slice(47, result.length - 1);
     createNewUnitTypeRow(newUnitTypeId, unitTypeName);
     closeModal();
-    showToast('Unit Type added successfully');
+    showToast("Unit Type added successfully");
   }
 });
 
 // Hide error message when user starts typing in the name input
-document.getElementById('unitTypeName').addEventListener('input', () => {
-  addUnitTypeError.classList.add('hidden');
-  addUnitTypeError.textContent = '';
+document.getElementById("unitTypeName").addEventListener("input", () => {
+  addUnitTypeError.classList.add("hidden");
+  addUnitTypeError.textContent = "";
 });
-
 
 // ===================== Edit Glassware Modal Logic =====================
 
 cancelBtnEditUnitType.addEventListener("click", () => {
   editUnitTypeError.classList.add("hidden");
-  editUnitTypeError.textContent = '';
+  editUnitTypeError.textContent = "";
   closeEditModal();
 });
 
 modalBackdropEditUnitType.addEventListener("click", () => {
   editUnitTypeError.classList.add("hidden");
-  editUnitTypeError.textContent = '';
+  editUnitTypeError.textContent = "";
   closeEditModal();
 });
 
@@ -176,20 +177,25 @@ function populateEditForm(row) {
 editUnitTypeForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   const editUnitTypeId = document.getElementById("editUnitTypeId").value.trim();
-  const editUnitTypeName = document.getElementById("editUnitTypeName").value.trim();
+  const editUnitTypeName = document
+    .getElementById("editUnitTypeName")
+    .value.trim();
 
   if (!editUnitTypeName) {
     showToast("Please fill in all required fields.", true);
     return;
   }
 
-  let result = await dbhandler.updateUnitTypeRecordName(editUnitTypeId, editUnitTypeName);
+  let result = await dbhandler.updateUnitTypeRecordName(
+    editUnitTypeId,
+    editUnitTypeName
+  );
 
   if (result == null) {
     showToast(`Something went wrong. Please try again.`, true);
     return;
   } else if (result.includes("ERROR")) {
-    showToast(result.replace(/^ERROR:\s*/i, ''), true); // Removes the ERROR sign
+    showToast(result.replace(/^ERROR:\s*/i, ""), true); // Removes the ERROR sign
     return;
   } else {
     // Update the row in the table
@@ -200,7 +206,7 @@ editUnitTypeForm.addEventListener("submit", async (e) => {
       }
     });
     closeEditModal();
-    showToast('Unit Type updated successfully');
+    showToast("Unit Type updated successfully");
   }
 });
 
@@ -248,14 +254,19 @@ modalBackdropDeleteUnitType.addEventListener("click", closeDeleteModal);
 
 confirmDeleteBtn.addEventListener("click", async () => {
   if (unitTypeToDelete && rowToDelete) {
-    let result = await dbhandler.removeUnitTypeRecordByUnitTypeId(unitTypeToDelete);
+    let result = await dbhandler.removeUnitTypeRecordByUnitTypeId(
+      unitTypeToDelete
+    );
     if (result == null) {
-      showToast(`The mainHandler.removeUnitTypeRecordByUnitTypeId() DOESN'T return a status statement.`, true);
+      showToast(
+        `The mainHandler.removeUnitTypeRecordByUnitTypeId() DOESN'T return a status statement.`,
+        true
+      );
     } else if (result.includes("ERROR")) {
-      showToast(result.replace(/^ERROR:\s*/i, ''), true);
+      showToast(result.replace(/^ERROR:\s*/i, ""), true);
     } else {
       rowToDelete.remove();
-      showToast('Unit type deleted successfully');
+      showToast("Unit type deleted successfully");
     }
     closeDeleteModal();
   }
@@ -314,10 +325,52 @@ function showToast(message, isError = false) {
     ? "rgba(220, 38, 38, 0.95)"
     : "rgba(44, 161, 74, 0.95)";
   toast.style.opacity = "1";
-  setTimeout(() => {
-    toast.style.opacity = "0";
-  }, (isError)? 4000 : 3000);
+  setTimeout(
+    () => {
+      toast.style.opacity = "0";
+    },
+    isError ? 4000 : 3000
+  );
 }
+
+// ===================== Search Bar Function =====================
+
+function searchUnitType() {
+  const searchValue = searchInput.value.toLowerCase();
+  const rows = tbody.querySelectorAll("tr:not(.no-result-row)");
+  let hasResult = false;
+
+  const existingNoResults = tbody.querySelector(".no-result-row");
+  if (existingNoResults) {
+    existingNoResults.remove();
+  }
+
+  rows.forEach((row) => {
+    const unitName = row.children[1].textContent.toLowerCase();
+    const showRow = !searchValue || unitName.includes(searchValue);
+    row.style.display = showRow ? "" : "none";
+    if (showRow) hasResult = true;
+  });
+
+  if (!hasResult && searchValue) {
+    const noResultRow = document.createElement("tr");
+    noResultRow.className = "no-result-row";
+    noResultRow.innerHTML = `
+      <td colspan="7" class="px-6 py-16 text-center w-full">
+        <div class="flex flex-col items-center justify-center space-y-4 max-w-sm mx-auto">
+          <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <p class="text-gray-500 text-lg font-medium">No unit type found matching "${searchValue}"</p>
+          <p class="text-gray-400 text-base">Try adjusting your search term</p>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(noResultRow);
+  }
+}
+// Add event listener to the search input
+searchInput.addEventListener("input", searchUnitType);
 
 // ===================== Database Related Logic =====================
 
