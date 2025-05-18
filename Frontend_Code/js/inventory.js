@@ -70,6 +70,32 @@ tbody.addEventListener("click", (e) => {
   console.log("Clicked row with the item id of:", pressedId);
 });
 
+
+// ===============================================================================================
+// FRONT END-RELATED METHODS
+
+/**
+ * Method to add a new row to the table
+ * @param {int} itemId Primary key of the itemType table
+ * @param {string} itemName Name of the item
+ * @param {string} quantity Amount or quantity of said item (Combination of quantity + unit)
+ */
+function createNewItemMasterListRow(itemId, itemName, quantity) {
+  // Create new row
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-gray-900">${itemId}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-900">${itemName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-900">${quantity}</td>
+  
+                <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
+                </td>
+              `;
+
+  tbody.appendChild(tr);
+}
+
+// ------------------ TOAST FUNCTIONS ------------------
 function showToast(message, isError = false) {
   let toast = document.getElementById("custom-toast");
   if (!toast) {
@@ -97,37 +123,11 @@ function showToast(message, isError = false) {
     ? "rgba(220, 38, 38, 0.95)"
     : "rgba(44, 161, 74, 0.95)";
   toast.style.opacity = "1";
-  setTimeout(
-    () => {
-      toast.style.opacity = "0";
-    },
-    isError ? 4000 : 3000
-  );
+  setTimeout(() => {
+    toast.style.opacity = "0";
+  }, (isError)? 4000 : 3000);
 }
 
-// ===============================================================================================
-// FRONT END-RELATED METHODS
-
-/**
- * Method to add a new row to the table
- * @param {int} itemId Primary key of the itemType table
- * @param {string} itemName Name of the item
- * @param {string} quantity Amount or quantity of said item (Combination of quantity + unit)
- */
-function createNewItemMasterListRow(itemId, itemName, quantity) {
-  // Create new row
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900">${itemId}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900">${itemName}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900">${quantity}</td>
-  
-                <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
-                </td>
-              `;
-
-  tbody.appendChild(tr);
-}
 
 // ===============================================================================================
 // SEARCH BAR-RELATED METHODS

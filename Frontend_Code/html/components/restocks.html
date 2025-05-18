@@ -523,7 +523,11 @@
               required
               type="text"
               placeholder="Enter item name"
+              list = "addItemList"
             />
+
+            <datalist id = "addItemList">
+            </datalist>
           </div>
 
           <div>
@@ -551,14 +555,16 @@
             >
               Brand <span class="text-red-500">*</span>
             </label>
-            <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
-              id="restockBrand"
-              name="restockBrand"
+            <select
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 placeholder-gray-400"
+              id="addRestockBrand"
+              name="addRestockBrand"
               required
-              type="text"
-              placeholder="Enter brand name"
-            />
+            >
+               <option value="" disabled selected class="placeholder-option">
+                Select Brand
+              </option>
+            </select>
           </div>
 
           <div>
@@ -652,7 +658,7 @@
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
               id="editRestockItemName"
               name="editRestockItemName"
-              required
+              readonly
               type="text"
               placeholder="Enter item name"
             />
@@ -669,7 +675,6 @@
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent bg-gray-50"
               id="editRestockQuantity"
               name="editRestockQuantity"
-              readonly
               type="number"
             />
           </div>
@@ -700,7 +705,6 @@
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent bg-gray-50"
               id="editRestockDate"
               name="editRestockDate"
-              readonly
               type="date"
             />
           </div>
@@ -715,7 +719,6 @@
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent bg-gray-50"
               id="editRestockExpirationDate"
               name="editRestockExpirationDate"
-              readonly
               type="date"
             />
           </div>
@@ -850,7 +853,8 @@
       </div>
     </div>
     <!-- End of Add Remarks Modal -->
-
+    <!-- Script to access the supabase API -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="/Frontend_Code/js/restocks.js"></script>
   </body>
 </html>
