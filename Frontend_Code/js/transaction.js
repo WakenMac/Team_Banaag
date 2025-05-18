@@ -1,42 +1,12 @@
 // Import the database handler
 import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
-// NOTE THAT ALL DATA HERE IS MOCK DATA FOR TESTING PURPOSES
-// Loading state management
-function showLoading() {
-  document.getElementById('loadingSpinner').style.display = 'flex';
-}
-
-function hideLoading() {
-  document.getElementById('loadingSpinner').style.display = 'none';
-}
-
-// Initialize the page
-async function initializePage() {
-  try {
-    showLoading();
-    
-    // Initialize all the required data
-    await Promise.all([
-      initializeItemsList(),
-    ]);
-    
-    // Hide loading spinner after everything is loaded
-    hideLoading();
-  } catch (error) {
-    console.error('Error initializing page:', error);
-    hideLoading();
-    showToast('Error loading page. Please refresh.');
-  }
-}
-
-// Mock admin data for testing
+// Mock data for testing
 const mockAdmins = [
-  { admin_id: '123', password: 'password123' },
-  { admin_id: 'admin', password: 'admin123' }
+  { admin_id: '123', password: 'password123', name: 'John Smith' },
+  { admin_id: 'admin', password: 'admin123', name: 'Jane Doe' }
 ];
 
-// Mock inventory data for testing
 const mockInventory = [
   { item_name: 'Beaker 100ml', available_quantity: 10, is_consumable: false },
   { item_name: 'Test Tube', available_quantity: 50, is_consumable: false },
@@ -48,94 +18,284 @@ const mockInventory = [
   { item_name: 'Lab Coat', available_quantity: 15, is_consumable: false }
 ];
 
-// Mock borrowed items data for testing
-const mockBorrowedItems = [
+const mockTransactionHistory = [
   {
-    id: 'TRANS-001',
-    transaction_date: '2024-03-15',
-    items: {
-      id: 1,
-      name: 'Microscope',
-      is_consumable: false
-    },
-    quantity: 2,
-    returned_quantity: 0
+    transaction_id: 'TRANS-001',
+    type: 'borrow',
+    admin_id: '123',
+    admin_name: 'Waken Cean Maclang',
+    items: [
+      { name: 'Microscope', quantity: 2, is_consumable: false },
+      { name: 'Petri Dish', quantity: 5, is_consumable: true }
+    ],
+    date: '2024-03-15T09:30:00',
+    status: 'pending_return',
+    remarks: 'For biology class'
   },
   {
-    id: 'TRANS-002',
-    transaction_date: '2024-03-14',
-    items: {
-      id: 2,
-      name: 'Beaker 100ml',
-      is_consumable: false
-    },
-    quantity: 5,
-    returned_quantity: 2
+    transaction_id: 'TRANS-002',
+    type: 'borrow',
+    admin_id: '123',
+    admin_name: 'Dave Shanna Marie Gigawin',
+    items: [
+      { name: 'Beaker 100ml', quantity: 5, is_consumable: false }
+    ],
+    date: '2024-03-14T14:15:00',
+    status: 'partially_returned',
+    remarks: 'Chemistry experiment'
   },
   {
-    id: 'TRANS-003',
-    transaction_date: '2024-03-14',
-    items: {
-      id: 3,
-      name: 'Test Tube',
-      is_consumable: false
-    },
-    quantity: 10,
-    returned_quantity: 0
+    transaction_id: 'TRANS-003',
+    type: 'borrow',
+    admin_id: '456',
+    admin_name: 'Allan Tagle',
+    items: [
+      { name: 'Test Tube', quantity: 10 }
+    ],
+    date: '2024-03-14T11:45:00',
+    status: 'pending_return',
+    remarks: 'Lab practice'
   },
   {
-    id: 'TRANS-004',
-    transaction_date: '2024-03-13',
-    items: {
-      id: 4,
-      name: 'pH Meter',
-      is_consumable: false
-    },
-    quantity: 1,
-    returned_quantity: 0
-  },
-  {
-    id: 'TRANS-005',
-    transaction_date: '2024-03-13',
-    items: {
-      id: 5,
-      name: 'Safety Goggles',
-      is_consumable: false
-    },
-    quantity: 8,
-    returned_quantity: 5
+    transaction_id: 'TRANS-004',
+    type: 'return',
+    admin_id: '123',
+    admin_name: 'Jeff Ronyl Pausal',
+    items: [
+      { name: 'Beaker 100ml', quantity: 3 }
+    ],
+    date: '2024-03-15T16:20:00',
+    status: 'completed',
+    remarks: 'Returned in good condition'
   }
 ];
 
-// Store the current admin ID after verification
+// Global state
 let currentAdminId = null;
 let selectedItems = [];
+let filteredTransactions = [];
 
-// Initialize datalist with mock items
-function initializeItemsList() {
-  const itemsList = document.getElementById('itemsList');
-  if (!itemsList) return; // Guard clause if element doesn't exist
+// Initialize the page
+async function initializePage() {
+  try {
+    showLoading();
+    await loadTransactionHistory();
+    setupEventListeners();
+    hideLoading();
+  } catch (error) {
+    console.error('Error initializing page:', error);
+    hideLoading();
+    showToast('Error loading page. Please refresh.', true);
+  }
+}
+
+// Helper Functions
+function showLoading() {
+  document.getElementById('loadingSpinner').style.display = 'flex';
+  document.getElementById('tableLoadingState').style.display = 'block';
+}
+
+function hideLoading() {
+  document.getElementById('loadingSpinner').style.display = 'none';
+  document.getElementById('tableLoadingState').style.display = 'none';
+}
+
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toastNotification');
+  const toastMessage = document.getElementById('toastMessage');
   
-  itemsList.innerHTML = '';
-  mockInventory.forEach(item => {
-    const option = document.createElement('option');
-    option.value = item.item_name;
-    itemsList.appendChild(option);
+  if (!toast || !toastMessage) return;
+  
+  toastMessage.textContent = message;
+  toast.classList.remove('hidden');
+  toast.classList.add('flex');
+  
+  toast.style.backgroundColor = isError ? 'rgba(220, 38, 38, 0.95)' : 'rgba(44, 161, 74, 0.95)';
+  
+  setTimeout(() => {
+    toast.classList.add('hidden');
+    toast.classList.remove('flex');
+  }, isError ? 4000 : 3000);
+}
+
+function getStatusStyle(status) {
+  switch (status) {
+    case 'completed':
+      return 'bg-green-100 text-green-800';
+    case 'pending_return':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'partially_returned':
+      return 'bg-orange-100 text-orange-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+}
+
+function formatDateTime(dateString) {
+  return new Date(dateString).toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   });
 }
 
-// Helper function to show/hide modals
-function showModal(modal) {
-  if (!modal) return;
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+// Transaction History Functions
+async function loadTransactionHistory() {
+  const table = document.getElementById('transactionHistoryTable');
+  if (!table) return;
+
+  try {
+    showTableLoading();
+
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Apply filters
+    const searchTerm = document.getElementById('transactionSearch')?.value.toLowerCase() || '';
+    const type = document.getElementById('transactionFilter')?.value || 'all';
+    const startDate = document.getElementById('startDate')?.value;
+    const endDate = document.getElementById('endDate')?.value;
+
+    filteredTransactions = mockTransactionHistory.filter(transaction => {
+      const matchesSearch = 
+        transaction.transaction_id.toLowerCase().includes(searchTerm) ||
+        transaction.admin_name.toLowerCase().includes(searchTerm);
+
+      const matchesType = type === 'all' || transaction.type === type;
+
+      const transactionDate = new Date(transaction.date);
+      const matchesDateRange = (!startDate || transactionDate >= new Date(startDate)) &&
+                              (!endDate || transactionDate <= new Date(endDate));
+
+      return matchesSearch && matchesType && matchesDateRange;
+    });
+
+    // Sort by date (most recent first)
+    filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    if (filteredTransactions.length === 0) {
+      table.innerHTML = `
+        <tr class="h-[250px] text-center text-gray-500 italic">
+          <td colspan="5" class="align-middle">
+            No transactions found
+          </td>
+        </tr>
+      `;
+      hideTableLoading();
+      return;
+    }
+
+    // Render transactions
+    table.innerHTML = filteredTransactions.map(transaction => `
+      <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" onclick="showTransactionDetails('${transaction.transaction_id}')">
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          ${transaction.transaction_id}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          ${formatDateTime(transaction.date)}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
+            ${transaction.type === 'borrow' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
+            ${transaction.type}
+          </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          ${transaction.admin_name}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
+            ${getStatusStyle(transaction.status)}">
+            ${transaction.status.replace('_', ' ')}
+          </span>
+        </td>
+      </tr>
+    `).join('');
+
+    hideTableLoading();
+  } catch (error) {
+    console.error('Error loading transactions:', error);
+    table.innerHTML = `
+      <tr class="h-[250px] text-center text-red-500 italic">
+        <td colspan="5" class="align-middle">
+          Error loading transactions. Please try again.
+        </td>
+      </tr>
+    `;
+    hideTableLoading();
+  }
 }
 
-function hideModal(modal) {
-  if (!modal) return;
-  modal.classList.remove('flex');
-  modal.classList.add('hidden');
+function showTableLoading() {
+  const table = document.getElementById('transactionHistoryTable');
+  if (!table) return;
+
+  table.innerHTML = Array(5).fill(0).map(() => `
+    <tr class="animate-pulse">
+      <td class="px-6 py-4 whitespace-nowrap">
+        <div class="h-4 bg-gray-200 rounded w-24"></div>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <div class="h-4 bg-gray-200 rounded w-32"></div>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <div class="h-4 bg-gray-200 rounded w-16"></div>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <div class="h-4 bg-gray-200 rounded w-28"></div>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <div class="h-4 bg-gray-200 rounded w-20"></div>
+      </td>
+    </tr>
+  `).join('');
 }
+
+function hideTableLoading() {
+  document.getElementById('tableLoadingState').style.display = 'none';
+}
+
+function setupEventListeners() {
+  // Search input
+  const searchInput = document.getElementById('transactionSearch');
+  if (searchInput) {
+    searchInput.addEventListener('input', debounce(() => loadTransactionHistory(), 300));
+  }
+
+  // Transaction type filter
+  const typeFilter = document.getElementById('transactionFilter');
+  if (typeFilter) {
+    typeFilter.addEventListener('change', () => loadTransactionHistory());
+  }
+
+  // Date filters
+  const startDate = document.getElementById('startDate');
+  const endDate = document.getElementById('endDate');
+  if (startDate && endDate) {
+    startDate.addEventListener('change', () => loadTransactionHistory());
+    endDate.addEventListener('change', () => loadTransactionHistory());
+  }
+}
+
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Initialize the page when the DOM is loaded
+document.addEventListener('DOMContentLoaded', initializePage);
+
+// Make functions available globally for onclick handlers
+window.showTransactionDetails = showTransactionDetails;
 
 // Verify admin credentials using mock data for testing
 async function verifyAdmin(adminId, password) {
@@ -239,44 +399,6 @@ function addItemToTable(itemName) {
   selectedItemsTable.appendChild(row);
   selectedItems.push({ itemName, quantity: 1 });
 }
-
-
-// --- Toast Notification ---
-// Shows a small message at the bottom right when something is added, edited, deleted, or an error occurs
-function showToast(message, isError = false) {
-    let toast = document.getElementById("custom-toast");
-    if (!toast) {
-      toast = document.createElement("div");
-      toast.id = "custom-toast";
-      toast.style.position = "fixed";
-      toast.style.bottom = "32px";
-      toast.style.right = "32px";
-      toast.style.background = isError
-        ? "rgba(220, 38, 38, 0.95)"
-        : "rgba(44, 161, 74, 0.95)"; // Red for error, green for success
-      toast.style.color = "white";
-      toast.style.padding = "16px 28px";
-      toast.style.borderRadius = "8px";
-      toast.style.fontSize = "16px";
-      toast.style.fontWeight = "regular";
-      toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
-      toast.style.opacity = "0";
-      toast.style.transition = "opacity 0.4s";
-      toast.style.zIndex = "9999";
-      document.body.appendChild(toast);
-    }
-    toast.textContent = message;
-    toast.style.background = isError
-      ? "rgba(220, 38, 38, 0.95)"
-      : "rgba(44, 161, 74, 0.95)";
-    toast.style.opacity = "1";
-    setTimeout(
-      () => {
-        toast.style.opacity = "0";
-      },
-      isError ? 4000 : 3000
-    );
-  }
 
 // Remove item from the selected items table
 function removeItem(itemName) {
@@ -418,13 +540,20 @@ async function handleReturnItems() {
       const returnQuantity = parseInt(returnQuantityInput?.value);
       const maxQuantity = parseInt(returnQuantityInput?.getAttribute('max'));
       
+      // Debug logging
+      console.log(`Transaction ${transactionId}:`, {
+        returnQuantity,
+        maxQuantity,
+        comparison: returnQuantity > maxQuantity
+      });
+      
       // Validate return quantity
       if (!returnQuantity || isNaN(returnQuantity) || returnQuantity < 1) {
         throw new Error(`Invalid return quantity for transaction ${transactionId}`);
       }
       
       if (returnQuantity > maxQuantity) {
-        throw new Error(`Return quantity cannot exceed borrowed quantity for transaction ${transactionId}`);
+        throw new Error(`Cannot return more items than borrowed for transaction ${transactionId}`);
       }
       
       itemsToReturn.push({ transactionId, returnQuantity });
@@ -617,5 +746,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Make functions available globally
 window.removeItem = removeItem;
-window.updateItemQuantity = updateItemQuantity; 
-window.updateItemQuantity = updateItemQuantity; 
+window.updateItemQuantity = updateItemQuantity;
+window.initializeItemsList = initializeItemsList;
+
+function showTransactionDetails(transactionId) {
+  const transaction = filteredTransactions.find(t => t.transaction_id === transactionId);
+  if (!transaction) return;
+
+  // Update modal content
+  document.getElementById('transactionIdDisplay').textContent = `Transaction ID: ${transaction.transaction_id}`;
+  document.getElementById('adminInfoDisplay').textContent = transaction.admin_name;
+  document.getElementById('dateTimeDisplay').textContent = formatDateTime(transaction.date);
+  document.getElementById('typeDisplay').textContent = transaction.type;
+  document.getElementById('statusDisplay').innerHTML = `
+    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(transaction.status)}">
+      ${transaction.status.replace('_', ' ')}
+    </span>
+  `;
+  document.getElementById('remarksDisplay').textContent = transaction.remarks || 'No remarks';
+
+  // Update items table
+  const itemsTable = document.getElementById('transactionItemsTable');
+  itemsTable.innerHTML = transaction.items.map(item => `
+    <tr>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.name}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.quantity}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        ${item.is_consumable ? 'Consumable' : 'Non-consumable'}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(transaction.status)}">
+          ${transaction.status.replace('_', ' ')}
+        </span>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+        ${item.is_consumable ? 'No' : 'Yes'}
+      </td>
+    </tr>
+  `).join('');
+
+  showModal('transactionDetailsModal');
+}
+
+function showModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+
+  // Add event listeners for closing the modal
+  const closeButtons = modal.querySelectorAll('[id$="closeDetailsBtn"], [id$="closeDetailsModalBtn"]');
+  closeButtons.forEach(button => {
+    button.addEventListener('click', () => hideModal(modalId));
+  });
+}
+
+function hideModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+} 
