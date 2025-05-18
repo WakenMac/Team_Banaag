@@ -36,3 +36,13 @@ document.addEventListener("click", (e) => {
       });
   }
 });
+
+// Helper function to show toast notification
+function showToast(message) {
+  const toastMessage = document.getElementById('toastMessage')
+  toastMessage.textContent = message
+  showModal(toastNotification)
+  setTimeout(() => {
+    hideModal(toastNotification)
+  }, 3000)
+}

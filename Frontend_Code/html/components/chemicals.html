@@ -26,7 +26,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <title>CARES | CAS Lab Inventory</title>
+    <title>CARES | Chemicals Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
@@ -39,6 +39,46 @@
     <link rel="stylesheet" href="/Frontend_Code/css/admin.css" />
   </head>
   <body class="bg-[#f3f7f7] min-h-screen">
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="fixed inset-0 z-[9998] flex items-center justify-center bg-[#f3f7f7]">
+      <div class="absolute inset-0 bg-[#f3f7f7] opacity-90"></div>
+      <div class="flex flex-col items-center bg-white p-8 rounded-lg shadow-lg z-10">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2ca14a]"></div>
+        <p class="mt-4 text-gray-700 text-lg font-medium loading-message">Loading Chemicals Management...</p>
+        <p class="mt-2 text-gray-500 text-sm">Please wait while we prepare everything for you...</p>
+      </div>
+    </div>
+
+    <!-- Table Loading State -->
+    <div id="tableLoadingState" class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-[#f3f7f7]">
+      <div class="absolute inset-0 bg-[#f3f7f7] opacity-90"></div>
+      <div class="w-full max-w-6xl mx-auto p-6 z-10">
+        <div class="animate-pulse space-y-4">
+          <!-- Table header shimmer -->
+          <div class="h-8 bg-gray-200 rounded w-1/4"></div>
+          <!-- Search bar and button shimmer -->
+          <div class="flex justify-between items-center">
+            <div class="h-10 bg-gray-200 rounded w-64"></div>
+            <div class="h-10 bg-gray-200 rounded w-32"></div>
+          </div>
+          <!-- Table header shimmer -->
+          <div class="h-12 bg-gray-200 rounded"></div>
+          <!-- Table rows shimmer -->
+          <div class="space-y-3">
+            <div class="h-10 bg-gray-200 rounded"></div>
+            <div class="h-10 bg-gray-200 rounded opacity-75"></div>
+            <div class="h-10 bg-gray-200 rounded opacity-50"></div>
+            <div class="h-10 bg-gray-200 rounded opacity-75"></div>
+            <div class="h-10 bg-gray-200 rounded opacity-50"></div>
+          </div>
+          <!-- Loading message -->
+          <div class="flex items-center justify-center mt-6">
+            <p class="text-gray-500 text-sm loading-message">Loading chemicals data...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <nav
       class="flex items-center justify-between px-4 md:px-8 lg:px-12 h-20 border-b border-gray-300 bg-[#f3f7f7]"
     >
@@ -279,15 +319,15 @@
             id="searchInput"
             aria-label="Search"
             class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-64"
-            placeholder="Search..."
+            placeholder="Search chemicals..."
             type="search"
           />
         </div>
         <button
-          aria-controls="addChemicalsModal"
+          aria-controls="addChemicalModal"
           aria-haspopup="dialog"
           class="custom-btn"
-          id="addChemicalsBtn"
+          id="addChemicalBtn"
           type="button"
         >
           Add Chemical
@@ -304,7 +344,7 @@
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Item ID
+                Chemical ID
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
@@ -334,32 +374,27 @@
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Initial Quantity (Per Bottle)
+                Quantity
               </th>
               <th
                 class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Container Size
+                Price
               </th>
               <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200"
                 scope="col"
               >
-                Remaining Quantity
+                Actions
               </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              ></th>
             </tr>
           </thead>
           <tbody
             id="chemicalsTableBody"
             class="bg-white divide-y divide-gray-200"
           >
-            <!-- This is just for the table body -->
-            <!-- Example row will be added dynamically through CRUD -->
+            <!-- Table content will be dynamically populated -->
           </tbody>
         </table>
       </div>
@@ -563,7 +598,7 @@
       aria-labelledby="modalTitle"
       aria-modal="true"
       class="fixed inset-0 z-50 hidden items-center justify-center"
-      id="addChemicalsModal"
+      id="addChemicalModal"
       role="dialog"
     >
       <div
@@ -583,7 +618,7 @@
             <span class="font-black text-3xl text-black">Add Chemical</span>
           </div>
         </div>
-        <form class="space-y-4" id="addChemicalsForm">
+        <form class="space-y-4" id="addChemicalForm">
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"

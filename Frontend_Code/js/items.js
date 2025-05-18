@@ -75,6 +75,65 @@ const remarksForm = document.getElementById("remarksForm");
 const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
 const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
 
+// Loading state management
+function showPageLoading() {
+  const spinner = document.getElementById('loadingSpinner');
+  if (spinner) {
+    spinner.style.display = 'flex';
+    spinner.style.opacity = '0';
+    // Fade in animation
+    setTimeout(() => {
+      spinner.style.transition = 'opacity 0.3s ease-in-out';
+      spinner.style.opacity = '1';
+    }, 0);
+  }
+}
+
+function hidePageLoading() {
+  const spinner = document.getElementById('loadingSpinner');
+  if (spinner) {
+    // Fade out animation
+    spinner.style.transition = 'opacity 0.3s ease-in-out';
+    spinner.style.opacity = '0';
+    setTimeout(() => {
+      spinner.style.display = 'none';
+    }, 300);
+  }
+}
+
+function showTableLoading() {
+  const tableBody = document.getElementById('consumableItemsTableBody');
+  const loadingState = document.getElementById('tableLoadingState');
+  if (tableBody && loadingState) {
+    tableBody.style.opacity = '0';
+    tableBody.style.transition = 'opacity 0.3s ease-in-out';
+    loadingState.classList.remove('hidden');
+    loadingState.style.opacity = '0';
+    // Fade in animation
+    setTimeout(() => {
+      loadingState.style.transition = 'opacity 0.3s ease-in-out';
+      loadingState.style.opacity = '1';
+    }, 0);
+  }
+}
+
+function hideTableLoading() {
+  const tableBody = document.getElementById('consumableItemsTableBody');
+  const loadingState = document.getElementById('tableLoadingState');
+  if (tableBody && loadingState) {
+    // Fade out loading state
+    loadingState.style.transition = 'opacity 0.3s ease-in-out';
+    loadingState.style.opacity = '0';
+    
+    setTimeout(() => {
+      loadingState.classList.add('hidden');
+      // Fade in table body
+      tableBody.style.transition = 'opacity 0.3s ease-in-out';
+      tableBody.style.opacity = '1';
+    }, 300);
+  }
+}
+
 // -------------------- PREPARE LOCATION & UNIT TYPE FUNCTIONS --------------------
 /**
  * Method to add a new unit to the addEquipmentUnit and editEquipmentUnit dropdown element
@@ -504,25 +563,47 @@ function handleTableButtonClicks(e) {
 }
 
 // -------------------- INITIALIZATION --------------------
-document.addEventListener("DOMContentLoaded", async () => {
-  tbody = document.querySelector("#consumableItemsTableBody");
+async function initializePage() {
+  try {
+    showPageLoading();
+    
+    // Initialize basic UI elements
+    tbody = document.querySelector("#consumableItemsTableBody");
+    setupDropdownElements();
+    
+    if (!initializeConsumableItems()) {
+      throw new Error("Could not initialize consumable items table");
+    }
 
-  setupDropdownElements();
-  if (!initializeConsumableItems()) {
-    showToast("Could not initialize consumable items table", true);
-    return;
+    // Show table loading state while fetching data
+    showTableLoading();
+    
+    // Initialize all data-dependent components
+    await Promise.all([
+      initializeConsumableItemsTable(),
+      initializeUnitTypeDropdown(),
+      initializeLocationDropdown(),
+    ]);
+
+    // Setup event listeners after data is loaded
+    setupEventListeners();
+    initializeRemarksListeners();
+    
+    // Hide all loading states
+    hideTableLoading();
+    hidePageLoading();
+    
+    showToast('Page loaded successfully!');
+  } catch (error) {
+    console.error('Error initializing page:', error);
+    hideTableLoading();
+    hidePageLoading();
+    showToast('Error loading page. Please refresh.', true);
   }
+}
 
-  // Initializes Components that rely on the database's data
-  await initializeConsumableItemsTable(); // Gets all of the content for the table, including remarks and others
-  initializeUnitTypeDropdown();
-  initializeLocationDropdown();
-  initializeRemarksListeners();
-
-  setupEventListeners();
-
-  showToast("Loaded page successfully!");
-});
+// Call initialize when the page loads
+document.addEventListener("DOMContentLoaded", initializePage);
 
 function initializeConsumableItems() {
   if (!tbody) {
@@ -616,7 +697,7 @@ async function handleRemarksItemSubmit(e) {
 }
 
 // -------------------- TOAST NOTIFICATION --------------------
-function showToast(message, isError = false, time = 1800) {
+function showToast(message, isError = false, time = 3000) {
   let toast = document.getElementById("custom-toast");
   if (!toast) {
     toast = document.createElement("div");
@@ -626,25 +707,56 @@ function showToast(message, isError = false, time = 1800) {
     toast.style.right = "32px";
     toast.style.background = isError
       ? "rgba(220, 38, 38, 0.95)"
-      : "rgba(44, 161, 74, 0.95)"; // Red for error, green for success
+      : "rgba(44, 161, 74, 0.95)";
     toast.style.color = "white";
     toast.style.padding = "16px 28px";
     toast.style.borderRadius = "8px";
     toast.style.fontSize = "16px";
-    toast.style.fontWeight = "bold";
-    toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+    toast.style.fontWeight = "500";
+    toast.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
     toast.style.opacity = "0";
-    toast.style.transition = "opacity 0.4s";
+    toast.style.transform = "translateY(20px)";
+    toast.style.transition = "all 0.3s ease-in-out";
     toast.style.zIndex = "9999";
+    
+    // Add icon container
+    const iconContainer = document.createElement("div");
+    iconContainer.style.display = "flex";
+    iconContainer.style.alignItems = "center";
+    iconContainer.style.gap = "12px";
+    
+    // Add icon
+    const icon = document.createElement("i");
+    icon.className = isError ? "fas fa-exclamation-circle" : "fas fa-check-circle";
+    icon.style.fontSize = "20px";
+    
+    iconContainer.appendChild(icon);
+    iconContainer.appendChild(document.createTextNode(message));
+    toast.appendChild(iconContainer);
+    
     document.body.appendChild(toast);
+  } else {
+    const icon = toast.querySelector("i");
+    if (icon) {
+      icon.className = isError ? "fas fa-exclamation-circle" : "fas fa-check-circle";
+    }
+    toast.textContent = message;
   }
-  toast.textContent = message;
+  
   toast.style.background = isError
     ? "rgba(220, 38, 38, 0.95)"
     : "rgba(44, 161, 74, 0.95)";
-  toast.style.opacity = "1";
+  
+  // Animate in
+  setTimeout(() => {
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+  }, 0);
+  
+  // Animate out
   setTimeout(() => {
     toast.style.opacity = "0";
+    toast.style.transform = "translateY(20px)";
   }, time);
 }
 

@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <title>CARES | CAS Automated Resource and Equipment System</title>
+    <title>CARES | Admins Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
@@ -16,9 +16,14 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/Frontend_Code/css/admin.css" />
+    <style>
+      body { font-family: "Poppins", sans-serif; }
+    </style>
   </head>
 
   <body class="bg-[#f3f7f7] min-h-screen">
+    <!-- Loading states will be injected by common.js -->
+    
     <nav
       class="flex items-center justify-between px-4 md:px-8 lg:px-12 h-20 border-b border-gray-300 bg-[#f3f7f7]"
     >
@@ -250,63 +255,42 @@
       </ul>
     </nav>
     <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 mt-6">
-      <div class="flex justify-between items-center w-full">
-        <input
-          id="searchInput"
-          aria-label="Search"
-          class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-64"
-          placeholder="Search admin"
-          type="search"
-        />
+      <div class="flex flex-col sm:flex-row justify-between items-center w-full gap-3 sm:gap-0">
+        <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
+          <input
+            id="searchInput"
+            aria-label="Search"
+            class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-64"
+            placeholder="Search admins..."
+            type="search"
+          />
+        </div>
         <button
           aria-controls="addAdminModal"
           aria-haspopup="dialog"
-          class="custom-btn ml-4"
+          class="custom-btn"
           id="addAdminBtn"
           type="button"
         >
           Add Admin
         </button>
       </div>
-      <h2 class="font-semibold text-gray-900 text-sm mb-3 mt-4">
-        Masterlist - Admins
-      </h2>
+
+      <h2 class="font-semibold text-gray-900 text-sm mb-3 mt-4">Administrators</h2>
+      
       <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
         <table class="min-w-full divide-y divide-gray-200 text-sm">
           <thead class="bg-gray-50 sticky top-0 z-10">
             <tr>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Admin ID
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                First Name
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Middle Name
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              >
-                Last Name
-              </th>
-              <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
-                scope="col"
-              ></th>
+              <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Admin ID</th>
+              <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">First Name</th>
+              <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Middle Name</th>
+              <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Last Name</th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200">Actions</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <!-- Sample data row -->
+          <tbody id="adminsTableBody" class="bg-white divide-y divide-gray-200">
+            <!-- Table content will be dynamically populated -->
           </tbody>
         </table>
       </div>
@@ -490,17 +474,99 @@
               >Admin ID</label
             >
             <input
-              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent bg-gray-100"
               id="editAdminId"
               name="editAdminId"
               type="text"
+              readonly
             />
           </div>
           <div>
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
+              for="editCurrentPassword"
+            >
+              Current Password <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="editCurrentPassword"
+                name="editCurrentPassword"
+                required
+                type="password"
+                placeholder="Enter current password"
+              />
+              <button
+                type="button"
+                class="password-toggle absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800"
+                data-password-input="editCurrentPassword"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="editNewPassword"
+            >
+              New Password <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="editNewPassword"
+                name="editNewPassword"
+                required
+                type="password"
+                minlength="8"
+                pattern=".{8,}"
+                placeholder="Enter new password"
+                title="Password must be at least 8 characters long"
+              />
+              <button
+                type="button"
+                class="password-toggle absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800"
+                data-password-input="editNewPassword"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <p class="mt-1 text-sm text-gray-500">Must be at least 8 characters long</p>
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
+              for="editConfirmPassword"
+            >
+              Confirm New Password <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+                id="editConfirmPassword"
+                name="editConfirmPassword"
+                required
+                type="password"
+                minlength="8"
+                pattern=".{8,}"
+                placeholder="Confirm new password"
+              />
+              <button
+                type="button"
+                class="password-toggle absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800"
+                data-password-input="editConfirmPassword"
+              >
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div>
+            <label
+              class="block text-sm font-medium text-gray-700 mb-1"
               for="editFirstName"
-              >First Name</label
+              >First Name <span class="text-red-500">*</span></label
             >
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
@@ -527,7 +593,7 @@
             <label
               class="block text-sm font-medium text-gray-700 mb-1"
               for="editLastName"
-              >Last Name
+              >Last Name <span class="text-red-500">*</span>
             </label>
             <input
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
@@ -550,7 +616,7 @@
               class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]"
               type="submit"
             >
-              Save
+              Save Changes
             </button>
           </div>
         </form>

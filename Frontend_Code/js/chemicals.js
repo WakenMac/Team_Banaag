@@ -15,8 +15,9 @@
  * - All user feedback is shown as a toast at the bottom right (no more alert popups)
  */
 import * as dbhandler from "../../Backend_Code/mainHandler.js";
+import { showPageLoading, hidePageLoading, showTableLoading, hideTableLoading, initializeCommonUI } from "./common.js";
 
-// Initialize Compoenents
+// Initialize Components
 const addChemicalLocation = document.getElementById("chemicalLocation");
 const addChemicalUnit = document.getElementById("chemicalUnit");
 
@@ -27,90 +28,53 @@ const chemicalsTableBody = document.getElementById("chemicalsTableBody");
 let chemicalRowToDelete = null;
 let initialQuantity = 0; // Variable used to change the initial quantity of Chemical records (For updates)
 
-await initialize();
+// Initialize the tables
+document.addEventListener('DOMContentLoaded', initializePage);
 
-async function initialize() {
-  // Initialize dropdown menus
-  setupDropdown("masterlistBtn", "masterlistMenu");
-  setupDropdown("consumablesBtn", "consumablesMenu");
-  setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
-  setupDropdown("propertiesBtn", "propertiesMenu");
+async function initializePage() {
+  try {
+    // Initialize common UI elements first
+    initializeCommonUI();
+    
+    showPageLoading('Loading Chemicals Management...');
 
-  // Test chemical label
-  // createNewChemicalRow(
-  //   -1,
-  //   "Corola",
-  //   "Box(es)",
-  //   "General Santos",
-  //   "Toyota",
-  //   "30",
-  //   "1000",
-  //   "1000"
-  // );
+    // Remove local dropdown setup since it's handled by initializeCommonUI
+    // setupDropdown("masterlistBtn", "masterlistMenu");
+    // setupDropdown("consumablesBtn", "consumablesMenu");
+    // setupDropdown("nonconsumablesBtn", "nonconsumablesMenu");
+    // setupDropdown("propertiesBtn", "propertiesMenu");
 
-  // // Test q hehe - dave
-  // createNewChemicalRow(
-  //   0,
-  //   "ChemName",
-  //   "ChemUnit",
-  //   "General Santos",
-  //   "Well",
-  //   "49",
-  //   "5000",
-  //   "N/A",
-  //   "N/A",
-  //   "N/A"
-  // );
+    // Show table loading state
+    showTableLoading('chemicalsTable', 'Loading chemicals data...');
 
-  await dbhandler.testPresence();
-  await prepareChemicalsTable();
+    // Prepares the contents of the chemicals table
+    await dbhandler.testPresence();
+    await Promise.all([
+      prepareChemicalsTable(),
+      prepareUnitTypeDropdown(),
+      prepareLocationDropdown()
+    ]);
 
-  await prepareUnitTypeDropdown();
-  await prepareLocationDropdown();
-
-  showToast("Loaded page successfully!");
+    hideTableLoading('chemicalsTable');
+    hidePageLoading();
+    showToast("Loaded page successfully!");
+  } catch (error) {
+    console.error('Error initializing page:', error);
+    hideTableLoading('chemicalsTable');
+    hidePageLoading();
+    showToast('Error loading page. Please refresh.', true);
+  }
 }
 
 //=======================================================================================================================================
 // FRONT END-RELATED METHODS (LOGIC &  REACTIVITY)
 
-/**
- * Sets up dropdown menu functionality for navigation items
- * @param {string} buttonId - The ID of the dropdown button
- * @param {string} menuId - The ID of the dropdown menu
- */
-function setupDropdown(buttonId, menuId) {
-  const btn = document.getElementById(buttonId);
-  const menu = document.getElementById(menuId);
-
-  btn.addEventListener("click", () => {
-    const expanded = btn.getAttribute("aria-expanded") === "true";
-    btn.setAttribute("aria-expanded", !expanded);
-    if (!expanded) {
-      menu.classList.remove("opacity-0", "invisible");
-      menu.classList.add("opacity-100", "visible");
-    } else {
-      menu.classList.add("opacity-0", "invisible");
-      menu.classList.remove("opacity-100", "visible");
-    }
-  });
-
-  // Close dropdown if clicked outside
-  document.addEventListener("click", (e) => {
-    if (!btn.contains(e.target) && !menu.contains(e.target)) {
-      btn.setAttribute("aria-expanded", "false");
-      menu.classList.add("opacity-0", "invisible");
-      menu.classList.remove("opacity-100", "visible");
-    }
-  });
-}
-
 // ===================== Add Chemical Modal Logic =====================
 
 // Add Chemicals Functionality
-const addChemicalsBtn = document.getElementById("addChemicalsBtn");
-const addChemicalsModal = document.getElementById("addChemicalsModal");
-const addChemicalsForm = document.getElementById("addChemicalsForm");
+const addChemicalBtn = document.getElementById("addChemicalBtn");
+const addChemicalModal = document.getElementById("addChemicalModal");
+const addChemicalForm = document.getElementById("addChemicalForm");
 const cancelBtn = document.getElementById("cancelBtn");
 const modalBackdropAddChemical = document.getElementById(
   "modalBackdropAddChemical"
@@ -120,20 +84,20 @@ const modalBackdropAddChemical = document.getElementById(
  * Opens the add chemicals modal
  */
 function openAddModal() {
-  addChemicalsModal.classList.remove("hidden");
-  addChemicalsModal.classList.add("flex");
+  addChemicalModal.classList.remove("hidden");
+  addChemicalModal.classList.add("flex");
 }
 
 /**
  * Closes the add chemicals modal and resets the form
  */
 function closeAddModal() {
-  addChemicalsModal.classList.add("hidden");
-  addChemicalsModal.classList.remove("flex");
-  addChemicalsForm.reset();
+  addChemicalModal.classList.add("hidden");
+  addChemicalModal.classList.remove("flex");
+  addChemicalForm.reset();
 }
 
-addChemicalsBtn.addEventListener("click", openAddModal);
+addChemicalBtn.addEventListener("click", openAddModal);
 cancelBtn.addEventListener("click", closeAddModal);
 modalBackdropAddChemical.addEventListener("click", closeAddModal);
 
@@ -142,53 +106,50 @@ modalBackdropAddChemical.addEventListener("click", closeAddModal);
  * Creates a new row in the table with the chemical information
  * Includes functionality for remarks and additional chemical details
  */
-addChemicalsForm.addEventListener("submit", async (e) => {
+addChemicalForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // const chemicalId = addChemicalsForm.chemicalId.value.trim();
-  const chemicalName = addChemicalsForm.chemicalName.value.trim();
-  const chemicalUnit = addChemicalsForm.chemicalUnit.value.trim();
-  const chemicalLocation = addChemicalsForm.chemicalLocation.value.trim();
-  const chemicalBrand = addChemicalsForm.chemicalBrand.value.trim();
-  const chemicalContainerSize =
-    addChemicalsForm.chemicalContainerSize.value.trim();
-  const chemicalCASNo = addChemicalsForm.chemicalCASNo.value.trim();
-  const chemicalMSDS = addChemicalsForm.chemicalMSDS.value.trim();
-  const chemicalBarCode = addChemicalsForm.chemicalBarCode.value.trim();
+  try {
+    showPageLoading('Adding new chemical...');
 
-  // Conditions that are commented are to be removed~
-  // Hindi ko lang muna tinanggal just in case may changes na gagawin - Waks
-  if (
-    !chemicalName ||
-    !chemicalUnit ||
-    !chemicalLocation ||
-    !chemicalBrand ||
-    !chemicalContainerSize
-  ) {
-    showToast("Please fill in all required fields.", true, 4000);
-    return;
-  }
+    const chemicalName = addChemicalForm.chemicalName.value.trim();
+    const chemicalUnit = addChemicalForm.chemicalUnit.value.trim();
+    const chemicalLocation = addChemicalForm.chemicalLocation.value.trim();
+    const chemicalBrand = addChemicalForm.chemicalBrand.value.trim();
+    const chemicalContainerSize = addChemicalForm.chemicalContainerSize.value.trim();
+    const chemicalCASNo = addChemicalForm.chemicalCASNo.value.trim();
+    const chemicalMSDS = addChemicalForm.chemicalMSDS.value.trim();
+    const chemicalBarCode = addChemicalForm.chemicalBarCode.value.trim();
 
-  let result = await dbhandler.addChemicalsRecord(
-    chemicalName,
-    chemicalLocation,
-    chemicalUnit,
-    chemicalBrand,
-    chemicalContainerSize,
-    chemicalBarCode,
-    chemicalCASNo,
-    chemicalMSDS
-  );
+    if (!chemicalName || !chemicalUnit || !chemicalLocation || !chemicalBrand || !chemicalContainerSize) {
+      hidePageLoading();
+      showToast("Please fill in all required fields.", true, 4000);
+      return;
+    }
 
-  if (result == null) {
-    showToast(
-      `The mainHandler.addChemicalsRecord() DOESN'T return a status statement.`,
-      true,
-      4000
+    let result = await dbhandler.addChemicalsRecord(
+      chemicalName,
+      chemicalLocation,
+      chemicalUnit,
+      chemicalBrand,
+      chemicalContainerSize,
+      chemicalBarCode,
+      chemicalCASNo,
+      chemicalMSDS
     );
-  } else if (result.includes("ERROR")) {
-    showToast(result, true, 4000);
-  } else {
+
+    if (result == null) {
+      hidePageLoading();
+      showToast(`The mainHandler.addChemicalsRecord() DOESN'T return a status statement.`, true, 4000);
+      return;
+    }
+
+    if (result.includes("ERROR")) {
+      hidePageLoading();
+      showToast(result, true, 4000);
+      return;
+    }
+
     console.log(result);
     let newItemId = result.slice(46, result.length - 1);
     createNewChemicalRow(
@@ -204,8 +165,14 @@ addChemicalsForm.addEventListener("submit", async (e) => {
       chemicalMSDS,
       chemicalBarCode
     );
+
     closeAddModal();
+    hidePageLoading();
     showToast("Chemical added successfully", false, 3000);
+  } catch (error) {
+    console.error('Error adding chemical:', error);
+    hidePageLoading();
+    showToast('Error adding chemical. Please try again.', true, 4000);
   }
 });
 

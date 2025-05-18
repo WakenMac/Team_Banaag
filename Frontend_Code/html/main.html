@@ -24,6 +24,14 @@
     </style>
   </head>
   <body class="bg-[#f3f7f7] min-h-screen">
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="fixed inset-0 z-50 flex items-center justify-center bg-[#f3f7f7]">
+      <div class="flex flex-col items-center">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2ca14a]"></div>
+        <p class="mt-4 text-gray-600 text-lg font-medium">Loading...</p>
+      </div>
+    </div>
+    
     <nav
       class="flex items-center justify-between px-4 md:px-8 lg:px-12 h-20 border-b border-gray-300 bg-[#f3f7f7]"
     >
@@ -375,12 +383,258 @@
 
     <!-- End of New Transaction Modal -->
 
-    <!-- Type of Transaction (Borrow or Return) -->
-
     <!-- Verify Admin for Transaction Modal -->
+    <div id="verifyAdminModal" class="fixed inset-0 z-50 hidden items-center justify-center" role="dialog" aria-labelledby="verifyAdminTitle" aria-modal="true">
+      <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
+      <div class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
+            <span class="font-black text-2xl text-black">Admin Verification</span>
+          </div>
+        </div>
+        <form id="verifyAdminForm" class="space-y-4">
+          <div id="verifyAdminError" class="hidden mb-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded px-3 py-2"></div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="verifyAdminId">
+              Admin ID <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="verifyAdminId" name="verifyAdminId" required
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              placeholder="Enter your admin ID" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1" for="verifyAdminPassword">
+              Password <span class="text-red-500">*</span>
+            </label>
+            <input type="password" id="verifyAdminPassword" name="verifyAdminPassword" required
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              placeholder="Enter your password" />
+          </div>
+          <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" id="cancelVerifyBtn"
+              class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]">
+              Cancel
+            </button>
+            <button type="submit"
+              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
+              Verify
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Transaction Type Selection Modal -->
+    <div id="transactionTypeModal" class="fixed inset-0 z-50 hidden items-center justify-center" role="dialog" aria-labelledby="transactionTypeTitle" aria-modal="true">
+      <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
+      <div class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
+            <span class="font-black text-2xl text-black">Select Transaction Type</span>
+          </div>
+        </div>
+        <div class="flex justify-center space-x-4">
+          <button id="borrowBtn" class="px-6 py-3 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
+            Borrow
+          </button>
+          <button id="returnBtn" class="px-6 py-3 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
+            Return
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Borrow Items Modal -->
+    <div id="borrowItemsModal" class="fixed inset-0 z-50 hidden items-center justify-center" role="dialog" aria-labelledby="borrowItemsTitle" aria-modal="true">
+      <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
+      <div class="bg-white rounded-lg shadow-lg max-w-4xl w-full z-50 p-6 relative">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
+            <span class="font-black text-2xl text-black">Borrow Items</span>
+          </div>
+        </div>
+        <form id="borrowItemsForm" class="space-y-4">
+          <div class="flex space-x-4 mb-4">
+            <div class="flex-1">
+              <input list="itemsList" id="itemSearch" name="itemSearch" placeholder="Search for items..."
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent" />
+              <datalist id="itemsList">
+                <!-- Items will be populated dynamically -->
+              </datalist>
+            </div>
+            <button type="button" id="addItemBtn"
+              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
+              Add Item
+            </button>
+          </div>
+
+          <!-- Table with fixed height and scrolling -->
+          <div class="h-[300px] overflow-y-auto border border-gray-100 rounded-md bg-white">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <thead class="bg-gray-50 sticky top-0 z-10">
+                  <tr>
+                    <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200 bg-gray-50">Item Name</th>
+                    <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200 bg-gray-50">Available Qty</th>
+                    <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200 bg-gray-50">Borrow Qty</th>
+                    <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200 bg-gray-50">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="selectedItemsTable" class="bg-white divide-y divide-gray-200">
+                  <tr id="noItemsRow" class="h-[250px]">
+                    <td colspan="4" class="px-6 py-4 text-center text-gray-500 italic align-middle">
+                      <div class="flex items-center justify-center h-full">
+                        No items added yet
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Remarks Field -->
+          <div class="mt-4">
+            <label for="borrowRemarks" class="block text-sm font-medium text-gray-700 mb-1">
+              Remarks
+            </label>
+            <textarea
+              id="borrowRemarks"
+              name="borrowRemarks"
+              rows="3"
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              placeholder="Add any additional notes or remarks here..."
+            ></textarea>
+          </div>
+
+          <!-- Note about consumable items -->
+          <div class="mt-4 flex items-center text-sm text-gray-500">
+            <i class="fas fa-info-circle text-[#2ca14a] mr-2"></i>
+            <span>Items marked with <span class="font-medium text-[#2ca14a]">*</span> are consumable and will not be returned.</span>
+          </div>
+
+          <div class="flex justify-end space-x-3 pt-4">
+            <button type="button" id="cancelBorrowBtn"
+              class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]">
+              Cancel
+            </button>
+            <button type="submit"
+              class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
+              Proceed to Borrow
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="fixed inset-0 z-50 hidden items-center justify-center" role="dialog" aria-labelledby="confirmationTitle" aria-modal="true">
+      <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
+      <div class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative">
+        <div class="text-center">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Confirm Transaction</h3>
+          <p class="text-sm text-gray-500">Are you sure you want to proceed with this transaction?</p>
+        </div>
+        <div class="flex justify-center space-x-3 mt-6">
+          <button type="button" id="cancelConfirmBtn"
+            class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]">
+            Cancel
+          </button>
+          <button type="button" id="confirmTransactionBtn"
+            class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastNotification" class="fixed bottom-4 right-4 z-50 hidden">
+      <div class="bg-[#2dc653] text-white px-6 py-3 rounded-lg shadow-lg">
+        <p id="toastMessage">Transaction successful!</p>
+      </div>
+    </div>
+
+    <!-- Return Items Modal -->
+    <div id="returnItemsModal" class="fixed inset-0 z-50 hidden items-center justify-center" role="dialog" aria-labelledby="returnItemsTitle" aria-modal="true">
+      <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
+      <div class="bg-white rounded-lg shadow-lg max-w-4xl w-full z-50 p-6 relative">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
+            <span class="font-black text-2xl text-black">Return Items</span>
+          </div>
+        </div>
+        
+        <!-- Search and Filter -->
+        <div class="flex space-x-4 mb-4">
+          <input 
+            type="text" 
+            id="returnSearchInput" 
+            placeholder="Search borrowed items..."
+            class="flex-1 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+          />
+        </div>
+
+        <!-- Borrowed Items Table -->
+        <div class="h-[400px] overflow-y-auto border border-gray-100 rounded-md bg-white">
+          <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-gray-50 sticky top-0 z-10">
+              <tr>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">
+                  <input type="checkbox" id="selectAllItems" class="rounded border-gray-300 text-[#2ca14a] focus:ring-[#2ca14a]">
+                </th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Transaction ID</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Item Name</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Borrowed Qty</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Borrow Date</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Return Qty</th>
+              </tr>
+            </thead>
+            <tbody id="borrowedItemsTable" class="bg-white divide-y divide-gray-200">
+              <!-- Table content will be dynamically populated -->
+              <tr class="h-[250px] text-center text-gray-500 italic">
+                <td colspan="6" class="align-middle">
+                  Loading borrowed items...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Return Notes -->
+        <div class="mt-4">
+          <label for="returnNotes" class="block text-sm font-medium text-gray-700 mb-1">
+            Return Notes
+          </label>
+          <textarea
+            id="returnNotes"
+            rows="3"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+            placeholder="Add any notes about the returned items (condition, damages, etc.)"
+          ></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end space-x-3 mt-6">
+          <button type="button" id="cancelReturnBtn"
+            class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]">
+            Cancel
+          </button>
+          <button type="button" id="confirmReturnBtn"
+            class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
+            Return Selected Items
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Script to access the supabase API -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="/Frontend_Code/js/script.js"></script>
+    <script type="module" src="/Frontend_Code/js/transaction.js"></script>
   </body>
 </html>

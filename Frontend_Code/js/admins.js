@@ -218,11 +218,114 @@ function openEditAdminModal(row) {
 }
 
 function closeEditAdminModal() {
-  editAdminModal.classList.add("hidden");
-  editAdminModal.classList.remove("flex");
-  editAdminForm.reset();
-  adminRowToEdit = null;
+  editAdminModal.classList.add('hidden')
+  editAdminModal.classList.remove('flex')
+  adminRowToEdit = null
+  editAdminForm.reset()
+  document.getElementById('editAdminError').classList.add('hidden')
 }
+
+// Password toggle functionality
+document.querySelectorAll('.password-toggle').forEach(button => {
+  button.addEventListener('click', () => {
+    const input = document.getElementById(button.dataset.passwordInput)
+    const icon = button.querySelector('i')
+    
+    if (input.type === 'password') {
+      input.type = 'text'
+      icon.classList.remove('fa-eye')
+      icon.classList.add('fa-eye-slash')
+    } else {
+      input.type = 'password'
+      icon.classList.remove('fa-eye-slash')
+      icon.classList.add('fa-eye')
+    }
+  })
+})
+
+// Edit form submission handler
+editAdminForm.addEventListener('submit', async (e) => {
+  e.preventDefault()
+  const errorDiv = document.getElementById('editAdminError')
+  errorDiv.classList.add('hidden')
+
+  const adminId = document.getElementById('editAdminId').value
+  const currentPassword = document.getElementById('editCurrentPassword').value
+  const newPassword = document.getElementById('editNewPassword').value
+  const confirmPassword = document.getElementById('editConfirmPassword').value
+  const firstName = document.getElementById('editFirstName').value
+  const middleName = document.getElementById('editMiddleName').value
+  const lastName = document.getElementById('editLastName').value
+
+  // Validate required fields
+  if (!firstName || !lastName) {
+    errorDiv.textContent = 'Please fill in all required fields.'
+    errorDiv.classList.remove('hidden')
+    return
+  }
+
+  // Validate passwords
+  if (newPassword || confirmPassword || currentPassword) {
+    if (!currentPassword) {
+      errorDiv.textContent = 'Current password is required to change password.'
+      errorDiv.classList.remove('hidden')
+      return
+    }
+
+    if (newPassword !== confirmPassword) {
+      errorDiv.textContent = 'New passwords do not match.'
+      errorDiv.classList.remove('hidden')
+      return
+    }
+
+    if (newPassword.length < 8) {
+      errorDiv.textContent = 'New password must be at least 8 characters long.'
+      errorDiv.classList.remove('hidden')
+      return
+    }
+  }
+
+  try {
+    // First verify current password if changing password
+    if (currentPassword) {
+      const isCurrentPasswordValid = await dbhandler.verifyAdminPassword(adminId, currentPassword)
+      if (!isCurrentPasswordValid) {
+        errorDiv.textContent = 'Current password is incorrect.'
+        errorDiv.classList.remove('hidden')
+        return
+      }
+    }
+
+    // Update admin record
+    const result = await dbhandler.updateAdminRecord(
+      adminId,
+      firstName,
+      middleName,
+      lastName,
+      newPassword // Will be undefined if not changing password
+    )
+
+    if (result.includes('ERROR')) {
+      errorDiv.textContent = result.replace(/^ERROR:\s*/i, '')
+      errorDiv.classList.remove('hidden')
+      return
+    }
+
+    // Update the row in the table
+    if (adminRowToEdit) {
+      adminRowToEdit.cells[1].textContent = firstName
+      adminRowToEdit.cells[2].textContent = middleName
+      adminRowToEdit.cells[3].textContent = lastName
+    }
+
+    closeEditAdminModal()
+    showToast('Admin updated successfully')
+  } catch (error) {
+    console.error('Error updating admin:', error)
+    errorDiv.textContent = 'An error occurred while updating the admin.'
+    errorDiv.classList.remove('hidden')
+  }
+})
 
 function openDeleteAdminModal(row) {
   adminRowToDelete = row;
