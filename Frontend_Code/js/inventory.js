@@ -70,40 +70,6 @@ tbody.addEventListener("click", (e) => {
   console.log("Clicked row with the item id of:", pressedId);
 });
 
-function showToast(message, isError = false) {
-  let toast = document.getElementById("custom-toast");
-  if (!toast) {
-    toast = document.createElement("div");
-    toast.id = "custom-toast";
-    toast.style.position = "fixed";
-    toast.style.bottom = "32px";
-    toast.style.right = "32px";
-    toast.style.background = isError
-      ? "rgba(220, 38, 38, 0.95)"
-      : "rgba(44, 161, 74, 0.95)"; // Red for error, green for success
-    toast.style.color = "white";
-    toast.style.padding = "16px 28px";
-    toast.style.borderRadius = "8px";
-    toast.style.fontSize = "16px";
-    toast.style.fontWeight = "bold";
-    toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
-    toast.style.opacity = "0";
-    toast.style.transition = "opacity 0.4s";
-    toast.style.zIndex = "9999";
-    document.body.appendChild(toast);
-  }
-  toast.textContent = message;
-  toast.style.background = isError
-    ? "rgba(220, 38, 38, 0.95)"
-    : "rgba(44, 161, 74, 0.95)";
-  toast.style.opacity = "1";
-  setTimeout(
-    () => {
-      toast.style.opacity = "0";
-    },
-    isError ? 4000 : 3000
-  );
-}
 
 // ===============================================================================================
 // FRONT END-RELATED METHODS

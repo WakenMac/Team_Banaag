@@ -125,8 +125,7 @@ addAdminForm.addEventListener("submit", async (e) => {
         firstName,
         middleName,
         lastName,
-        "randomPassword" // Dili ko manghilabot sa backend code waks hehe
-        // password
+        password // Dili ko manghilabot sa backend code waks hehe (I appreciate the respect dave bwehehe)
       );
 
       if (result.includes("ERROR")) {
@@ -139,7 +138,6 @@ addAdminForm.addEventListener("submit", async (e) => {
           firstName,
           middleName,
           lastName,
-          // "randomPassword"
         );
         console.log(result);
         addAdminError.classList.add("hidden");
@@ -260,6 +258,7 @@ modalBackdropDeleteAdmin.addEventListener("click", closeDeleteAdminModal);
 // Edit form submit
 editAdminForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  const oldAdminId = adminRowToEdit.children[0].textContent.trim();
   const adminId = document.getElementById("editAdminId").value.trim();
   const firstName = document.getElementById("editFirstName").value.trim();
   const middleName = document.getElementById("editMiddleName").value.trim();
@@ -279,22 +278,19 @@ editAdminForm.addEventListener("submit", async (e) => {
     editAdminError.classList.remove("hidden");
     return;
   }
-  // Check for duplicate Admin ID (except for the current row)
-  const rows = tbody.querySelectorAll("tr");
-  for (const row of rows) {
-    if (row !== adminRowToEdit && row.children[0].textContent === adminId) {
-      editAdminError.textContent = "Admin ID is already in use.";
-      editAdminError.classList.remove("hidden");
-      return;
-    }
-  }
+
+  // SQL code can check for existing ids for us~
+  // Updates an admin record
   let result = await dbhandler.updateAdminRecord(
+    oldAdminId,
     adminId,
     firstName,
     middleName,
     lastName,
-    ""
+    "", // Edit this later on
+    ""  // Edit this too later on
   );
+
   if (result && result.includes("ERROR")) {
     editAdminError.textContent = result.replace(/^ERROR:\s*/i, "");
     editAdminError.classList.remove("hidden");

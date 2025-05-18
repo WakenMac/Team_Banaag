@@ -140,21 +140,52 @@ export async function addAdminRecord(adminId, fName, mName, lName, adminPassword
 }
 
 /**
- * Updates the password of a record in the Admin table based on the adminId
- * @param {string} adminId User-defined primary key of the Admin table
- * @param {string} adminPassword Password of the admin to be using the database
+ * Updates most of the attributes of an Admin record based on their adminId
+ * @param {string} oldAdminId       User-defined old primary key of the Admin table
+ * @param {string} newAdminId       User-defined updated primary key of the old admin id in the Admin table
+ * @param {string} oldAdminPassword The old password of the admin to be using the database
+ * @param {string} newAdminPassword The new password of the admin to be using the database
+ * @param {string} fName            First name of the admin
+ * @param {string} mName            Middle name of the admin
+ * @param {string} lName            Last name of the admin
  * @returns A string containing the status of the updated record (Success or Error)
  */
-export async function updateAdminRecordPassword(adminId, adminPassword){
+export async function updateAdminRecord(oldAdminId, newAdminId, fName, mName, lName, oldAdminPassword, newAdminPassword){
     try{
-        let [ sAdminId, sAdminPassword ] = converter('string', adminId, adminPassword);
+        let [ sOldAdminId, sNewAdminId, sFName, sMName, sLName, sOldAdminPassword, sNewAdminPassword ] = converter('string', 
+            oldAdminId, newAdminId, fName, mName, lName, oldAdminPassword, newAdminPassword);
 
-        if (typeof sAdminId !== 'string' || typeof sAdminPassword !== 'string')
-            throw new Error(`ERROR: updateAdminRecord's parameters must be strings.`);
+        if (typeof sOldAdminId !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Admin ID parameter must be a string.")
+            return null;
+        } else if (typeof sNewAdminId !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Admin ID parameter must be a string.")
+            return null;
+        } else if (typeof sFName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's First Name parameter must be a string.")
+            return null;
+        } else if (typeof sMName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Middle Name parameter must be a string.")
+            return null;
+        } else if (typeof sLName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Last Name parameter must be a string.")
+            return null;
+        } else if (typeof sOldAdminPassword !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Old Password parameter must be a string.")
+            return null;
+        } else if (typeof sNewAdminPassword !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's New Password parameter must be a string.")
+            return null;
+        }
 
-        const {data, error: supabaseError} = await supabaseClient.rpc('update_admin_record_password', {
-            input_admin_id: adminId, 
-            input_admin_password: adminPassword
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_admin_record', {
+            input_old_admin_id: sOldAdminId, 
+            input_new_admin_id : sNewAdminId,
+            input_f_name: fName, 
+            input_m_name: mName, 
+            input_l_name: lName, 
+            input_current_admin_password: sOldAdminPassword,
+            input_new_admin_password : sNewAdminPassword
         })
         
         if (supabaseError){
@@ -171,28 +202,168 @@ export async function updateAdminRecordPassword(adminId, adminPassword){
 }
 
 /**
- * Updates most of the attributes of an Admin record based on their adminId
- * @param {string} adminId User-defined primary key of the Admin table
- * @param {string} adminPassword Password of the admin to be using the database
- * @param {string} fName First name of the admin
- * @param {string} mName Middle name of the admin
- * @param {string} lName Last name of the admin
+ * Updates the name and id attributes of an Admin record based on their oldAdminId
+ * @param {string} oldAdminId       User-defined old primary key of the Admin table
+ * @param {string} newAdminId       User-defined updated primary key of the old admin id in the Admin table
+ * @param {string} fName            First name of the admin
+ * @param {string} mName            Middle name of the admin
+ * @param {string} lName            Last name of the admin
  * @returns A string containing the status of the updated record (Success or Error)
  */
-export async function updateAdminRecord(adminId, fName, mName, lName, adminPassword){
+export async function updateAdminRecordIdName(oldAdminId, newAdminId, fName, mName, lName){
     try{
-        let [ sAdminId, sFName, sMName, sLName, sAdminPassword ] = converter('string', adminId, fName, mName, lName, adminPassword);
+        let [ sOldAdminId, sNewAdminId, sFName, sMName, sLName ] = converter('string', 
+            oldAdminId, newAdminId, fName, mName, lName);
 
-        if (typeof sAdminId !== 'string' || typeof sFName !== 'string' || typeof sMName !== 'string' ||
-            typeof sLName !== 'string' || typeof sAdminPassword !== 'string')
-            throw new Error(`ERROR: updateAdminRecord's parameters must be strings.`);
+        if (typeof sOldAdminId !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Admin ID parameter must be a string.")
+            return null;
+        } else if (typeof sNewAdminId !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Admin ID parameter must be a string.")
+            return null;
+        } else if (typeof sFName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's First Name parameter must be a string.")
+            return null;
+        } else if (typeof sMName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Middle Name parameter must be a string.")
+            return null;
+        } else if (typeof sLName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Last Name parameter must be a string.")
+            return null;
+        }
 
-        const {data, error: supabaseError} = await supabaseClient.rpc('update_admin_record', {
-            input_admin_id: adminId, 
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_admin_record_id_name', {
+            input_old_admin_id: sOldAdminId, 
+            input_new_admin_id : sNewAdminId,
             input_f_name: fName, 
             input_m_name: mName, 
             input_l_name: lName, 
-            input_admin_password: adminPassword
+        })
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, error.message);
+            return null;
+        }   else {
+            return data;
+        }
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Updates the name and id attributes of an Admin record based on their oldAdminId
+ * @param {string} adminId       User-defined old primary key of the Admin table
+ * @param {string} fName         First name of the admin
+ * @param {string} mName         Middle name of the admin
+ * @param {string} lName         Last name of the admin
+ * @returns A string containing the status of the updated record (Success or Error)
+ */
+export async function updateAdminRecordName(adminId, fName, mName, lName){
+    try{
+        let [ sAdminId, sFName, sMName, sLName ] = converter('string', 
+            adminId, fName, mName, lName);
+
+        if (typeof sAdminId !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Admin ID parameter must be a string.")
+            return null;
+        } else if (typeof sFName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's First Name parameter must be a string.")
+            return null;
+        } else if (typeof sMName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Middle Name parameter must be a string.")
+            return null;
+        } else if (typeof sLName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Last Name parameter must be a string.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_admin_record_id_name', {
+            input_admin_id: sAdminId, 
+            input_f_name: fName, 
+            input_m_name: mName, 
+            input_l_name: lName, 
+        })
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, error.message);
+            return null;
+        }   else {
+            return data;
+        }
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Updates the password of a record in the Admin table based on the adminId
+ * @param {string} adminId          User-defined primary key of the Admin table
+ * @param {string} oldAdminPassword The old assword of the admin to be using the database
+ * @param {string} newAdminPassword The new password of the admin to be using the database
+ * @returns A string containing the status of the updated record (Success or Error)
+ */
+export async function updateAdminRecordPassword(adminId, oldAdminPassword, newAdminPassword){
+    try{
+        let [ sAdminId, sOldAdminPassword, sNewAdminPassword ] = converter('string', 
+            adminId, oldAdminPassword, newAdminPassword);
+
+        if (typeof sAdminId !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Admin ID parameter must be a string.")
+            return null;
+        } else if (typeof sOldAdminPassword !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Old Password parameter must be a string.")
+            return null;
+        } else if (typeof sNewAdminPassword !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's New Password parameter must be a string.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_admin_record_password', {
+            input_admin_id: sAdminId, 
+            input_current_admin_password: sOldAdminPassword,
+            input_new_admin_password : sNewAdminPassword
+        })
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, error.message);
+            return null;
+        }   else {
+            return data;
+        }
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Checks if an admin with a id and password combination exists in the database
+ * @param {string} adminId          User-defined primary key of the Admin table
+ * @param {string} adminPassword    The old assword of the admin to be using the database
+ * @returns A string containing the status of the updated record (Success or Error)
+ */
+export async function adminExists(adminId, adminPassword){
+    try{
+        let [ sAdminId, sAdminPassword ] = converter('string', 
+            adminId, adminPassword);
+
+        if (typeof sAdminId !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Admin ID parameter must be a string.")
+            return null;
+        } else if (typeof sAdminPassword !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Old Password parameter must be a string.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('admin_exists', {
+            input_admin_id: sAdminId, 
+            input_admin_password: sAdminPassword,
         })
         
         if (supabaseError){
