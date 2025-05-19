@@ -70,6 +70,20 @@ const mockTransactionHistory = [
   }
 ];
 
+const mockBorrowedItems = [
+  {
+    id: 'TRANS-001',
+    transaction_date: '2024-03-15',
+    items: {
+      id: 1,
+      name: 'Microscope',
+      is_consumable: false
+    },
+    quantity: 2,
+    returned_quantity: 0
+  },
+]
+
 // Global state
 let currentAdminId = null;
 let selectedItems = [];
@@ -88,6 +102,8 @@ async function initializePage() {
     showToast('Error loading page. Please refresh.', true);
   }
 }
+
+// TODO: Dave there is an error regarding the tableLoadingState lines that are commented. 
 
 // Helper Functions
 function showLoading() {
@@ -290,9 +306,6 @@ function debounce(func, wait) {
     timeout = setTimeout(later, wait);
   };
 }
-
-// Initialize the page when the DOM is loaded
-document.addEventListener('DOMContentLoaded', initializePage);
 
 // Make functions available globally for onclick handlers
 window.showTransactionDetails = showTransactionDetails;
@@ -606,7 +619,7 @@ function closeReturnModal() {
   const returnItemsModal = document.getElementById('returnItemsModal');
   if (!returnItemsModal) return;
   
-  hideModal(returnItemsModal);
+  hideModal(returnItemsModal.id);
   const returnNotes = document.getElementById('returnNotes');
   const returnSearchInput = document.getElementById('returnSearchInput');
   const selectAllItems = document.getElementById('selectAllItems');
@@ -618,7 +631,7 @@ function closeReturnModal() {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize the page
+  // Initialize the page when the DOM is loaded
   initializePage();
 
   // Get all modal elements
@@ -647,7 +660,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const returnSearchInput = document.getElementById('returnSearchInput');
 
   // Event listeners for transaction type
-  addTransactionBtn?.addEventListener('click', () => showModal(verifyAdminModal));
+  addTransactionBtn?.addEventListener('click', () => showModal(verifyAdminModal.id));
 
   verifyAdminForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -656,8 +669,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const isVerified = await verifyAdmin(adminId, password);
     if (isVerified) {
-      hideModal(verifyAdminModal);
-      showModal(transactionTypeModal);
+      hideModal(verifyAdminModal.id);
+      showModal(transactionTypeModal.id);
       verifyAdminForm.reset();
     } else {
       const errorDiv = document.getElementById('verifyAdminError');
@@ -669,15 +682,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   borrowBtn?.addEventListener('click', () => {
-    hideModal(transactionTypeModal);
-    showModal(borrowItemsModal);
+    hideModal(transactionTypeModal.id);
+    showModal(borrowItemsModal.id);
     initializeItemsList();
   });
 
   returnBtn?.addEventListener('click', () => {
-    hideModal(transactionTypeModal);
+    hideModal(transactionTypeModal.id);
     loadBorrowedItems();
-    showModal(returnItemsModal);
+    showModal(returnItemsModal.id);
   });
 
   // Return functionality event listeners
@@ -714,15 +727,15 @@ document.addEventListener('DOMContentLoaded', () => {
   borrowItemsForm?.addEventListener('submit', (e) => {
     e.preventDefault();
     if (selectedItems.length > 0) {
-      hideModal(borrowItemsModal);
-      showModal(confirmationModal);
+      hideModal(borrowItemsModal.id);
+      showModal(confirmationModal.id);
     } else {
       showToast('Please add at least one item');
     }
   });
 
   confirmTransactionBtn?.addEventListener('click', () => {
-    hideModal(confirmationModal);
+    hideModal(confirmationModal.id);
     showToast('Transaction completed successfully!');
     clearItemsTable();
     const borrowRemarks = document.getElementById('borrowRemarks');
@@ -730,26 +743,30 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   cancelVerifyBtn?.addEventListener('click', () => {
-    hideModal(verifyAdminModal);
+    hideModal(verifyAdminModal.id);
     verifyAdminForm?.reset();
   });
 
   cancelBorrowBtn?.addEventListener('click', () => {
-    hideModal(borrowItemsModal);
+    hideModal(borrowItemsModal.id);
     selectedItems = [];
     const selectedItemsTable = document.getElementById('selectedItemsTable');
     if (selectedItemsTable) selectedItemsTable.innerHTML = '';
   });
 
-  cancelConfirmBtn?.addEventListener('click', () => hideModal(confirmationModal));
+  cancelConfirmBtn?.addEventListener('click', () => hideModal(confirmation.id));
 });
 
 // Make functions available globally
 window.removeItem = removeItem;
 window.updateItemQuantity = updateItemQuantity;
-window.initializeItemsList = initializeItemsList;
+
+// TODO: Make the function to implement item list
+// window.initializeItemsList = initializeItemsList;
 
 function showTransactionDetails(transactionId) {
+  console.log(transactionId);
+
   const transaction = filteredTransactions.find(t => t.transaction_id === transactionId);
   if (!transaction) return;
 
@@ -789,6 +806,7 @@ function showTransactionDetails(transactionId) {
 }
 
 function showModal(modalId) {
+  console.log(modalId)
   const modal = document.getElementById(modalId);
   if (!modal) return;
   modal.classList.remove('hidden');
