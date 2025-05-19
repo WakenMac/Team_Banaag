@@ -203,14 +203,12 @@ export function initializeCommonUI() {
     document.body.appendChild(spinnerContainer.firstElementChild);
   }
 
-  // Add table loading state if not present
   if (!document.getElementById('tableLoadingState')) {
     const tableLoadingContainer = document.createElement('div');
     tableLoadingContainer.innerHTML = tableLoadingHTML;
     document.body.appendChild(tableLoadingContainer.firstElementChild);
   }
 
-  // Setup common dropdowns
   const commonDropdowns = [
     { button: 'masterlistBtn', menu: 'masterlistMenu' },
     { button: 'consumablesBtn', menu: 'consumablesMenu' },
