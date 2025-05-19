@@ -3,8 +3,8 @@ import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
 // Mock data for testing
 const mockAdmins = [
-  { admin_id: '123', password: 'password123', name: 'John Smith' },
-  { admin_id: 'admin', password: 'admin123', name: 'Jane Doe' }
+  { admin_id: '123', password: 'password123', name: 'Chicco' },
+  { admin_id: 'admin', password: 'admin123', name: 'Rar' }
 ];
 
 const mockInventory = [
@@ -73,16 +73,29 @@ const mockTransactionHistory = [
 const mockBorrowedItems = [
   {
     id: 'TRANS-001',
-    transaction_date: '2024-03-15',
-    items: {
-      id: 1,
-      name: 'Microscope',
-      is_consumable: false
-    },
+    items: { name: 'Microscope', is_consumable: false },
     quantity: 2,
-    returned_quantity: 0
+    returned_quantity: 0,
+    transaction_date: '2024-03-15T09:30:00',
+    is_returned: false
   },
-]
+  {
+    id: 'TRANS-002',
+    items: { name: 'Beaker 100ml', is_consumable: false },
+    quantity: 5,
+    returned_quantity: 2,
+    transaction_date: '2024-03-14T14:15:00',
+    is_returned: false
+  },
+  {
+    id: 'TRANS-003',
+    items: { name: 'Test Tube', is_consumable: false },
+    quantity: 10,
+    returned_quantity: 0,
+    transaction_date: '2024-03-14T11:45:00',
+    is_returned: false
+  }
+];
 
 // Global state
 let currentAdminId = null;
@@ -107,13 +120,29 @@ async function initializePage() {
 
 // Helper Functions
 function showLoading() {
-  document.getElementById('loadingSpinner').style.display = 'flex';
-  document.getElementById('tableLoadingState').style.display = 'block';
+  const loadingSpinner = document.getElementById('loadingSpinner');
+  const tableLoadingState = document.getElementById('tableLoadingState');
+  
+  if (loadingSpinner) {
+    loadingSpinner.style.display = 'flex';
+  }
+  
+  if (tableLoadingState) {
+    tableLoadingState.style.display = 'block';
+  }
 }
 
 function hideLoading() {
-  document.getElementById('loadingSpinner').style.display = 'none';
-  document.getElementById('tableLoadingState').style.display = 'none';
+  const loadingSpinner = document.getElementById('loadingSpinner');
+  const tableLoadingState = document.getElementById('tableLoadingState');
+  
+  if (loadingSpinner) {
+    loadingSpinner.style.display = 'none';
+  }
+  
+  if (tableLoadingState) {
+    tableLoadingState.style.display = 'none';
+  }
 }
 
 function showToast(message, isError = false) {
@@ -142,6 +171,8 @@ function getStatusStyle(status) {
       return 'bg-yellow-100 text-yellow-800';
     case 'partially_returned':
       return 'bg-orange-100 text-orange-800';
+    case 'not_returnable':
+      return 'bg-red-100 text-red-800'
     default:
       return 'bg-gray-100 text-gray-800';
   }
@@ -619,7 +650,7 @@ function closeReturnModal() {
   const returnItemsModal = document.getElementById('returnItemsModal');
   if (!returnItemsModal) return;
   
-  hideModal(returnItemsModal.id);
+  hideModal('returnItemsModal');
   const returnNotes = document.getElementById('returnNotes');
   const returnSearchInput = document.getElementById('returnSearchInput');
   const selectAllItems = document.getElementById('selectAllItems');
@@ -660,7 +691,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const returnSearchInput = document.getElementById('returnSearchInput');
 
   // Event listeners for transaction type
-  addTransactionBtn?.addEventListener('click', () => showModal(verifyAdminModal.id));
+  if (addTransactionBtn) {
+    addTransactionBtn.addEventListener('click', () => showModal('verifyAdminModal'));
+  }
 
   verifyAdminForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -669,8 +702,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const isVerified = await verifyAdmin(adminId, password);
     if (isVerified) {
-      hideModal(verifyAdminModal.id);
-      showModal(transactionTypeModal.id);
+      hideModal('verifyAdminModal');
+      showModal('transactionTypeModal');
       verifyAdminForm.reset();
     } else {
       const errorDiv = document.getElementById('verifyAdminError');
@@ -682,23 +715,23 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   borrowBtn?.addEventListener('click', () => {
-    hideModal(transactionTypeModal.id);
-    showModal(borrowItemsModal.id);
+    hideModal('transactionTypeModal');
+    showModal('borrowItemsModal');
     initializeItemsList();
   });
 
   returnBtn?.addEventListener('click', () => {
-    hideModal(transactionTypeModal.id);
+    hideModal('transactionTypeModal');
     loadBorrowedItems();
-    showModal(returnItemsModal.id);
+    showModal('returnItemsModal');
   });
 
   // Return functionality event listeners
-  cancelReturnBtn?.addEventListener('click', closeReturnModal);
+  cancelReturnBtn?.addEventListener('click', () => hideModal('returnItemsModal'));
   confirmReturnBtn?.addEventListener('click', handleReturnItems);
 
   returnItemsModal?.addEventListener('click', (e) => {
-    if (e.target === returnItemsModal) closeReturnModal();
+    if (e.target === returnItemsModal) hideModal('returnItemsModal');
   });
 
   selectAllItems?.addEventListener('change', (e) => {
@@ -727,15 +760,15 @@ document.addEventListener('DOMContentLoaded', () => {
   borrowItemsForm?.addEventListener('submit', (e) => {
     e.preventDefault();
     if (selectedItems.length > 0) {
-      hideModal(borrowItemsModal.id);
-      showModal(confirmationModal.id);
+      hideModal('borrowItemsModal');
+      showModal('confirmationModal');
     } else {
       showToast('Please add at least one item');
     }
   });
 
   confirmTransactionBtn?.addEventListener('click', () => {
-    hideModal(confirmationModal.id);
+    hideModal('confirmationModal');
     showToast('Transaction completed successfully!');
     clearItemsTable();
     const borrowRemarks = document.getElementById('borrowRemarks');
@@ -743,18 +776,18 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   cancelVerifyBtn?.addEventListener('click', () => {
-    hideModal(verifyAdminModal.id);
+    hideModal('verifyAdminModal');
     verifyAdminForm?.reset();
   });
 
   cancelBorrowBtn?.addEventListener('click', () => {
-    hideModal(borrowItemsModal.id);
+    hideModal('borrowItemsModal');
     selectedItems = [];
     const selectedItemsTable = document.getElementById('selectedItemsTable');
     if (selectedItemsTable) selectedItemsTable.innerHTML = '';
   });
 
-  cancelConfirmBtn?.addEventListener('click', () => hideModal(confirmation.id));
+  cancelConfirmBtn?.addEventListener('click', () => hideModal('confirmationModal'));
 });
 
 // Make functions available globally
@@ -770,6 +803,9 @@ function showTransactionDetails(transactionId) {
   const transaction = filteredTransactions.find(t => t.transaction_id === transactionId);
   if (!transaction) return;
 
+  const modal = document.getElementById('transactionDetailsModal');
+  if (!modal) return;
+
   // Update modal content
   document.getElementById('transactionIdDisplay').textContent = `Transaction ID: ${transaction.transaction_id}`;
   document.getElementById('adminInfoDisplay').textContent = transaction.admin_name;
@@ -784,44 +820,76 @@ function showTransactionDetails(transactionId) {
 
   // Update items table
   const itemsTable = document.getElementById('transactionItemsTable');
-  itemsTable.innerHTML = transaction.items.map(item => `
-    <tr>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.name}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.quantity}</td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        ${item.is_consumable ? 'Consumable' : 'Non-consumable'}
-      </td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm">
-        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(transaction.status)}">
-          ${transaction.status.replace('_', ' ')}
-        </span>
-      </td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-        ${item.is_consumable ? 'No' : 'Yes'}
-      </td>
-    </tr>
-  `).join('');
+  if (itemsTable) {
+    itemsTable.innerHTML = transaction.items.map(item => `
+      <tr>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.name}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.quantity}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          ${item.is_consumable ? 'Consumable' : 'Non-consumable'}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(transaction.status)}">
+            ${transaction.status.replace('_', ' ')}
+          </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          ${item.is_consumable ? 'No' : 'Yes'}
+        </td>
+      </tr>
+    `).join('');
+  }
 
+  // Show the modal
   showModal('transactionDetailsModal');
+
+  // Add event listeners for closing the modal
+  const closeBtn = document.getElementById('closeDetailsBtn');
+  const closeModalBtn = document.getElementById('closeDetailsModalBtn');
+  
+  if (closeBtn) {
+    closeBtn.onclick = () => hideModal('transactionDetailsModal');
+  }
+  
+  if (closeModalBtn) {
+    closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
+  }
 }
 
 function showModal(modalId) {
   console.log(modalId)
   const modal = document.getElementById(modalId);
-  if (!modal) return;
+  if (!modal) {
+    console.error(`Modal with ID ${modalId} not found`);
+    return;
+  }
   modal.classList.remove('hidden');
   modal.classList.add('flex');
-
-  // Add event listeners for closing the modal
-  const closeButtons = modal.querySelectorAll('[id$="closeDetailsBtn"], [id$="closeDetailsModalBtn"]');
-  closeButtons.forEach(button => {
-    button.addEventListener('click', () => hideModal(modalId));
-  });
 }
 
 function hideModal(modalId) {
   const modal = document.getElementById(modalId);
-  if (!modal) return;
+  if (!modal) {
+    console.error(`Modal with ID ${modalId} not found`);
+    return;
+  }
   modal.classList.add('hidden');
   modal.classList.remove('flex');
+}
+
+// Initialize items list for borrowing
+function initializeItemsList() {
+  const itemsList = document.getElementById('itemsList');
+  if (!itemsList) return;
+
+  // Clear existing options
+  itemsList.innerHTML = '';
+
+  // Add items from mock inventory
+  mockInventory.forEach(item => {
+    const option = document.createElement('option');
+    option.value = item.item_name;
+    option.textContent = `${item.item_name} (${item.available_quantity} available)`;
+    itemsList.appendChild(option);
+  });
 } 
