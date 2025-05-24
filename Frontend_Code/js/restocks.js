@@ -56,10 +56,7 @@ const remarksForm = document.getElementById("remarksForm");
 const cancelRemarksBtn = document.getElementById("cancelRemarksBtn");
 const modalBackdropRemarks = document.getElementById("modalBackdropRemarks");
 
-// Initialize table components
-initialize();
-
-async function initialize() {
+document.addEventListener('DOMContentLoaded', async function() {
   setupDropdownElements();
 
   tbody = document.querySelector("#restocksTableBody");
@@ -68,14 +65,14 @@ async function initialize() {
     return;
   }
 
-  await initializeRestocksTable();
   await initializeDataList();
+  await initializeRestocksTable();
   await initializeReferenceTable();
   setupEventListeners();
   setupDateValidation();
 
   showToast("Loaded page successfully!");
-}
+});
 
 function initializeRestocks() {
   if (!tbody) {
@@ -92,7 +89,7 @@ function setupEventListeners() {
   cancelRestockBtn.addEventListener("click", closeAddModal);
   modalBackdropAddRestock.addEventListener("click", closeAddModal);
   addRestockForm.addEventListener("submit", handleAddRestockSubmit);
-  addRestockItemName.addEventListener('input', async () => {
+  addRestockItemName.addEventListener('input', () => {
     let searchIndex = findItemIndex(addRestockItemName.value.toLowerCase());
     
     if (searchIndex != -1){
@@ -106,7 +103,6 @@ function setupEventListeners() {
     } else {
       resetBrandOption();
       addRestockForm.restockQuantity.step = "1";
-      console.error("Unable to find item name:", addRestockItemName.value + " in the inventory.");
     }
   });
 
@@ -281,13 +277,12 @@ function createNewRestockRow(
  * Method to add a new unit to the addEquipmentUnit and editEquipmentUnit dropdown element
  * @param {string} unitTypeName Name of the unit type to be added
  */
-function createNewOption(itemName) {
+async function createNewOption(itemName) {
   const op1 = document.createElement("option");
-  const op2 = document.createElement("option");
+  op1.textContent = itemName;
   op1.value = itemName;
-  op2.value = itemName;
+  console.log(addDataList);
   addDataList.appendChild(op1);
-  // editDataList.appendChild(tr2);
 }
 
 function createNewBrandOption(itemBrand){
@@ -1235,12 +1230,10 @@ async function initializeDataList(){
       return;
     }
 
-    for (let i = 0; i < data.length; i++){
-      console.log(data[i]["Name"]);
-      createNewOption(data[i]["Name"]);
-    }
+    addDataList.innerHTML = '';
+    for (let i = 0; i < data.length; i++)
+      await createNewOption(data[i]["Name"]);
     
-
   } catch (generalError) {
     console.error(generalError);
   }

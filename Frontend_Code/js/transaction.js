@@ -884,6 +884,7 @@ function initializeItemsList() {
 
   // Clear existing options
   itemsList.innerHTML = '';
+  console.log(itemsList);
 
   // Add items from mock inventory
   mockInventory.forEach(item => {
