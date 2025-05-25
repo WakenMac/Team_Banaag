@@ -198,7 +198,7 @@
         <button
           aria-controls="verifyAdminModal"
           aria-haspopup="dialog"
-          class="mr-4 custom-btn"
+          class="custom-btn"
           id="addTransactionBtn"
           type="button"
         >
@@ -631,10 +631,10 @@
       <div class="fixed inset-0 bg-black opacity-50 modal-backdrop"></div>
       <div class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
         <div class="flex items-center gap-3 mb-6">
-          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
-          <span class="font-black text-3xl text-black">Log out</span>
+          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="object-contain w-12 h-12" />
+          <span class="text-3xl font-black text-black">Log out</span>
         </div>
-        <p class="text-gray-700 mb-6">
+        <p class="mb-6 text-gray-700">
           Are you sure you want to log out?
         </p>
         <div class="flex justify-end space-x-3">
@@ -646,7 +646,7 @@
             Cancel
           </button>
           <button
-            class="px-4 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+            class="px-4 py-2 font-semibold text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
             id="confirmLogoutBtn"
             type="button"
           >
@@ -660,7 +660,7 @@
     <button
       id="logoutBtn"
       title="Logout"
-      class="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-white border border-gray-300 shadow-lg hover:bg-red-100 group transition"
+      class="fixed z-50 p-3 transition bg-white border border-gray-300 rounded-full shadow-lg bottom-6 right-6 hover:bg-red-100 group"
       type="button"
     >
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-500 group-hover:text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
