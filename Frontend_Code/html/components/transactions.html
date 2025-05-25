@@ -50,7 +50,7 @@
     <!-- Navigation Bar -->
     <nav class="flex items-center justify-between px-4 md:px-8 lg:px-12 h-20 border-b border-gray-300 bg-[#f3f7f7]">
       <!-- Left side: Logo and Title -->
-      <a href="/Frontend_Code/html/main.html" class="flex items-center space-x-3 group">
+      <a href="/Frontend_Code/html/dashboard.html" class="flex items-center space-x-3 group">
         <img
           alt="CAS Lab logo"
           class="w-12 h-12 object-contain transition-transform"
@@ -72,7 +72,7 @@
       <ul class="flex space-x-8 text-[13px] font-normal text-black">
         <li>
           <a class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]" 
-             href="/Frontend_Code/html/main.html">Dashboard</a>
+             href="/Frontend_Code/html/dashboard.html">Dashboard</a>
         </li>
         <li class="relative">
           <button class="inline-flex items-center cursor-pointer select-none focus:outline-none" 
@@ -220,9 +220,11 @@
             id="transactionFilter"
             class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-48"
           >
-            <option value="all">All Types</option>
-            <option value="borrow">Borrow</option>
-            <option value="return">Return</option>
+            <option value="all">All Status</option>
+            <option value="completed">Completed</option>
+            <option value="pending_return">Pending Return</option>
+            <option value="partially_returned">Partially Returned</option>
+            <option value="not_returnable">Not Returnable</option>
           </select>
 
           <!-- Date Range Filters -->
@@ -271,7 +273,7 @@
     </main>
 
     <!-- Transaction Details Modal -->
-    <div id="transactionDetailsModal" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4" role="dialog" aria-labelledby="transactionDetailsTitle" aria-modal="true">
+    <div id="transactionDetailsModal" class="fixed inset-0 z-50 hidden items-center justify-center p-2 sm:p-4" role="dialog" aria-labelledby="transactionDetailsTitle" aria-modal="true">
       <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
       <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl sm:max-w-3xl md:max-w-4xl lg:max-w-5xl z-50 p-2 sm:p-4 md:p-6 relative overflow-visible">
         <div class="flex items-center justify-between mb-6">

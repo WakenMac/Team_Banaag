@@ -28,7 +28,7 @@
     <div id="loadingSpinner" class="fixed inset-0 z-50 flex items-center justify-center bg-[#f3f7f7]">
       <div class="flex flex-col items-center">
         <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2ca14a]"></div>
-        <p class="mt-4 text-gray-600 text-lg font-medium">Loading...</p>
+        <p class="mt-4 text-lg font-medium text-gray-600">Loading...</p>
       </div>
     </div>
     
@@ -37,18 +37,18 @@
     >
       <!-- Left side: Logo and Title -->
       <a
-        href="/Frontend_Code/html/main.html"
+        href="/Frontend_Code/html/dashboard.html"
         class="flex items-center space-x-3 group"
       >
         <img
           alt="CAS Lab logo with green and yellow colors, circular emblem with text"
-          class="w-12 h-12 object-contain transition-transform"
+          class="object-contain w-12 h-12 transition-transform"
           height="48"
           src="/Frontend_Code/images/cas_logo.png"
           width="48"
         />
         <div class="flex flex-col leading-tight">
-          <span class="font-semibold text-black text-sm"> CARES. </span>
+          <span class="text-sm font-semibold text-black"> CARES. </span>
           <span class="text-[9px] font-semibold text-black/80 tracking-tight">
             CENTRALIZED RESOURCE
           </span>
@@ -56,13 +56,13 @@
             AND EQUIPMENT SYSTEM
           </span>
         </div>
-        <div class="border-l border-black/40 h-10 ml-4"></div>
+        <div class="h-10 ml-4 border-l border-black/40"></div>
       </a>
 
       <ul class="flex space-x-8 text-[13px] font-normal text-black">
         <li>
           <a class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none"
-             href="/Frontend_Code/html/main.html">Dashboard</a>
+             href="/Frontend_Code/html/dashboard.html">Dashboard</a>
         </li>
         <li class="relative">
           <button class="inline-flex items-center cursor-pointer select-none focus:outline-none" 
@@ -71,9 +71,9 @@
                   aria-expanded="false"
                   aria-haspopup="true">
             Masterlist
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"></i>
+            <i class="ml-1 text-xs text-black fas fa-chevron-down"></i>
           </button>
-          <ul class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10" 
+          <ul class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-36" 
               id="masterlistMenu"
               role="menu"
               aria-labelledby="masterlistBtn">
@@ -98,9 +98,9 @@
                   aria-expanded="false"
                   aria-haspopup="true">
             Consumables
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"></i>
+            <i class="ml-1 text-xs text-black fas fa-chevron-down"></i>
           </button>
-          <ul class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10" 
+          <ul class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-36" 
               id="consumablesMenu"
               role="menu"
               aria-labelledby="consumablesBtn">
@@ -125,9 +125,9 @@
                   aria-expanded="false"
                   aria-haspopup="true">
             Non-consumables
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"></i>
+            <i class="ml-1 text-xs text-black fas fa-chevron-down"></i>
           </button>
-          <ul class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10" 
+          <ul class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-44" 
               id="nonconsumablesMenu"
               role="menu"
               aria-labelledby="nonconsumablesBtn">
@@ -158,9 +158,9 @@
                   aria-expanded="false"
                   aria-haspopup="true">
             Properties
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"></i>
+            <i class="ml-1 text-xs text-black fas fa-chevron-down"></i>
           </button>
-          <ul class="absolute left-0 top-full mt-1 w-40 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10" 
+          <ul class="absolute left-0 z-10 invisible w-40 mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full" 
               id="propertiesMenu"
               role="menu"
               aria-labelledby="propertiesBtn">
@@ -193,12 +193,12 @@
       </ul>
 
     </nav>
-    <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 mt-6">
-      <div class="flex justify-end items-center w-full">
+    <main class="max-w-full px-4 mx-auto mt-6 sm:px-6 lg:px-12">
+      <div class="flex items-center justify-end w-full">
         <button
           aria-controls="verifyAdminModal"
           aria-haspopup="dialog"
-          class="custom-btn mr-4"
+          class="mr-4 custom-btn"
           id="addTransactionBtn"
           type="button"
         >
@@ -211,35 +211,35 @@
     <div
       aria-labelledby="modalTitle"
       aria-modal="true"
-      class="fixed inset-0 z-50 hidden items-center justify-center"
+      class="fixed inset-0 z-50 items-center justify-center hidden"
       id="addAdminModal"
       role="dialog"
     >
       <div
-        class="modal-backdrop fixed inset-0 bg-black opacity-50"
+        class="fixed inset-0 bg-black opacity-50 modal-backdrop"
         id="modalBackdrop"
       ></div>
       <div
-        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+        class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg"
       >
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
             <img
               src="/Frontend_Code/images/cas_logo.png"
               alt="CARES logo"
-              class="w-12 h-12 object-contain"
+              class="object-contain w-12 h-12"
             />
-            <span class="font-black text-3xl text-black">New Transaction</span>
+            <span class="text-3xl font-black text-black">New Transaction</span>
           </div>
         </div>
         <form class="space-y-4" id="addAdminForm">
           <div
             id="addAdminError"
-            class="hidden mb-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded px-3 py-2"
+            class="hidden px-3 py-2 mb-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded"
           ></div>
           <div>
             <label
-              class="block text-sm font-medium text-gray-700 mb-1"
+              class="block mb-1 text-sm font-medium text-gray-700"
               for="adminId"
             >
               <span class="text-red-500">*</span>
@@ -255,7 +255,7 @@
           </div>
           <div>
             <label
-              class="block text-sm font-medium text-gray-700 mb-1"
+              class="block mb-1 text-sm font-medium text-gray-700"
               for="firstName"
             >
               First Name <span class="text-red-500">*</span>
@@ -271,7 +271,7 @@
           </div>
           <div>
             <label
-              class="block text-sm font-medium text-gray-700 mb-1"
+              class="block mb-1 text-sm font-medium text-gray-700"
               for="middleName"
             >
               Middle Name
@@ -286,7 +286,7 @@
           </div>
           <div>
             <label
-              class="block text-sm font-medium text-gray-700 mb-1"
+              class="block mb-1 text-sm font-medium text-gray-700"
               for="lastName"
             >
               Last Name <span class="text-red-500">*</span>
@@ -300,7 +300,7 @@
               placeholder="e.g. Smith"
             />
           </div>
-          <div class="flex justify-end space-x-3 pt-4">
+          <div class="flex justify-end pt-4 space-x-3">
             <button
               class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
               id="cancelBtn"
@@ -322,19 +322,19 @@
     <!-- End of New Transaction Modal -->
 
     <!-- Verify Admin for Transaction Modal -->
-    <div id="verifyAdminModal" class="fixed inset-0 z-50 hidden items-center justify-center" role="dialog" aria-labelledby="verifyAdminTitle" aria-modal="true">
-      <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
-      <div class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative">
+    <div id="verifyAdminModal" class="fixed inset-0 z-50 items-center justify-center hidden" role="dialog" aria-labelledby="verifyAdminTitle" aria-modal="true">
+      <div class="fixed inset-0 bg-black opacity-50 modal-backdrop"></div>
+      <div class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
-            <span class="font-black text-2xl text-black">Admin Verification</span>
+            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="object-contain w-12 h-12" />
+            <span class="text-2xl font-black text-black">Admin Verification</span>
           </div>
         </div>
         <form id="verifyAdminForm" class="space-y-4">
-          <div id="verifyAdminError" class="hidden mb-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded px-3 py-2"></div>
+          <div id="verifyAdminError" class="hidden px-3 py-2 mb-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded"></div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1" for="verifyAdminId">
+            <label class="block mb-1 text-sm font-medium text-gray-700" for="verifyAdminId">
               Admin ID <span class="text-red-500">*</span>
             </label>
             <input type="text" id="verifyAdminId" name="verifyAdminId" required
@@ -342,14 +342,14 @@
               placeholder="Enter your admin ID" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1" for="verifyAdminPassword">
+            <label class="block mb-1 text-sm font-medium text-gray-700" for="verifyAdminPassword">
               Password <span class="text-red-500">*</span>
             </label>
             <input type="password" id="verifyAdminPassword" name="verifyAdminPassword" required
               class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
               placeholder="Enter your password" />
           </div>
-          <div class="flex justify-end space-x-3 pt-4">
+          <div class="flex justify-end pt-4 space-x-3">
             <button type="button" id="cancelVerifyBtn"
               class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]">
               Cancel
@@ -364,13 +364,13 @@
     </div>
 
     <!-- Transaction Type Selection Modal -->
-    <div id="transactionTypeModal" class="fixed inset-0 z-50 hidden items-center justify-center" role="dialog" aria-labelledby="transactionTypeTitle" aria-modal="true">
-      <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
-      <div class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative">
+    <div id="transactionTypeModal" class="fixed inset-0 z-50 items-center justify-center hidden" role="dialog" aria-labelledby="transactionTypeTitle" aria-modal="true">
+      <div class="fixed inset-0 bg-black opacity-50 modal-backdrop"></div>
+      <div class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
-            <span class="font-black text-2xl text-black">Borrow Items</span>
+            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="object-contain w-12 h-12" />
+            <span class="text-2xl font-black text-black">Borrow Items</span>
           </div>
         </div>
         <div class="flex justify-center">
@@ -382,17 +382,17 @@
     </div>
 
     <!-- Borrow Items Modal -->
-    <div id="borrowItemsModal" class="fixed inset-0 z-50 hidden items-center justify-center" role="dialog" aria-labelledby="borrowItemsTitle" aria-modal="true">
-      <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
-      <div class="bg-white rounded-lg shadow-lg max-w-4xl w-full z-50 p-6 relative">
+    <div id="borrowItemsModal" class="fixed inset-0 z-50 items-center justify-center hidden" role="dialog" aria-labelledby="borrowItemsTitle" aria-modal="true">
+      <div class="fixed inset-0 bg-black opacity-50 modal-backdrop"></div>
+      <div class="relative z-50 w-full max-w-4xl p-6 bg-white rounded-lg shadow-lg">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
-            <span class="font-black text-2xl text-black">Borrow Items</span>
+            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="object-contain w-12 h-12" />
+            <span class="text-2xl font-black text-black">Borrow Items</span>
           </div>
         </div>
         <form id="borrowItemsForm" class="space-y-4">
-          <div class="flex space-x-4 mb-4">
+          <div class="flex mb-4 space-x-4">
             <div class="flex-1">
               <input list="itemsList" id="itemSearch" name="itemSearch" placeholder="Search for items..."
                 class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent" />
@@ -409,18 +409,18 @@
           <!-- Table with fixed height and scrolling -->
           <div class="h-[300px] overflow-y-auto border border-gray-100 rounded-md bg-white">
             <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50 sticky top-0 z-10">
+              <table class="min-w-full text-sm divide-y divide-gray-200">
+                <thead class="sticky top-0 z-10 bg-gray-50">
                   <tr>
-                    <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Item Name</th>
-                    <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200">Available Qty</th>
-                    <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200">Borrow Qty</th>
-                    <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200">Actions</th>
+                    <th class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200">Item Name</th>
+                    <th class="px-6 py-3 font-semibold text-center text-gray-900 border-b border-gray-200">Available Qty</th>
+                    <th class="px-6 py-3 font-semibold text-center text-gray-900 border-b border-gray-200">Borrow Qty</th>
+                    <th class="px-6 py-3 font-semibold text-center text-gray-900 border-b border-gray-200">Actions</th>
                   </tr>
                 </thead>
                 <tbody id="selectedItemsTable" class="bg-white divide-y divide-gray-200">
                   <tr id="noItemsRow" class="h-[250px]">
-                    <td colspan="4" class="px-6 py-4 text-center text-gray-500 italic align-middle">
+                    <td colspan="4" class="px-6 py-4 italic text-center text-gray-500 align-middle">
                       <div class="flex items-center justify-center h-full">
                         No items added yet
                       </div>
@@ -433,7 +433,7 @@
 
           <!-- Remarks Field -->
           <div class="mt-4">
-            <label for="borrowRemarks" class="block text-sm font-medium text-gray-700 mb-1">
+            <label for="borrowRemarks" class="block mb-1 text-sm font-medium text-gray-700">
               Remarks
             </label>
             <textarea
@@ -446,12 +446,12 @@
           </div>
 
           <!-- Note about consumable items -->
-          <div class="mt-4 flex items-center text-sm text-gray-500">
+          <div class="flex items-center mt-4 text-sm text-gray-500">
             <i class="fas fa-info-circle text-[#2ca14a] mr-2"></i>
             <span>Items marked with <span class="font-medium text-[#2ca14a]">*</span> are consumable and will not be returned.</span>
           </div>
 
-          <div class="flex justify-end space-x-3 pt-4">
+          <div class="flex justify-end pt-4 space-x-3">
             <button type="button" id="cancelBorrowBtn"
               class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]">
               Cancel
@@ -466,14 +466,14 @@
     </div>
 
     <!-- Confirmation Modal -->
-    <div id="confirmationModal" class="fixed inset-0 z-50 hidden items-center justify-center" role="dialog" aria-labelledby="confirmationTitle" aria-modal="true">
-      <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
-      <div class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative">
+    <div id="confirmationModal" class="fixed inset-0 z-50 items-center justify-center hidden" role="dialog" aria-labelledby="confirmationTitle" aria-modal="true">
+      <div class="fixed inset-0 bg-black opacity-50 modal-backdrop"></div>
+      <div class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
         <div class="text-center">
-          <h3 class="text-lg font-medium text-gray-900 mb-4">Confirm Transaction</h3>
+          <h3 class="mb-4 text-lg font-medium text-gray-900">Confirm Transaction</h3>
           <p class="text-sm text-gray-500">Are you sure you want to proceed with this transaction?</p>
         </div>
-        <div class="flex justify-center space-x-3 mt-6">
+        <div class="flex justify-center mt-6 space-x-3">
           <button type="button" id="cancelConfirmBtn"
             class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]">
             Cancel
@@ -487,20 +487,20 @@
     </div>
 
     <!-- Toast Notification -->
-    <div id="toastNotification" class="fixed bottom-4 right-4 z-50 hidden">
+    <div id="toastNotification" class="fixed z-50 hidden bottom-4 right-4">
       <div class="bg-[#2dc653] text-white px-6 py-3 rounded-lg shadow-lg">
         <p id="toastMessage">Transaction successful!</p>
       </div>
     </div>
 
     <!-- Return Items Modal -->
-    <div id="returnItemsModal" class="fixed inset-0 z-50 hidden items-center justify-center" role="dialog" aria-labelledby="returnItemsTitle" aria-modal="true">
-      <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
-      <div class="bg-white rounded-lg shadow-lg max-w-4xl w-full z-50 p-6 relative">
+    <div id="returnItemsModal" class="fixed inset-0 z-50 items-center justify-center hidden" role="dialog" aria-labelledby="returnItemsTitle" aria-modal="true">
+      <div class="fixed inset-0 bg-black opacity-50 modal-backdrop"></div>
+      <div class="relative z-50 w-full max-w-4xl p-6 bg-white rounded-lg shadow-lg">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
-            <span class="font-black text-2xl text-black">Return Items</span>
+            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="object-contain w-12 h-12" />
+            <span class="text-2xl font-black text-black">Return Items</span>
           </div>
           <button onclick="hideModal('returnItemsModal')" class="text-gray-400 hover:text-gray-500">
             <i class="fas fa-times"></i>
@@ -509,13 +509,13 @@
         
         <!-- Items Table -->
         <div class="h-[400px] overflow-y-auto border border-gray-100 rounded-md bg-white">
-          <table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50 sticky top-0 z-10">
+          <table class="min-w-full text-sm divide-y divide-gray-200">
+            <thead class="sticky top-0 z-10 bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Item Name</th>
-                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Borrowed Quantity</th>
-                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Return Quantity</th>
-                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Action</th>
+                <th class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200">Item Name</th>
+                <th class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200">Borrowed Quantity</th>
+                <th class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200">Return Quantity</th>
+                <th class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200">Action</th>
               </tr>
             </thead>
             <tbody id="borrowedItemsTable" class="bg-white divide-y divide-gray-200">
@@ -526,7 +526,7 @@
 
         <!-- Return Notes -->
         <div class="mt-4">
-          <label for="returnNotes" class="block text-sm font-medium text-gray-700 mb-1">
+          <label for="returnNotes" class="block mb-1 text-sm font-medium text-gray-700">
             Return Notes
           </label>
           <textarea
@@ -538,7 +538,7 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex justify-end space-x-3 mt-6">
+        <div class="flex justify-end mt-6 space-x-3">
           <button type="button" onclick="hideModal('returnItemsModal')"
             class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]">
             Close
@@ -548,13 +548,13 @@
     </div>
 
     <!-- Transaction Details Modal -->
-    <div id="transactionDetailsModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" role="dialog" aria-labelledby="transactionDetailsTitle" aria-modal="true">
-      <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
+    <div id="transactionDetailsModal" class="fixed inset-0 z-50 items-center justify-center hidden p-4" role="dialog" aria-labelledby="transactionDetailsTitle" aria-modal="true">
+      <div class="fixed inset-0 bg-black opacity-50 modal-backdrop"></div>
       <div class="bg-white rounded-lg shadow-lg w-[98vw] max-w-6xl z-50 p-6 relative">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
-            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
-            <span class="font-black text-2xl text-black">Transaction Details</span>
+            <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="object-contain w-12 h-12" />
+            <span class="text-2xl font-black text-black">Transaction Details</span>
           </div>
           <button id="closeDetailsModalBtn" class="text-gray-400 hover:text-gray-500">
             <i class="fas fa-times"></i>
@@ -594,12 +594,12 @@
           <table class="w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-900 border-b border-gray-200">Item Name</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-900 border-b border-gray-200">Quantity</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-900 border-b border-gray-200">Type</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-900 border-b border-gray-200">Return Status</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-900 border-b border-gray-200">Returnable</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-900 border-b border-gray-200">Action</th>
+                <th class="px-6 py-3 text-xs font-semibold text-left text-gray-900 border-b border-gray-200">Item Name</th>
+                <th class="px-6 py-3 text-xs font-semibold text-left text-gray-900 border-b border-gray-200">Quantity</th>
+                <th class="px-6 py-3 text-xs font-semibold text-left text-gray-900 border-b border-gray-200">Type</th>
+                <th class="px-6 py-3 text-xs font-semibold text-left text-gray-900 border-b border-gray-200">Return Status</th>
+                <th class="px-6 py-3 text-xs font-semibold text-left text-gray-900 border-b border-gray-200">Returnable</th>
+                <th class="px-6 py-3 text-xs font-semibold text-left text-gray-900 border-b border-gray-200">Action</th>
               </tr>
             </thead>
             <tbody id="transactionItemsTable" class="bg-white divide-y divide-gray-200">
@@ -610,12 +610,12 @@
 
         <!-- Remarks Field -->
         <div class="mt-8">
-          <h3 class="text-base font-semibold text-gray-900 mb-2">Remarks</h3>
-          <div class="bg-gray-50 rounded-md p-4 text-sm text-gray-800" id="remarksDisplay"></div>
+          <h3 class="mb-2 text-base font-semibold text-gray-900">Remarks</h3>
+          <div class="p-4 text-sm text-gray-800 rounded-md bg-gray-50" id="remarksDisplay"></div>
         </div>
         <div class="mt-4">
-          <h3 class="text-base font-semibold text-gray-900 mb-2">Return Remarks</h3>
-          <div class="bg-gray-50 rounded-md p-4 text-sm text-gray-800" id="returnRemarksDisplay"></div>
+          <h3 class="mb-2 text-base font-semibold text-gray-900">Return Remarks</h3>
+          <div class="p-4 text-sm text-gray-800 rounded-md bg-gray-50" id="returnRemarksDisplay"></div>
         </div>
 
         <div class="flex justify-end mt-6">
@@ -625,6 +625,48 @@
         </div>
       </div>
     </div>
+
+    <!-- Logout Confirmation Modal (matching delete modal style) -->
+    <div id="logoutModal" class="fixed inset-0 z-50 items-center justify-center hidden">
+      <div class="fixed inset-0 bg-black opacity-50 modal-backdrop"></div>
+      <div class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
+        <div class="flex items-center gap-3 mb-6">
+          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
+          <span class="font-black text-3xl text-black">Log out</span>
+        </div>
+        <p class="text-gray-700 mb-6">
+          Are you sure you want to log out?
+        </p>
+        <div class="flex justify-end space-x-3">
+          <button
+            class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
+            id="cancelLogoutBtn"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="px-4 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+            id="confirmLogoutBtn"
+            type="button"
+          >
+            Log out
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!--Logout Button -->
+    <button
+      id="logoutBtn"
+      title="Logout"
+      class="fixed bottom-6 right-6 z-50 p-3 rounded-full bg-white border border-gray-300 shadow-lg hover:bg-red-100 group transition"
+      type="button"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-500 group-hover:text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1" />
+      </svg>
+    </button>
 
     <!-- Script to access the supabase API -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

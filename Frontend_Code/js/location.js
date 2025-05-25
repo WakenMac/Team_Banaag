@@ -286,9 +286,6 @@ function createNewLocationRow(locationId, locationName) {
                 <button aria-label="Edit location" class="text-yellow-400 hover:text-yellow-500">
                   <i class="fas fa-pencil-alt"></i>
                 </button>
-                <button aria-label="Delete location" class="text-red-600 hover:text-red-700">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
               </td>
             `;
 

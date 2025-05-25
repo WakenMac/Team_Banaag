@@ -290,8 +290,6 @@ function createNewUnitTypeRow(unitTypeId, unitTypeName) {
                   <button aria-label="Edit unit type" class="text-yellow-400 hover:text-yellow-500">
                     <i class="fas fa-pencil-alt"></i>
                   </button>
-                  <button aria-label="Delete unit type" class="text-red-600 hover:text-red-700">
-                    <i class="fas fa-trash-alt"></i>
                 </td>
               `;
 

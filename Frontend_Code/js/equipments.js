@@ -142,9 +142,6 @@ function createNewEquipmentRow(
       <button aria-label="Edit equipment" class="text-yellow-400 hover:text-yellow-500">
         <i class="fas fa-pencil-alt"></i>
       </button>
-      <button aria-label="Delete equipment" class="text-red-600 hover:text-red-700">
-        <i class="fas fa-trash-alt"></i>
-      </button>
     </td>
   `;
 

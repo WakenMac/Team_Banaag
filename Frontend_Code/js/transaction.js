@@ -159,6 +159,12 @@ let currentAdminId = null;
 let selectedItems = [];
 let filteredTransactions = [];
 
+// Mock admin credentials for testing
+const mockAdmin = {
+    id: "123",
+    password: "admin123"
+};
+
 // Initialize the page
 async function initializePage() {
   try {
@@ -255,7 +261,7 @@ async function loadTransactionHistory() {
     // Use in-memory mockTransactionHistory
     // Apply filters
     const searchTerm = document.getElementById('transactionSearch')?.value.toLowerCase() || '';
-    const type = document.getElementById('transactionFilter')?.value || 'all';
+    const status = document.getElementById('transactionFilter')?.value || 'all';
     const startDate = document.getElementById('startDate')?.value;
     const endDate = document.getElementById('endDate')?.value;
 
@@ -264,13 +270,13 @@ async function loadTransactionHistory() {
         transaction.transaction_id.toLowerCase().includes(searchTerm) ||
         transaction.admin_name.toLowerCase().includes(searchTerm);
 
-      const matchesType = type === 'all' || transaction.type === type;
+      const matchesStatus = status === 'all' || transaction.status === status;
 
       const transactionDate = new Date(transaction.date);
       const matchesDateRange = (!startDate || transactionDate >= new Date(startDate)) &&
                               (!endDate || transactionDate <= new Date(endDate));
 
-      return matchesSearch && matchesType && matchesDateRange;
+      return matchesSearch && matchesStatus && matchesDateRange;
     });
 
     // Sort by date (most recent first)
@@ -289,45 +295,40 @@ async function loadTransactionHistory() {
     }
 
     // Render transactions
-    table.innerHTML = `
-      
-      <tbody>
-        ${filteredTransactions.map(transaction => {
-          // Truncate remarks if too long
-          const maxRemarkLength = 40;
-          let displayRemark = transaction.remarks || '';
-          let isTruncated = false;
-          if (displayRemark.length > maxRemarkLength) {
-            displayRemark = displayRemark.slice(0, maxRemarkLength) + '...';
-            isTruncated = true;
-          }
-          return `
-            <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" 
-                onclick="showTransactionDetails('${transaction.transaction_id}')"
-                data-transaction-id="${transaction.transaction_id}">
-              <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
-                ${transaction.transaction_id || ''}
-              </td>
-              <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
-                ${formatDateTime(transaction.date) || ''}
-              </td>
-              <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
-                ${transaction.admin_name || ''}
-              </td>
-              <td class="px-6 py-4 text-left whitespace-nowrap text-sm">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-                  ${getStatusStyle(transaction.status)}">
-                  ${(transaction.status || '').replace('_', ' ')}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-left whitespace-normal text-sm text-gray-900" title="${isTruncated ? transaction.remarks : ''}">
-                ${displayRemark || '<span class=\'italic text-gray-400\'>No remarks</span>'}
-              </td>
-            </tr>
-          `;
-        }).join('')}
-      </tbody>
-    `;
+    table.innerHTML = filteredTransactions.map(transaction => {
+      // Truncate remarks if too long
+      const maxRemarkLength = 40;
+      let displayRemark = transaction.remarks || '';
+      let isTruncated = false;
+      if (displayRemark.length > maxRemarkLength) {
+        displayRemark = displayRemark.slice(0, maxRemarkLength) + '...';
+        isTruncated = true;
+      }
+      return `
+        <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" 
+            onclick="showTransactionDetails('${transaction.transaction_id}')"
+            data-transaction-id="${transaction.transaction_id}">
+          <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
+            ${transaction.transaction_id || ''}
+          </td>
+          <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
+            ${formatDateTime(transaction.date) || ''}
+          </td>
+          <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
+            ${transaction.admin_name || ''}
+          </td>
+          <td class="px-6 py-4 text-left whitespace-nowrap text-sm">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
+              ${getStatusStyle(transaction.status)}">
+              ${(transaction.status || '').replace('_', ' ')}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-left whitespace-normal text-sm text-gray-900" title="${isTruncated ? transaction.remarks : ''}">
+            ${displayRemark || '<span class=\'italic text-gray-400\'>No remarks</span>'}
+          </td>
+        </tr>
+      `;
+    }).join('');
 
     hideTableLoading();
   } catch (error) {
@@ -372,11 +373,63 @@ function hideTableLoading() {
   document.getElementById('tableLoadingState').style.display = 'none';
 }
 
+function searchTransactionsTable() {
+  const tbody = document.getElementById('transactionHistoryTable');
+  const searchInput = document.getElementById('transactionSearch');
+  const searchValue = searchInput.value.toLowerCase();
+  const rows = tbody.querySelectorAll('tr:not(.no-result-row)');
+  let hasResult = false;
+
+  // Remove existing no-results message if present
+  const existingNoResults = tbody.querySelector('.no-result-row');
+  if (existingNoResults) {
+    existingNoResults.remove();
+  }
+
+  rows.forEach((row) => {
+    const transactionId = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase() || '';
+    const dateTime = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+    const adminName = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
+    const status = row.querySelector('td:nth-child(4)')?.textContent.toLowerCase() || '';
+    const remarks = row.querySelector('td:nth-child(5)')?.textContent.toLowerCase() || '';
+
+    const showRow =
+      !searchValue ||
+      transactionId.includes(searchValue) ||
+      dateTime.includes(searchValue) ||
+      adminName.includes(searchValue) ||
+      status.includes(searchValue) ||
+      remarks.includes(searchValue);
+
+    row.style.display = showRow ? '' : 'none';
+    if (showRow) {
+      hasResult = true;
+    }
+  });
+
+  if (!hasResult && searchValue) {
+    const noResultRow = document.createElement('tr');
+    noResultRow.className = 'no-result-row';
+    noResultRow.innerHTML = `
+      <td colspan="5" class="px-6 py-16 text-center w-full">
+        <div class="flex flex-col items-center justify-center space-y-4 max-w-sm mx-auto">
+          <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <p class="text-gray-500 text-lg font-medium">No transactions found matching "${searchValue}"</p>
+          <p class="text-gray-400 text-base">Try adjusting your search term</p>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(noResultRow);
+  }
+}
+
 function setupEventListeners() {
-  // Search input
+  // Search input with new implementation
   const searchInput = document.getElementById('transactionSearch');
   if (searchInput) {
-    searchInput.addEventListener('input', debounce(() => loadTransactionHistory(), 300));
+    searchInput.addEventListener('input', searchTransactionsTable);
   }
 
   // Transaction type filter
@@ -392,18 +445,6 @@ function setupEventListeners() {
     startDate.addEventListener('change', () => loadTransactionHistory());
     endDate.addEventListener('change', () => loadTransactionHistory());
   }
-}
-
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
 }
 
 // Initialize the page when the DOM is loaded
@@ -1064,4 +1105,266 @@ window.addNewTransaction = function(newTransaction) {
   if (typeof loadTransactionHistory === 'function') {
     loadTransactionHistory();
   }
-}; 
+};
+
+// Function to validate login
+function validateLogin(event) {
+    event.preventDefault();
+    
+    const adminId = document.getElementById('adminId').value;
+    const password = document.getElementById('password').value;
+    const adminIdField = document.getElementById('adminId');
+    const passwordField = document.getElementById('password');
+    const adminIdError = document.getElementById('adminIdError');
+    const passwordError = document.getElementById('passwordError');
+    
+    // Reset previous error states
+    adminIdField.classList.remove('border-red-500', 'focus:ring-red-500');
+    passwordField.classList.remove('border-red-500', 'focus:ring-red-500');
+    adminIdError.classList.add('hidden');
+    passwordError.classList.add('hidden');
+    
+    // Validate credentials
+    if (adminId === mockAdmin.id && password === mockAdmin.password) {
+        // Successful login
+        showNotification('Login successful! Redirecting...', 'success');
+        // Show loading spinner
+        showLoading();
+        // Use a real network request to measure actual connectivity
+        fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
+          .then(response => response.json())
+          .catch(() => {}) // Ignore errors, just for timing
+          .finally(() => {
+            hideLoading();
+            const baseUrl = window.location.origin;
+            const path = '/Frontend_Code/html/dashboard.html';
+            window.location.href = baseUrl + path;
+          });
+    } else {
+        // Failed login
+        if (adminId !== mockAdmin.id) {
+            adminIdField.classList.add('border-red-500', 'focus:ring-red-500');
+            adminIdError.textContent = 'Invalid ID number';
+            adminIdError.classList.remove('hidden');
+        }
+        if (password !== mockAdmin.password) {
+            passwordField.classList.add('border-red-500', 'focus:ring-red-500');
+            passwordError.textContent = 'Invalid password';
+            passwordError.classList.remove('hidden');
+        }
+    }
+}
+
+// Function to show notifications
+function showNotification(message, type) {
+    // Remove any existing notifications
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    } text-white`;
+    notification.textContent = message;
+    
+    // Add to document
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Add event listener to login form
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.querySelector('form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', validateLogin);
+    }
+});
+
+/**
+ * Registration handler for testing (no backend/database yet)
+ * - Validates the registration form fields
+ * - Shows a success alert
+ * - Redirects to dashboard.html after successful registration
+ * - No backend/database call is made
+ *
+ * To enable backend integration later, replace this logic with a call to your backend handler.
+ */
+if (window.location.pathname.includes('register.html')) {
+  document.addEventListener('DOMContentLoaded', () => {
+    const regForm = document.querySelector('form');
+    if (regForm) {
+      regForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const adminId = document.getElementById('adminId').value.trim();
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const password = document.getElementById('password').value;
+        // Basic validation
+        if (!adminId || !firstName || !lastName || !password) {
+          showToast('Please fill in all required fields', true);
+          return;
+        }
+        if (password.length < 8) {
+          showToast('Password must be at least 8 characters long', true);
+          return;
+        }
+        // Show toast notification
+        showNotification('Registration successful! Redirecting...', 'success');
+        
+        // Use a real network request to measure actual connectivity
+        fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
+          .then(response => response.json())
+          .catch(() => {}) // Ignore errors, just for timing
+          .finally(() => {
+            window.location.href = 'dashboard.html';
+          });
+      });
+    }
+  });
+}
+
+// REGISTER.HTML REGISTRATION LOGIC
+document.addEventListener('DOMContentLoaded', () => {
+  // Terms Modal
+  const openTermsModal = document.getElementById('openTermsModal');
+  const termsModal = document.getElementById('termsModal');
+  const closeTermsModal = document.getElementById('closeTermsModal');
+  openTermsModal?.addEventListener('click', (e) => {
+    e.preventDefault();
+    termsModal.classList.remove('hidden');
+    termsModal.classList.add('flex');
+  });
+  closeTermsModal?.addEventListener('click', () => {
+    termsModal.classList.add('hidden');
+    termsModal.classList.remove('flex');
+  });
+  termsModal?.addEventListener('click', (e) => {
+    if (e.target === termsModal) {
+      termsModal.classList.add('hidden');
+      termsModal.classList.remove('flex');
+    }
+  });
+  // Privacy Modal
+  const openPrivacyModal = document.getElementById('openPrivacyModal');
+  const privacyModal = document.getElementById('privacyModal');
+  const closePrivacyModal = document.getElementById('closePrivacyModal');
+  openPrivacyModal?.addEventListener('click', (e) => {
+    e.preventDefault();
+    privacyModal.classList.remove('hidden');
+    privacyModal.classList.add('flex');
+  });
+  closePrivacyModal?.addEventListener('click', () => {
+    privacyModal.classList.add('hidden');
+    privacyModal.classList.remove('flex');
+  });
+  privacyModal?.addEventListener('click', (e) => {
+    if (e.target === privacyModal) {
+      privacyModal.classList.add('hidden');
+      privacyModal.classList.remove('flex');
+    }
+  });
+});
+
+// Registration Form Handling
+document.addEventListener('DOMContentLoaded', function() {
+  const registerForm = document.querySelector('form');
+  const termsModal = document.getElementById('termsModal');
+  const privacyModal = document.getElementById('privacyModal');
+  const openTermsModal = document.getElementById('openTermsModal');
+  const openPrivacyModal = document.getElementById('openPrivacyModal');
+  const closeTermsModal = document.getElementById('closeTermsModal');
+  const closePrivacyModal = document.getElementById('closePrivacyModal');
+
+  // Only run registration code if we're on the registration page
+  if (registerForm && window.location.pathname.includes('register.html')) {
+    // Handle form submission
+    registerForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      // Get form values
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const adminId = document.getElementById('adminId').value.trim();
+      const password = document.getElementById('password').value;
+      const termsChecked = document.getElementById('terms').checked;
+
+      // Validate required fields
+      if (!firstName || !lastName || !adminId || !password) {
+        showToast('Please fill in all required fields', true);
+        return;
+      }
+
+      // Validate password length
+      if (password.length < 8) {
+        showToast('Password must be at least 8 characters long', true);
+        return;
+      }
+
+      // Validate terms checkbox
+      if (!termsChecked) {
+        showToast('Please agree to the Terms of Service and Privacy Policy', true);
+        return;
+      }
+
+      showNotification('Registration successful! Redirecting...', 'success');
+
+      // Use a real network request to measure actual connectivity
+      fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
+        .then(response => response.json())
+        .catch(() => {}) // Ignore errors, just for timing
+        .finally(() => {
+          window.location.href = 'dashboard.html';
+        });
+    });
+
+    // Modal handling
+    if (openTermsModal) {
+      openTermsModal.addEventListener('click', function(e) {
+        e.preventDefault();
+        termsModal.classList.remove('hidden');
+        termsModal.classList.add('flex');
+      });
+    }
+
+    if (openPrivacyModal) {
+      openPrivacyModal.addEventListener('click', function(e) {
+        e.preventDefault();
+        privacyModal.classList.remove('hidden');
+        privacyModal.classList.add('flex');
+      });
+    }
+
+    if (closeTermsModal) {
+      closeTermsModal.addEventListener('click', function() {
+        termsModal.classList.add('hidden');
+        termsModal.classList.remove('flex');
+      });
+    }
+
+    if (closePrivacyModal) {
+      closePrivacyModal.addEventListener('click', function() {
+        privacyModal.classList.add('hidden');
+        privacyModal.classList.remove('flex');
+      });
+    }
+
+    // Close modals when clicking outside
+    window.addEventListener('click', function(e) {
+      if (e.target === termsModal) {
+        termsModal.classList.add('hidden');
+        termsModal.classList.remove('flex');
+      }
+      if (e.target === privacyModal) {
+        privacyModal.classList.add('hidden');
+        privacyModal.classList.remove('flex');
+      }
+    });
+  }
+});
