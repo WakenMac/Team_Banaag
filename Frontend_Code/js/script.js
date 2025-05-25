@@ -46,3 +46,36 @@ function showToast(message) {
     hideModal(toastNotification)
   }, 3000)
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Logout modal logic
+  const logoutBtn = document.getElementById('logoutBtn');
+  const logoutModal = document.getElementById('logoutModal');
+  const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+  const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+  if (logoutBtn && logoutModal) {
+    logoutBtn.addEventListener('click', () => {
+      logoutModal.classList.remove('hidden');
+      logoutModal.classList.add('flex');
+    });
+  }
+  if (cancelLogoutBtn && logoutModal) {
+    cancelLogoutBtn.addEventListener('click', () => {
+      logoutModal.classList.add('hidden');
+      logoutModal.classList.remove('flex');
+    });
+  }
+  if (confirmLogoutBtn) {
+    confirmLogoutBtn.addEventListener('click', () => {
+      window.location.href = "login.html";
+    });
+  }
+  // Optional: close modal when clicking backdrop
+  logoutModal?.addEventListener('click', (e) => {
+    if (e.target === logoutModal) {
+      logoutModal.classList.add('hidden');
+      logoutModal.classList.remove('flex');
+    }
+  });
+});

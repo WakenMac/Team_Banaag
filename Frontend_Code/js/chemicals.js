@@ -624,9 +624,7 @@ async function createNewChemicalRow(
       <button aria-label="Edit chemical" class="text-yellow-400 hover:text-yellow-500">
         <i class="fas fa-pencil-alt"></i>
       </button>
-      <button aria-label="Delete chemical" class="text-red-600 hover:text-red-700">
-        <i class="fas fa-trash-alt"></i>
-      </button>
+   
     </td>
     `;
   chemicalsTableBody.appendChild(tr);
