@@ -251,9 +251,9 @@
               <tr>
                 <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Transaction ID</th>
                 <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Date & Time</th>
-                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Type</th>
                 <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Admin Name</th>
                 <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Status</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Remarks</th>
               </tr>
             </thead>
             <tbody id="transactionHistoryTable" class="bg-white divide-y divide-gray-200">
@@ -271,9 +271,9 @@
     </main>
 
     <!-- Transaction Details Modal -->
-    <div id="transactionDetailsModal" class="fixed inset-0 z-50 hidden items-center justify-center" role="dialog" aria-labelledby="transactionDetailsTitle" aria-modal="true">
+    <div id="transactionDetailsModal" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4" role="dialog" aria-labelledby="transactionDetailsTitle" aria-modal="true">
       <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
-      <div class="bg-white rounded-lg shadow-lg max-w-4xl w-full z-50 p-6 relative">
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl sm:max-w-3xl md:max-w-4xl lg:max-w-5xl z-50 p-2 sm:p-4 md:p-6 relative overflow-visible">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
             <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
@@ -308,24 +308,22 @@
         </div>
 
         <!-- Items Table -->
-        <div class="mb-6">
-          <h3 class="font-semibold text-gray-900 mb-3">Transacted Items</h3>
-          <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
-            <table class="min-w-full divide-y divide-gray-200 text-sm">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Item Name</th>
-                  <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Quantity</th>
-                  <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Type</th>
-                  <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Status</th>
-                  <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Returnable</th>
-                </tr>
-              </thead>
-              <tbody id="transactionItemsTable" class="bg-white divide-y divide-gray-200">
-                <!-- Items will be populated dynamically -->
-              </tbody>
-            </table>
-          </div>
+        <div class="overflow-x-auto w-full max-w-full border border-gray-100 rounded-md bg-white">
+          <table class="min-w-[600px] sm:min-w-[700px] md:min-w-[900px] w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Item Name</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Quantity</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Type</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Return Status</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Returnable</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Action</th>
+              </tr>
+            </thead>
+            <tbody id="transactionItemsTable" class="bg-white divide-y divide-gray-200">
+              <!-- Items will be populated dynamically -->
+            </tbody>
+          </table>
         </div>
 
         <!-- Remarks -->
