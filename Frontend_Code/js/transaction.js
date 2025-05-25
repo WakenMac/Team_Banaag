@@ -50,7 +50,7 @@ const mockTransactionHistory = [
     admin_id: '456',
     admin_name: 'Allan Tagle',
     items: [
-      { name: 'Test Tube', quantity: 10 }
+      { name: 'Test Tube', quantity: 10, is_consumable: false }
     ],
     date: '2024-03-14T11:45:00',
     status: 'pending_return',
@@ -62,7 +62,7 @@ const mockTransactionHistory = [
     admin_id: '123',
     admin_name: 'Jeff Ronyl Pausal',
     items: [
-      { name: 'Beaker 100ml', quantity: 3 }
+      { name: 'Beaker 100ml', quantity: 3, is_consumable: false }
     ],
     date: '2024-03-15T16:20:00',
     status: 'completed',
@@ -236,28 +236,30 @@ async function loadTransactionHistory() {
     table.innerHTML = filteredTransactions.map(transaction => `
       <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" onclick="showTransactionDetails('${transaction.transaction_id}')">
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-          ${transaction.transaction_id}
+          ${transaction.transaction_id || ''}
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-          ${formatDateTime(transaction.date)}
+          ${formatDateTime(transaction.date) || ''}
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm">
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
             ${transaction.type === 'borrow' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
-            ${transaction.type}
+            ${transaction.type || ''}
           </span>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-          ${transaction.admin_name}
+          ${transaction.admin_name || ''}
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-sm">
           <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
             ${getStatusStyle(transaction.status)}">
-            ${transaction.status.replace('_', ' ')}
+            ${(transaction.status || '').replace('_', ' ')}
           </span>
         </td>
       </tr>
     `).join('');
+
+
 
     hideTableLoading();
   } catch (error) {
@@ -277,7 +279,7 @@ function showTableLoading() {
   const table = document.getElementById('transactionHistoryTable');
   if (!table) return;
 
-  table.innerHTML = Array(5).fill(0).map(() => `
+  table.innerHTML = `
     <tr class="animate-pulse">
       <td class="px-6 py-4 whitespace-nowrap">
         <div class="h-4 bg-gray-200 rounded w-24"></div>
@@ -295,7 +297,7 @@ function showTableLoading() {
         <div class="h-4 bg-gray-200 rounded w-20"></div>
       </td>
     </tr>
-  `).join('');
+  `;
 }
 
 function hideTableLoading() {
@@ -667,10 +669,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initializePage();
 
   // Get all modal elements
-  const verifyAdminModal = document.getElementById('verifyAdminModal');
-  const transactionTypeModal = document.getElementById('transactionTypeModal');
-  const borrowItemsModal = document.getElementById('borrowItemsModal');
-  const confirmationModal = document.getElementById('confirmationModal');
   const returnItemsModal = document.getElementById('returnItemsModal');
 
   // Get all form elements
