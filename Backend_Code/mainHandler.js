@@ -998,7 +998,7 @@ export async function   getAllItemMasterListNameRecords(){
 
 /**
  * Method to get all of the records from the Item Master List table
- * @returns A record consisting of 2 columns (Name, Brand)
+ * @returns A record consisting of 2 columns (Item ID, Name, Brand, Unit Type, Item Type, Remaining Quantity)
  */
 export async function   getAllItemMasterListNameBrandRecords(){
     try{
@@ -2839,11 +2839,12 @@ export async function removeRestocksRecordByRestockId(restockId = 0){
 
 export async function prepareUser(){
     try {
-        const {data, error} = await supabase.auth.signInWithPassword({
+        const {data, error} = await supabaseClient.auth.signInWithPassword({
             email: `maclangw26@gmail.com`,
             password: `2023-00570`
         })
         
+
     } catch (error){
         console.error(error)
     }
@@ -2858,6 +2859,7 @@ export async function prepareUser(){
  */
 export async function getAllTransactionRecords(){
     try{
+        await prepareUser();
         const {data, error: supabaseError} = await supabaseClient.rpc('get_all_transaction_records');
         
         if (supabaseError){
@@ -2880,11 +2882,13 @@ export async function getAllTransactionRecords(){
  * @param {float4} borrowQuantityArray     Array of borrowed quantities
  */
 export async function addTransactionRecord(
-    adminId, itemIdArray, borrowQuantityArray
+    adminId, remarks, itemIdArray, borrowQuantityArray
 ){
     try{
+        await prepareUser();
         const {data, error: supabaseError} = await supabaseClient.rpc('main_add_transaction', {
             admin_id : adminId,
+            remarks : remarks,
             item_id_array : itemIdArray,
             borrow_quantity_array : borrowQuantityArray
         });
