@@ -249,41 +249,209 @@
         </li>
       </ul>
     </nav>
-    <main class="w-full max-w-full px-2 mx-auto mt-8 sm:px-4 lg:px-8">
-      <div class="mb-8">
-        <h2 class="mb-2 text-3xl font-bold text-gray-900">Statistics Overview</h2>
-        <p class="text-base text-gray-600">A summary of resource and equipment usage, trends, and alerts for the laboratory.</p>
+<<<<<<< HEAD
+    <main class="max-w-full px-4 mx-auto mt-6 sm:px-6 lg:px-12">
+      <div
+        class="flex flex-col items-center justify-between w-full gap-3 sm:flex-row sm:gap-0"
+      >
+        <div
+          class="flex flex-col items-center w-full gap-3 sm:flex-row sm:gap-4 sm:w-auto"
+        >
+          <input
+            aria-label="Search"
+            class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-64"
+            placeholder="Search..."
+            type="search"
+          />
+          <select
+            aria-label="Filter by"
+            class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-48 custom-select"
+          >
+            <option value="" disabled selected class="placeholder-option">
+              Filter by
+            </option>
+          </select>
+        </div>
+        <button
+          aria-controls="addApparatusModal"
+          aria-haspopup="dialog"
+          class="custom-btn"
+          id="addApparatusBtn"
+          type="button"
+        >
+          Add Apparatus
+        </button>
       </div>
-      <!-- Quick Alerts -->
-      <div id="quickAlerts" class="mb-6 space-y-3"></div>
-      <!-- Summary Row -->
-      <div class="flex flex-wrap w-full gap-6 mb-8" id="summaryRow"></div>
-      <!-- Last Updated Timestamp -->
-      <div class="mb-8 text-sm text-gray-500" id="lastUpdated"></div>
-      <!-- Consumables Section -->
-      <section class="mb-12">
-        <div class="grid w-full grid-cols-2 gap-8">
-          <!-- Chemicals Card -->
-          <div class="flex flex-col w-full gap-6 p-6 bg-white shadow rounded-xl">
-            <div class="flex items-center mb-2">
-              <i class="mr-2 text-green-500 fas fa-vial"></i>
-              <h4 class="text-lg font-semibold text-gray-700">Chemicals</h4>
-            </div>
-            <!-- Top 10 Fast Moving -->
-            <div>
-              <div class="mb-1 font-semibold text-green-700">Top 10 Fast Moving Chemicals</div>
-              <ol id="top10Chemicals" class="p-2 pl-4 space-y-2 rounded top10-scroll bg-green-50"></ol>
-            </div>
-            <!-- # Consumed -->
-            <div class="text-center">
-              <div class="text-xs text-gray-500">Chemicals Consumed</div>
-              <div class="text-4xl font-bold text-green-600" id="chemicalsConsumedCount">0</div>
-            </div>
-            <!-- Soon to Expire -->
-            <div>
-              <div class="mb-1 font-semibold text-red-700">Soon to Expire</div>
-              <ul id="chemicalsExpiryList" class="space-y-1"></ul>
-            </div>
+      <h2 class="mt-4 mb-3 text-sm font-semibold text-gray-900">Statistics</h2>
+      <div class="overflow-x-auto bg-white border border-gray-100 rounded-md">
+        <table class="min-w-full text-sm divide-y divide-gray-200">
+          <thead class="bg-white">
+            <tr>
+              <th
+                class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
+                scope="col"
+              >
+                Item ID
+              </th>
+              <th
+                class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
+                scope="col"
+              >
+                Name
+              </th>
+              <th
+                class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
+                scope="col"
+              >
+                Unit
+              </th>
+              <th
+                class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
+                scope="col"
+              >
+                Location
+              </th>
+              <th
+                class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
+                scope="col"
+              >
+                Brand
+              </th>
+              <th
+                class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
+                scope="col"
+              >
+                Quantity
+              </th>
+              <th
+                class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
+                scope="col"
+              ></th>
+            </tr>
+          </thead>
+          <tbody class="bg-white">
+            <tr>
+              <td class="px-6 py-4 text-gray-900 whitespace-nowrap">1</td>
+              <td class="px-6 py-4 text-gray-900 whitespace-nowrap">Beaker</td>
+              <td class="px-6 py-4 text-gray-900 whitespace-nowrap">pcs</td>
+              <td class="px-6 py-4 text-gray-900 whitespace-nowrap">
+                Stock Room
+              </td>
+              <td class="px-6 py-4 text-gray-900 whitespace-nowrap">Pyrex</td>
+              <td class="px-6 py-4 text-gray-900 whitespace-nowrap">10</td>
+              <td class="px-6 py-4 space-x-3 text-right whitespace-nowrap">
+                <button
+                  aria-label="Edit apparatus"
+                  class="text-yellow-400 hover:text-yellow-500"
+                  data-id="1"
+                >
+                  <i class="fas fa-pencil-alt"></i>
+                </button>
+                <button
+                  aria-label="Delete apparatus"
+                  class="text-red-600 hover:text-red-700"
+                  data-id="1"
+                >
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="px-6 py-4 text-gray-900 whitespace-nowrap">2</td>
+              <td class="px-6 py-4 text-gray-900 whitespace-nowrap">
+                Test Tube
+              </td>
+              <td class="px-6 py-4 text-gray-900 whitespace-nowrap">pcs</td>
+              <td class="px-6 py-4 text-gray-900 whitespace-nowrap">
+                Lab Drawer
+              </td>
+              <td class="px-6 py-4 text-gray-900 whitespace-nowrap">Corning</td>
+              <td class="px-6 py-4 text-gray-900 whitespace-nowrap">25</td>
+              <td class="px-6 py-4 space-x-3 text-right whitespace-nowrap">
+                <button
+                  aria-label="Edit apparatus"
+                  class="text-yellow-400 hover:text-yellow-500"
+                  data-id="2"
+                >
+                  <i class="fas fa-pencil-alt"></i>
+                </button>
+                <button
+                  aria-label="Delete apparatus"
+                  class="text-red-600 hover:text-red-700"
+                  data-id="2"
+                >
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- Add Apparatus Modal -->
+    <div
+      aria-labelledby="modalTitle"
+      aria-modal="true"
+      class="fixed inset-0 z-50 items-center justify-center hidden"
+      id="addApparatusModal"
+      role="dialog"
+    >
+      <div
+        class="fixed inset-0 bg-black opacity-50 modal-backdrop"
+        id="modalBackdropApparatus"
+      ></div>
+      <div
+        class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img
+              src="/Frontend_Code/images/cas_logo.png"
+              alt="CARES logo"
+              class="object-contain w-12 h-12"
+            />
+            <span class="text-3xl font-black text-black">Add Apparatus</span>
+          </div>
+        </div>
+        <form class="space-y-4" id="addApparatusForm">
+          <div>
+            <label
+              class="block mb-1 text-sm font-medium text-gray-700"
+              for="apparatusName"
+            >
+              Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+              id="apparatusName"
+              name="apparatusName"
+              required=""
+              type="text"
+              placeholder="e.g. Apparatus Name"
+            />
+          </div>
+          <div>
+            <label
+              class="block mb-1 text-sm font-medium text-gray-700"
+              for="apparatusUnit"
+            >
+              Unit <span class="text-red-500">*</span>
+            </label>
+            <select
+              class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 placeholder-gray-400"
+              id="apparatusUnit"
+              name="apparatusUnit"
+              required
+            >
+              <option value="" disabled selected class="placeholder-option">
+                - Select Unit -
+              </option>
+              <option value="mL">mL</option>
+              <option value="pcs">pcs</option>
+              <!-- Options will be populated dynamically from the database -->
+              <!-- ~The dynamic options have been implemented~  -->
+            </select>
           </div>
           <div>
             <label
@@ -528,6 +696,141 @@
       </div>
     </div>
     <!-- End of Delete Apparatus Modal -->
+=======
+    <main class="w-full max-w-full px-2 mx-auto mt-8 sm:px-4 lg:px-8">
+      <div class="mb-8">
+        <h2 class="mb-2 text-3xl font-bold text-gray-900">Statistics Overview</h2>
+        <p class="text-base text-gray-600">A summary of resource and equipment usage, trends, and alerts for the laboratory.</p>
+      </div>
+      <!-- Quick Alerts -->
+      <div id="quickAlerts" class="mb-6 space-y-3"></div>
+      <!-- Summary Row -->
+      <div class="flex flex-wrap w-full gap-6 mb-8" id="summaryRow"></div>
+      <!-- Last Updated Timestamp -->
+      <div class="mb-8 text-sm text-gray-500" id="lastUpdated"></div>
+      <!-- Consumables Section -->
+      <section class="mb-12">
+        <div class="grid w-full grid-cols-2 gap-8">
+          <!-- Chemicals Card -->
+          <div class="flex flex-col w-full gap-6 p-6 bg-white shadow rounded-xl">
+            <div class="flex items-center mb-2">
+              <i class="mr-2 text-green-500 fas fa-vial"></i>
+              <h4 class="text-lg font-semibold text-gray-700">Chemicals</h4>
+            </div>
+            <!-- Top 10 Fast Moving -->
+            <div>
+              <div class="mb-1 font-semibold text-green-700">Top 10 Fast Moving Chemicals</div>
+              <ol id="top10Chemicals" class="p-2 pl-4 space-y-2 rounded top10-scroll bg-green-50"></ol>
+            </div>
+            <!-- # Consumed -->
+            <div class="text-center">
+              <div class="text-xs text-gray-500">Chemicals Consumed</div>
+              <div class="text-4xl font-bold text-green-600" id="chemicalsConsumedCount">0</div>
+            </div>
+            <!-- Soon to Expire -->
+            <div>
+              <div class="mb-1 font-semibold text-red-700">Soon to Expire</div>
+              <ul id="chemicalsExpiryList" class="space-y-1"></ul>
+            </div>
+          </div>
+          <!-- Items Card -->
+          <div class="flex flex-col w-full gap-6 p-6 bg-white shadow rounded-xl">
+            <div class="flex items-center mb-2">
+              <i class="mr-2 text-yellow-500 fas fa-box-open"></i>
+              <h4 class="text-lg font-semibold text-gray-700">Items</h4>
+            </div>
+            <!-- Top 10 Fast Moving -->
+            <div>
+              <div class="mb-1 font-semibold text-yellow-700">Top 10 Fast Moving Items</div>
+              <ol id="top10Items" class="p-2 pl-4 space-y-2 rounded top10-scroll bg-yellow-50"></ol>
+            </div>
+            <!-- # Consumed -->
+            <div class="text-center">
+              <div class="text-xs text-gray-500">Items Consumed</div>
+              <div class="text-4xl font-bold text-yellow-600" id="itemsConsumedCount">0</div>
+            </div>
+            <!-- Soon to Expire -->
+            <div>
+              <div class="mb-1 font-semibold text-red-700">Soon to Expire</div>
+              <ul id="itemsExpiryList" class="space-y-1"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Non-Consumables Section -->
+      <section class="mb-12">
+        <div class="grid w-full grid-cols-3 gap-8">
+          <!-- Apparatus Card -->
+          <div class="flex flex-col w-full gap-6 p-6 bg-white shadow rounded-xl">
+            <div class="flex items-center mb-2">
+              <i class="mr-2 text-blue-500 fas fa-cog"></i>
+              <h4 class="text-lg font-semibold text-gray-700">Apparatus</h4>
+            </div>
+            <!-- Top 10 Frequently Borrowed -->
+            <div>
+              <div class="mb-1 font-semibold text-blue-700">Top 10 Frequently Borrowed Apparatus</div>
+              <ol id="top10Apparatus" class="p-2 pl-4 space-y-2 rounded top10-scroll bg-blue-50"></ol>
+            </div>
+            <!-- # Borrowed -->
+            <div class="text-center">
+              <div class="text-xs text-gray-500">Apparatus Borrowed</div>
+              <div class="text-4xl font-bold text-blue-600" id="apparatusBorrowedCount">0</div>
+            </div>
+            <!-- Currently Borrowed -->
+            <div>
+              <div class="mb-1 font-semibold text-purple-700">Currently Borrowed</div>
+              <ul id="apparatusBorrowedList" class="space-y-1"></ul>
+            </div>
+          </div>
+          <!-- Glassware Card -->
+          <div class="flex flex-col w-full gap-6 p-6 bg-white shadow rounded-xl">
+            <div class="flex items-center mb-2">
+              <i class="mr-2 text-purple-500 fas fa-wine-glass-alt"></i>
+              <h4 class="text-lg font-semibold text-gray-700">Glassware</h4>
+            </div>
+            <!-- Top 10 Frequently Borrowed -->
+            <div>
+              <div class="mb-1 font-semibold text-purple-700">Top 10 Frequently Borrowed Glassware</div>
+              <ol id="top10Glassware" class="p-2 pl-4 space-y-2 rounded top10-scroll bg-purple-50"></ol>
+            </div>
+            <!-- # Borrowed -->
+            <div class="text-center">
+              <div class="text-xs text-gray-500">Glassware Borrowed</div>
+              <div class="text-4xl font-bold text-purple-600" id="glasswareBorrowedCount">0</div>
+            </div>
+            <!-- Currently Borrowed -->
+            <div>
+              <div class="mb-1 font-semibold text-purple-700">Currently Borrowed</div>
+              <ul id="glasswareBorrowedList" class="space-y-1"></ul>
+            </div>
+          </div>
+          <!-- Equipment Card -->
+          <div class="flex flex-col w-full gap-6 p-6 bg-white shadow rounded-xl">
+            <div class="flex items-center mb-2">
+              <i class="mr-2 text-red-500 fas fa-microscope"></i>
+              <h4 class="text-lg font-semibold text-gray-700">Equipment</h4>
+            </div>
+            <!-- Top 10 Frequently Borrowed -->
+            <div>
+              <div class="mb-1 font-semibold text-red-700">Top 10 Frequently Borrowed Equipment</div>
+              <ol id="top10Equipment" class="p-2 pl-4 space-y-2 rounded top10-scroll bg-red-50"></ol>
+            </div>
+            <!-- # Borrowed -->
+            <div class="text-center">
+              <div class="text-xs text-gray-500">Equipment Borrowed</div>
+              <div class="text-4xl font-bold text-red-600" id="equipmentBorrowedCount">0</div>
+            </div>
+            <!-- Currently Borrowed -->
+            <div>
+              <div class="mb-1 font-semibold text-purple-700">Currently Borrowed</div>
+              <ul id="equipmentBorrowedList" class="space-y-1"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+>>>>>>> 634f0761d925c48c3746c496582d973b8e3c9e43
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="/Frontend_Code/js/statistics.js"></script>
   </body>
