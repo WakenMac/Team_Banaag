@@ -1,5 +1,5 @@
 // Import the database handler
-// import * as dbhandler from "../../Backend_Code/mainHandler.js";
+import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
 // Mock data for testing
 const mockAdmins = [
@@ -583,10 +583,13 @@ window.processReturn = async function(transactionId, itemName) {
 // Verify admin credentials using mock data for testing
 async function verifyAdmin(adminId, password) {
   try {
-    const adminExists = mockAdmins.some(admin => 
+    var adminExists = mockAdmins.some(admin => 
       admin.admin_id === adminId && admin.password === password
     );
-    
+
+    if (adminExists === false)
+      adminExists = await dbhandler.adminExists(adminId, password);
+
     if (adminExists) {
       currentAdminId = adminId;
       return true;
@@ -1112,7 +1115,7 @@ window.addNewTransaction = function(newTransaction) {
 };
 
 // Function to validate login
-function validateLogin(event) {
+async function validateLogin(event) {
     event.preventDefault();
     
     const adminId = document.getElementById('adminId').value;
@@ -1128,14 +1131,18 @@ function validateLogin(event) {
     adminIdError.classList.add('hidden');
     passwordError.classList.add('hidden');
     
+  let result = await dbhandler.adminExists(adminId, password);
+  console.log(result);
+
     // Validate credentials
-    if (adminId === mockAdmin.id && password === mockAdmin.password) {
+    if (result === true) {
         // Successful login
         showNotification('Login successful! Redirecting...', 'success');
+        localStorage.setItem("loggedInAdmin", adminId)
         // Show loading spinner
         showLoading();
         // Use a real network request to measure actual connectivity
-        fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
+        await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
           .then(response => response.json())
           .catch(() => {}) // Ignore errors, just for timing
           .finally(() => {
@@ -1157,6 +1164,70 @@ function validateLogin(event) {
             passwordError.classList.remove('hidden');
         }
     }
+}
+
+/**
+ * Registration handler for testing (no backend/database yet)
+ * - Validates the registration form fields
+ * - Shows a success alert
+ * - Redirects to dashboard.html after successful registration
+ * - No backend/database call is made
+ *
+ * To enable backend integration later, replace this logic with a call to your backend handler.
+ */
+async function validateSignIn(event){
+  event.preventDefault();
+
+  const adminId = document.getElementById('adminId').value.trim();
+  const firstName = document.getElementById('firstName').value.trim();
+  const middleName = document.getElementById('middleName').value.trim();
+  const lastName = document.getElementById('lastName').value.trim();
+  const password = document.getElementById('password').value;
+
+  const adminIdField = document.getElementById('adminId');
+  const passwordField = document.getElementById('password');
+  const adminIdError = document.getElementById('adminIdError');
+  const passwordError = document.getElementById('passwordError');
+
+  // Reset previous error states
+  adminIdField.classList.remove('border-red-500', 'focus:ring-red-500');
+  passwordField.classList.remove('border-red-500', 'focus:ring-red-500');
+  adminIdError.classList.add('hidden');
+  passwordError.classList.add('hidden');
+
+  // Basic validation
+  if (!adminId || !firstName || !middleName || !lastName || !password) {
+    showToast('Please fill in all required fields', true);
+    return;
+  }
+  if (password.length < 8) {
+    passwordField.classList.add('border-red-500', 'focus:ring-red-500');
+    passwordError.textContent = 'Kindly use a longer password';
+    passwordError.classList.remove('hidden');
+    return;
+  }
+
+  let result = await dbhandler.addAdminRecord(adminId, firstName, middleName, lastName, password)
+  console.log(result);
+
+  if (result.includes("ERROR")){
+    adminIdField.classList.add('border-red-500', 'focus:ring-red-500');
+    adminIdError.textContent = 'ID number is already used.';
+    adminIdError.classList.remove('hidden');
+  } else {
+    // Show toast notification
+    showNotification('Registration successful! Redirecting...', 'success');
+    localStorage.setItem('loggedInAdmin', adminId)
+
+    // Use a real network request to measure actual connectivity
+    await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
+      .then(response => response.json())
+      .catch(() => {}) // Ignore errors, just for timing
+      .finally(() => {
+        console.log("I am logged in")
+        window.location.href = '/Frontend_Code/html/dashboard.html';
+      });
+  }
 }
 
 // Function to show notifications
@@ -1185,100 +1256,19 @@ function showNotification(message, type) {
 
 // Add event listener to login form
 document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.querySelector('form');
+    const loginForm = document.getElementById('logIn');
+    const regForm = document.getElementById('signIn');
+
     if (loginForm) {
         loginForm.addEventListener('submit', validateLogin);
+    } else if (regForm){
+        regForm.addEventListener('submit', validateSignIn);
     }
 });
-
-/**
- * Registration handler for testing (no backend/database yet)
- * - Validates the registration form fields
- * - Shows a success alert
- * - Redirects to dashboard.html after successful registration
- * - No backend/database call is made
- *
- * To enable backend integration later, replace this logic with a call to your backend handler.
- */
-if (window.location.pathname.includes('register.html')) {
-  document.addEventListener('DOMContentLoaded', () => {
-    const regForm = document.querySelector('form');
-    if (regForm) {
-      regForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const adminId = document.getElementById('adminId').value.trim();
-        const firstName = document.getElementById('firstName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
-        const password = document.getElementById('password').value;
-        // Basic validation
-        if (!adminId || !firstName || !lastName || !password) {
-          showToast('Please fill in all required fields', true);
-          return;
-        }
-        if (password.length < 8) {
-          showToast('Password must be at least 8 characters long', true);
-          return;
-        }
-        // Show toast notification
-        showNotification('Registration successful! Redirecting...', 'success');
-        
-        // Use a real network request to measure actual connectivity
-        fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
-          .then(response => response.json())
-          .catch(() => {}) // Ignore errors, just for timing
-          .finally(() => {
-            window.location.href = 'dashboard.html';
-          });
-      });
-    }
-  });
-}
 
 // REGISTER.HTML REGISTRATION LOGIC
 document.addEventListener('DOMContentLoaded', () => {
   // Terms Modal
-  const openTermsModal = document.getElementById('openTermsModal');
-  const termsModal = document.getElementById('termsModal');
-  const closeTermsModal = document.getElementById('closeTermsModal');
-  openTermsModal?.addEventListener('click', (e) => {
-    e.preventDefault();
-    termsModal.classList.remove('hidden');
-    termsModal.classList.add('flex');
-  });
-  closeTermsModal?.addEventListener('click', () => {
-    termsModal.classList.add('hidden');
-    termsModal.classList.remove('flex');
-  });
-  termsModal?.addEventListener('click', (e) => {
-    if (e.target === termsModal) {
-      termsModal.classList.add('hidden');
-      termsModal.classList.remove('flex');
-    }
-  });
-  // Privacy Modal
-  const openPrivacyModal = document.getElementById('openPrivacyModal');
-  const privacyModal = document.getElementById('privacyModal');
-  const closePrivacyModal = document.getElementById('closePrivacyModal');
-  openPrivacyModal?.addEventListener('click', (e) => {
-    e.preventDefault();
-    privacyModal.classList.remove('hidden');
-    privacyModal.classList.add('flex');
-  });
-  closePrivacyModal?.addEventListener('click', () => {
-    privacyModal.classList.add('hidden');
-    privacyModal.classList.remove('flex');
-  });
-  privacyModal?.addEventListener('click', (e) => {
-    if (e.target === privacyModal) {
-      privacyModal.classList.add('hidden');
-      privacyModal.classList.remove('flex');
-    }
-  });
-});
-
-// Registration Form Handling
-document.addEventListener('DOMContentLoaded', function() {
-  const registerForm = document.querySelector('form');
   const termsModal = document.getElementById('termsModal');
   const privacyModal = document.getElementById('privacyModal');
   const openTermsModal = document.getElementById('openTermsModal');
@@ -1286,49 +1276,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const closeTermsModal = document.getElementById('closeTermsModal');
   const closePrivacyModal = document.getElementById('closePrivacyModal');
 
-  // Only run registration code if we're on the registration page
-  if (registerForm && window.location.pathname.includes('register.html')) {
-    // Handle form submission
-    registerForm.addEventListener('submit', function(event) {
-      event.preventDefault();
-      
-      // Get form values
-      const firstName = document.getElementById('firstName').value.trim();
-      const lastName = document.getElementById('lastName').value.trim();
-      const adminId = document.getElementById('adminId').value.trim();
-      const password = document.getElementById('password').value;
-      const termsChecked = document.getElementById('terms').checked;
-
-      // Validate required fields
-      if (!firstName || !lastName || !adminId || !password) {
-        showToast('Please fill in all required fields', true);
-        return;
-      }
-
-      // Validate password length
-      if (password.length < 8) {
-        showToast('Password must be at least 8 characters long', true);
-        return;
-      }
-
-      // Validate terms checkbox
-      if (!termsChecked) {
-        showToast('Please agree to the Terms of Service and Privacy Policy', true);
-        return;
-      }
-
-      showNotification('Registration successful! Redirecting...', 'success');
-
-      // Use a real network request to measure actual connectivity
-      fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
-        .then(response => response.json())
-        .catch(() => {}) // Ignore errors, just for timing
-        .finally(() => {
-          window.location.href = 'dashboard.html';
-        });
-    });
-
-    // Modal handling
+  // Modal handling
     if (openTermsModal) {
       openTermsModal.addEventListener('click', function(e) {
         e.preventDefault();
@@ -1370,5 +1318,4 @@ document.addEventListener('DOMContentLoaded', function() {
         privacyModal.classList.remove('flex');
       }
     });
-  }
 });
