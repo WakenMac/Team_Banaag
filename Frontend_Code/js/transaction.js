@@ -632,7 +632,7 @@ function addItemToTable(itemName) {
   
   if (!selectedItemsTable) return;
   
-  if (selectedItems.some(item => item.itemName.includes(itemName) & item.brand.includes(itemBrand))) {
+  if (selectedItems.some(item => item.itemName.includes(itemName))) {
     showToast('Item already added to the list');
     return;
   }
