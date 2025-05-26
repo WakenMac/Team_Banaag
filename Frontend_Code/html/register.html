@@ -49,8 +49,7 @@
             </div>
           </div>
           
-
-          <form class="space-y-2" autocomplete="off">
+          <form class="space-y-2" autocomplete="off" id="signIn">
             <!-- Personal Information Section -->
             <div class="space-y-3">
               <div class="flex items-center gap-2">
@@ -110,6 +109,7 @@
               <div class="space-y-3">
                 <div class="space-y-1">
                   <label for="adminId" class="block text-sm font-medium text-gray-700">Admin ID<span class="text-red-500">*</span></label>
+                  <div id="adminIdError" class="hidden mb-2 text-sm text-red-600"></div>
                   <div class="relative">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                       <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,11 +118,12 @@
                     </div>
                     <input id="adminId" name="adminId" type="text" required placeholder="Enter admin ID" 
                       class="w-full py-2 pl-8 pr-3 transition-colors bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500" />
-                  </div>
+                    </div>
                 </div>
 
                 <div class="space-y-1">
                   <label for="password" class="block text-sm font-medium text-gray-700">Password<span class="text-red-500">*</span></label>
+                  <div id="passwordError" class="hidden mb-2 text-sm text-red-600"></div>
                   <div class="relative">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                       <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,6 +301,7 @@
     </div>
   </div>
 
-  <script src="/Frontend_Code/js/transaction.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="/Frontend_Code/js/transaction.js"></script>
 </body>
 </html> 
