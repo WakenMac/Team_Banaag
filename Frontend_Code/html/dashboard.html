@@ -22,6 +22,7 @@
         font-family: "Poppins", sans-serif;
       }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body class="bg-[#f3f7f7] min-h-screen">
     <!-- Loading Spinner -->
@@ -194,7 +195,7 @@
 
     </nav>
     <main class="max-w-full px-4 mx-auto mt-6 sm:px-6 lg:px-12">
-      <div class="flex items-center justify-end w-full">
+      <div class="flex items-center justify-end w-full mb-4">
         <button
           aria-controls="verifyAdminModal"
           aria-haspopup="dialog"
@@ -205,6 +206,80 @@
           New Transaction
         </button>
       </div>
+
+      <!-- New Dashboard Visualizations and Lists -->
+      <div class="max-w-full w-full mx-auto px-2 sm:px-4 lg:px-8 mt-8 space-y-8">
+        <!-- Summary Row -->
+        <div id="dashboardSummary" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+
+        <!-- Visualization Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="bg-white rounded-xl shadow p-6 flex flex-col justify-between">
+            <h3 class="flex items-center gap-2 text-base font-semibold text-green-700 mb-2"><i class="fas fa-chart-line"></i> Consumption Trend</h3>
+            <div class="h-48"><canvas id="consumptionTrendChart"></canvas></div>
+          </div>
+          <div class="bg-white rounded-xl shadow p-6 flex flex-col justify-between">
+            <h3 class="flex items-center gap-2 text-base font-semibold text-blue-700 mb-2"><i class="fas fa-chart-area"></i> Borrowing Trend</h3>
+            <div class="h-48"><canvas id="borrowingTrendChart"></canvas></div>
+          </div>
+          <div class="bg-white rounded-xl shadow p-6">
+            <h3 class="flex items-center gap-2 text-base font-semibold text-purple-700 mb-4">
+              <i class="fas fa-chart-pie"></i> Borrowed vs. Available
+            </h3>
+            <div class="flex items-center justify-between">
+              <!-- Chart -->
+              <div class="h-40 w-40">
+                <canvas id="borrowedDoughnutChart"></canvas>
+              </div>
+          
+              <!-- Stats -->
+              <div class="flex flex-col items-center gap-2 text-base font-semibold">
+                <div class="text-orange-600">
+                  Borrowed: <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-lg shadow-inner">681</span>
+                </div>
+                <div class="text-green-700">
+                  Available: <span class="bg-green-100 text-green-800 px-3 py-1 rounded-lg shadow-inner">319</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Items Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-green-50 rounded-xl shadow p-6 flex flex-col justify-between">
+            <h3 class="flex items-center gap-2 text-base font-semibold text-green-700 mb-2"><i class="fas fa-bolt"></i> Top 10 Fast Moving Consumables</h3>
+            <div class="h-72"><canvas id="topConsumablesBarChart"></canvas></div>
+          </div>
+          <div class="bg-blue-50 rounded-xl shadow p-6 flex flex-col justify-between">
+            <h3 class="flex items-center gap-2 text-base font-semibold text-blue-700 mb-2"><i class="fas fa-bolt"></i> Top 10 Frequently Borrowed Nonconsumables</h3>
+            <div class="h-72"><canvas id="topNonconsumablesBarChart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Data Lists Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="bg-purple-50 rounded-xl shadow p-6 flex flex-col h-72">
+            <h3 class="flex items-center gap-2 text-base font-semibold text-purple-700 mb-2"><i class="fas fa-hand-holding"></i> Currently Borrowed Items</h3>
+            <ul id="dashboardCurrentlyBorrowed" class="space-y-2 overflow-y-auto flex-1 pr-2"></ul>
+          </div>
+          <div class="bg-red-50 rounded-xl shadow p-6 flex flex-col h-72">
+            <h3 class="flex items-center gap-2 text-base font-semibold text-red-700 mb-2"><i class="fas fa-exclamation-circle"></i> Soon to Expire Consumables</h3>
+            <ul id="dashboardSoonToExpire" class="space-y-2 overflow-y-auto flex-1 pr-2"></ul>
+          </div>
+          <div class="bg-yellow-50 rounded-xl shadow p-6 flex flex-col h-72">
+            <h3 class="flex items-center gap-2 text-base font-semibold text-yellow-700 mb-2"><i class="fas fa-clock"></i> Pending/Partially Returns</h3>
+            <ul id="dashboardPendingReturns" class="space-y-2 overflow-y-auto flex-1 pr-2"></ul>
+          </div>
+        </div>
+
+        <!-- Most Recent Transaction (Full width) -->
+        <div class="bg-white rounded-xl shadow p-6 flex flex-col mt-4">
+          <h3 class="flex items-center gap-2 text-base font-semibold text-gray-700 mb-2"><i class="fas fa-history"></i> Most Recent Transaction</h3>
+          <div id="dashboardRecentTransaction" class="text-gray-700"></div>
+        </div>
+      </div>
+
     </main>
 
     <!-- Add Transaction Modal -->
