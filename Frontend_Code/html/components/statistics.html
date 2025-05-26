@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <title>CARES | CAS Automated Resource and Equipment System</title>
+    <title>CARES | Statistics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
@@ -16,6 +16,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/Frontend_Code/css/admin.css" />
+    <!-- Add Chart.js for statistics visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Add Chart.js for statistics visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
@@ -31,13 +33,13 @@
       >
         <img
           alt="CAS Lab logo with green and yellow colors, circular emblem with text"
-          class="w-12 h-12 object-contain transition-transform"
+          class="object-contain w-12 h-12 transition-transform"
           height="48"
           src="/Frontend_Code/images/cas_logo.png"
           width="48"
         />
         <div class="flex flex-col leading-tight">
-          <span class="font-semibold text-black text-sm"> CARES. </span>
+          <span class="text-sm font-semibold text-black"> CARES. </span>
           <span class="text-[9px] font-semibold text-black/80 tracking-tight">
             CENTRALIZED RESOURCE
           </span>
@@ -45,7 +47,7 @@
             AND EQUIPMENT SYSTEM
           </span>
         </div>
-        <div class="border-l border-black/40 h-10 ml-4"></div>
+        <div class="h-10 ml-4 border-l border-black/40"></div>
       </a>
       <!-- Right side: Navigation Links -->
       <ul class="flex space-x-8 text-[13px] font-normal text-black">
@@ -66,11 +68,11 @@
             type="button"
           >
             Masterlist
-            <i class="fas fa-chevron-down ml-1 text-xs"> </i>
+            <i class="ml-1 text-xs fas fa-chevron-down"> </i>
           </button>
           <ul
             aria-labelledby="masterlistBtn"
-            class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+            class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-36"
             id="masterlistMenu"
             role="menu"
           >
@@ -105,11 +107,11 @@
             type="button"
           >
             Consumables
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+            <i class="ml-1 text-xs text-black fas fa-chevron-down"> </i>
           </button>
           <ul
             aria-labelledby="consumablesBtn"
-            class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+            class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-36"
             id="consumablesMenu"
             role="menu"
           >
@@ -144,11 +146,11 @@
             type="button"
           >
             Non-consumables
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+            <i class="ml-1 text-xs text-black fas fa-chevron-down"> </i>
           </button>
           <ul
             aria-labelledby="nonconsumablesBtn"
-            class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+            class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-44"
             id="nonconsumablesMenu"
             role="menu"
           >
@@ -193,11 +195,11 @@
             type="button"
           >
             Properties
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+            <i class="ml-1 text-xs text-black fas fa-chevron-down"> </i>
           </button>
           <ul
             aria-labelledby="propertiesBtn"
-            class="absolute left-0 top-full mt-1 w-40 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+            class="absolute left-0 z-10 invisible w-40 mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full"
             id="propertiesMenu"
             role="menu"
           >
@@ -249,30 +251,30 @@
         </li>
       </ul>
     </nav>
-    <main class="max-w-full w-full mx-auto px-2 sm:px-4 lg:px-8 mt-8">
+    <main class="w-full max-w-full px-2 mx-auto mt-8 sm:px-4 lg:px-8">
       <div class="mb-8">
-        <h2 class="font-bold text-3xl text-gray-900 mb-2">Statistics Overview</h2>
-        <p class="text-gray-600 text-base">A summary of resource and equipment usage, trends, and alerts for the laboratory.</p>
+        <h2 class="mb-2 text-3xl font-bold text-gray-900">Statistics Overview</h2>
+        <p class="text-base text-gray-600">A summary of resource and equipment usage, trends, and alerts for the laboratory.</p>
       </div>
       <!-- Quick Alerts -->
       <div id="quickAlerts" class="mb-6 space-y-3"></div>
       <!-- Summary Row -->
-      <div class="flex flex-wrap gap-6 mb-8 w-full" id="summaryRow"></div>
+      <div class="flex flex-wrap w-full gap-6 mb-8" id="summaryRow"></div>
       <!-- Last Updated Timestamp -->
       <div class="mb-8 text-sm text-gray-500" id="lastUpdated"></div>
       <!-- Consumables Section -->
       <section class="mb-12">
-        <div class="grid grid-cols-2 gap-8 w-full">
+        <div class="grid w-full grid-cols-2 gap-8">
           <!-- Chemicals Card -->
-          <div class="bg-white rounded-xl shadow p-6 flex flex-col gap-6 w-full">
+          <div class="flex flex-col w-full gap-6 p-6 bg-white shadow rounded-xl">
             <div class="flex items-center mb-2">
-              <i class="fas fa-vial text-green-500 mr-2"></i>
+              <i class="mr-2 text-green-500 fas fa-vial"></i>
               <h4 class="text-lg font-semibold text-gray-700">Chemicals</h4>
             </div>
             <!-- Top 10 Fast Moving -->
             <div>
-              <div class="font-semibold text-green-700 mb-1">Top 10 Fast Moving Chemicals</div>
-              <ol id="top10Chemicals" class="top10-scroll pl-4 space-y-2 bg-green-50 rounded p-2"></ol>
+              <div class="mb-1 font-semibold text-green-700">Top 10 Fast Moving Chemicals</div>
+              <ol id="top10Chemicals" class="p-2 pl-4 space-y-2 rounded top10-scroll bg-green-50"></ol>
             </div>
             <!-- # Consumed -->
             <div class="text-center">
@@ -281,20 +283,20 @@
             </div>
             <!-- Soon to Expire -->
             <div>
-              <div class="font-semibold text-red-700 mb-1">Soon to Expire</div>
+              <div class="mb-1 font-semibold text-red-700">Soon to Expire</div>
               <ul id="chemicalsExpiryList" class="space-y-1"></ul>
             </div>
           </div>
           <!-- Items Card -->
-          <div class="bg-white rounded-xl shadow p-6 flex flex-col gap-6 w-full">
+          <div class="flex flex-col w-full gap-6 p-6 bg-white shadow rounded-xl">
             <div class="flex items-center mb-2">
-              <i class="fas fa-box-open text-yellow-500 mr-2"></i>
+              <i class="mr-2 text-yellow-500 fas fa-box-open"></i>
               <h4 class="text-lg font-semibold text-gray-700">Items</h4>
             </div>
             <!-- Top 10 Fast Moving -->
             <div>
-              <div class="font-semibold text-yellow-700 mb-1">Top 10 Fast Moving Items</div>
-              <ol id="top10Items" class="top10-scroll pl-4 space-y-2 bg-yellow-50 rounded p-2"></ol>
+              <div class="mb-1 font-semibold text-yellow-700">Top 10 Fast Moving Items</div>
+              <ol id="top10Items" class="p-2 pl-4 space-y-2 rounded top10-scroll bg-yellow-50"></ol>
             </div>
             <!-- # Consumed -->
             <div class="text-center">
@@ -303,7 +305,7 @@
             </div>
             <!-- Soon to Expire -->
             <div>
-              <div class="font-semibold text-red-700 mb-1">Soon to Expire</div>
+              <div class="mb-1 font-semibold text-red-700">Soon to Expire</div>
               <ul id="itemsExpiryList" class="space-y-1"></ul>
             </div>
           </div>
@@ -311,17 +313,17 @@
       </section>
       <!-- Non-Consumables Section -->
       <section class="mb-12">
-        <div class="grid grid-cols-3 gap-8 w-full">
+        <div class="grid w-full grid-cols-3 gap-8">
           <!-- Apparatus Card -->
-          <div class="bg-white rounded-xl shadow p-6 flex flex-col gap-6 w-full">
+          <div class="flex flex-col w-full gap-6 p-6 bg-white shadow rounded-xl">
             <div class="flex items-center mb-2">
-              <i class="fas fa-cog text-blue-500 mr-2"></i>
+              <i class="mr-2 text-blue-500 fas fa-cog"></i>
               <h4 class="text-lg font-semibold text-gray-700">Apparatus</h4>
             </div>
             <!-- Top 10 Frequently Borrowed -->
             <div>
-              <div class="font-semibold text-blue-700 mb-1">Top 10 Frequently Borrowed Apparatus</div>
-              <ol id="top10Apparatus" class="top10-scroll pl-4 space-y-2 bg-blue-50 rounded p-2"></ol>
+              <div class="mb-1 font-semibold text-blue-700">Top 10 Frequently Borrowed Apparatus</div>
+              <ol id="top10Apparatus" class="p-2 pl-4 space-y-2 rounded top10-scroll bg-blue-50"></ol>
             </div>
             <!-- # Borrowed -->
             <div class="text-center">
@@ -330,20 +332,20 @@
             </div>
             <!-- Currently Borrowed -->
             <div>
-              <div class="font-semibold text-purple-700 mb-1">Currently Borrowed</div>
+              <div class="mb-1 font-semibold text-purple-700">Currently Borrowed</div>
               <ul id="apparatusBorrowedList" class="space-y-1"></ul>
             </div>
           </div>
           <!-- Glassware Card -->
-          <div class="bg-white rounded-xl shadow p-6 flex flex-col gap-6 w-full">
+          <div class="flex flex-col w-full gap-6 p-6 bg-white shadow rounded-xl">
             <div class="flex items-center mb-2">
-              <i class="fas fa-wine-glass-alt text-purple-500 mr-2"></i>
+              <i class="mr-2 text-purple-500 fas fa-wine-glass-alt"></i>
               <h4 class="text-lg font-semibold text-gray-700">Glassware</h4>
             </div>
             <!-- Top 10 Frequently Borrowed -->
             <div>
-              <div class="font-semibold text-purple-700 mb-1">Top 10 Frequently Borrowed Glassware</div>
-              <ol id="top10Glassware" class="top10-scroll pl-4 space-y-2 bg-purple-50 rounded p-2"></ol>
+              <div class="mb-1 font-semibold text-purple-700">Top 10 Frequently Borrowed Glassware</div>
+              <ol id="top10Glassware" class="p-2 pl-4 space-y-2 rounded top10-scroll bg-purple-50"></ol>
             </div>
             <!-- # Borrowed -->
             <div class="text-center">
@@ -352,20 +354,20 @@
             </div>
             <!-- Currently Borrowed -->
             <div>
-              <div class="font-semibold text-purple-700 mb-1">Currently Borrowed</div>
+              <div class="mb-1 font-semibold text-purple-700">Currently Borrowed</div>
               <ul id="glasswareBorrowedList" class="space-y-1"></ul>
             </div>
           </div>
           <!-- Equipment Card -->
-          <div class="bg-white rounded-xl shadow p-6 flex flex-col gap-6 w-full">
+          <div class="flex flex-col w-full gap-6 p-6 bg-white shadow rounded-xl">
             <div class="flex items-center mb-2">
-              <i class="fas fa-microscope text-red-500 mr-2"></i>
+              <i class="mr-2 text-red-500 fas fa-microscope"></i>
               <h4 class="text-lg font-semibold text-gray-700">Equipment</h4>
             </div>
             <!-- Top 10 Frequently Borrowed -->
             <div>
-              <div class="font-semibold text-red-700 mb-1">Top 10 Frequently Borrowed Equipment</div>
-              <ol id="top10Equipment" class="top10-scroll pl-4 space-y-2 bg-red-50 rounded p-2"></ol>
+              <div class="mb-1 font-semibold text-red-700">Top 10 Frequently Borrowed Equipment</div>
+              <ol id="top10Equipment" class="p-2 pl-4 space-y-2 rounded top10-scroll bg-red-50"></ol>
             </div>
             <!-- # Borrowed -->
             <div class="text-center">
@@ -374,7 +376,7 @@
             </div>
             <!-- Currently Borrowed -->
             <div>
-              <div class="font-semibold text-purple-700 mb-1">Currently Borrowed</div>
+              <div class="mb-1 font-semibold text-purple-700">Currently Borrowed</div>
               <ul id="equipmentBorrowedList" class="space-y-1"></ul>
             </div>
           </div>

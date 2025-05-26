@@ -128,8 +128,8 @@ function renderQuickAlerts() {
   const alerts = [];
   // Soon to expire (Chemicals & Items)
   const soonToExpire = [
-    ...mockData.chemicals.soonToExpire.map(item => ({...item, type: 'chemicals'})),
-    ...mockData.items.soonToExpire.map(item => ({...item, type: 'items'}))
+    ...mockData.chemicals.soonToExpire.map(item => ({ ...item, type: 'chemicals' })),
+    ...mockData.items.soonToExpire.map(item => ({ ...item, type: 'items' }))
   ];
   if (soonToExpire.length > 0) {
     alerts.push(`
@@ -143,9 +143,9 @@ function renderQuickAlerts() {
   }
   // Currently borrowed (Apparatus, Glassware, Equipment)
   const currentlyBorrowed = [
-    ...mockData.apparatus.currentlyBorrowed.map(item => ({...item, type: 'apparatus'})),
-    ...mockData.glassware.currentlyBorrowed.map(item => ({...item, type: 'glassware'})),
-    ...mockData.equipment.currentlyBorrowed.map(item => ({...item, type: 'equipment'}))
+    ...mockData.apparatus.currentlyBorrowed.map(item => ({ ...item, type: 'apparatus' })),
+    ...mockData.glassware.currentlyBorrowed.map(item => ({ ...item, type: 'glassware' })),
+    ...mockData.equipment.currentlyBorrowed.map(item => ({ ...item, type: 'equipment' }))
   ];
   if (currentlyBorrowed.length > 0) {
     alerts.push(`
@@ -296,4 +296,179 @@ function renderCurrentlyBorrowedList(listId, data, color) {
       <span class="text-${color}-700 font-semibold">${item.borrower}</span>
     </li>
   `).join('');
-} 
+}
+
+
+// Chart Configurations
+function initializeCharts() {
+  // Fast-Moving Consumables Chart
+  const topConsumablesCtx = document.getElementById('topConsumablesBarChart');
+  if (topConsumablesCtx) {
+    new Chart(topConsumablesCtx, {
+      type: 'bar',
+      data: {
+        labels: mockChartData.fastMovingConsumables.labels,
+        datasets: [{
+          label: 'Consumption Rate (%)',
+          data: mockChartData.fastMovingConsumables.data,
+          backgroundColor: 'rgba(34, 197, 94, 0.6)',
+          borderColor: 'rgba(34, 197, 94, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: 'Consumption Rate (%)'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  }
+
+  // Consumption Trend Chart
+  const consumptionTrendCtx = document.getElementById('consumptionTrendChart');
+  if (consumptionTrendCtx) {
+    new Chart(consumptionTrendCtx, {
+      type: 'line',
+      data: {
+        labels: mockChartData.consumptionTrend.labels,
+        datasets: [
+          {
+            label: 'Chemicals',
+            data: mockChartData.consumptionTrend.chemicals,
+            borderColor: 'rgba(34, 197, 94, 1)',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            tension: 0.4
+          },
+          {
+            label: 'Items',
+            data: mockChartData.consumptionTrend.items,
+            borderColor: 'rgba(59, 130, 246, 1)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Quantity'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Borrowing Trend Chart
+  const borrowingTrendCtx = document.getElementById('borrowingTrendChart');
+  if (borrowingTrendCtx) {
+    new Chart(borrowingTrendCtx, {
+      type: 'line',
+      data: {
+        labels: mockChartData.borrowingTrend.labels,
+        datasets: [
+          {
+            label: 'Apparatus',
+            data: mockChartData.borrowingTrend.apparatus,
+            borderColor: 'rgba(59, 130, 246, 1)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4
+          },
+          {
+            label: 'Glassware',
+            data: mockChartData.borrowingTrend.glassware,
+            borderColor: 'rgba(168, 85, 247, 1)',
+            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+            tension: 0.4
+          },
+          {
+            label: 'Equipment',
+            data: mockChartData.borrowingTrend.equipment,
+            borderColor: 'rgba(239, 68, 68, 1)',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            tension: 0.4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Number of Borrows'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Top 10 Frequently Borrowed Non-consumables Chart
+  const topNonconsumablesCtx = document.getElementById('topNonconsumablesBarChart');
+  if (topNonconsumablesCtx) {
+    new Chart(topNonconsumablesCtx, {
+      type: 'bar',
+      data: {
+        labels: mockChartData.topBorrowedNonConsumables.labels,
+        datasets: [{
+          label: 'Times Borrowed',
+          data: mockChartData.topBorrowedNonConsumables.data,
+          backgroundColor: 'rgba(59, 130, 246, 0.6)',
+          borderColor: 'rgba(59, 130, 246, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Times Borrowed'
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  }
+
+  // Update dashboard summary cards with mock data
+  const totalItems = 150;
+  const totalConsumables = 75;
+  const totalNonConsumables = 75;
+  const totalTransactions = 45;
+
+  document.getElementById('totalItems').textContent = totalItems;
+  document.getElementById('totalConsumables').textContent = totalConsumables;
+  document.getElementById('totalNonConsumables').textContent = totalNonConsumables;
+  document.getElementById('totalTransactions').textContent = totalTransactions;
+}
