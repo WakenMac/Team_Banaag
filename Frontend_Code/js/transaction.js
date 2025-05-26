@@ -1,6 +1,9 @@
 // Import the database handler
 import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
+// Global data
+var itemData;
+
 // Mock data for testing
 const mockAdmins = [
   { admin_id: '123', password: 'password123', name: 'Chicco' },
@@ -155,7 +158,7 @@ const mockBorrowedItems = [
 ];
 
 // Global state
-let currentAdminId = null;
+let currentAdminId = null; // Use localStorage later.
 let selectedItems = [];
 let filteredTransactions = [];
 
@@ -169,8 +172,8 @@ const mockAdmin = {
 async function initializePage() {
   try {
     showLoading();
-    await loadTransactionHistory();
     setupEventListeners();
+    await loadTransactionHistory(); // For returning
     hideLoading();
   } catch (error) {
     console.error('Error initializing page:', error);
@@ -449,9 +452,6 @@ function setupEventListeners() {
   }
 }
 
-// Initialize the page when the DOM is loaded
-document.addEventListener('DOMContentLoaded', initializePage);
-
 // Make all necessary functions available globally
 window.showTransactionDetails = function(transactionId) {
   const transaction = filteredTransactions.find(t => t.transaction_id === transactionId);
@@ -537,6 +537,7 @@ window.showTransactionDetails = function(transactionId) {
   showModal('transactionDetailsModal');
 };
 
+// TODO: What does this do?
 window.processReturn = async function(transactionId, itemName) {
   const quantityInput = document.querySelector(`input[data-item="${itemName}"]`);
   if (!quantityInput) return;
@@ -583,6 +584,8 @@ window.processReturn = async function(transactionId, itemName) {
 // Verify admin credentials using mock data for testing
 async function verifyAdmin(adminId, password) {
   try {
+
+    // Keep for now for the presentation
     var adminExists = mockAdmins.some(admin => 
       admin.admin_id === adminId && admin.password === password
     );
@@ -604,15 +607,19 @@ async function verifyAdmin(adminId, password) {
 // Update item quantity in the selectedItems array
 function updateItemQuantity(itemName, newQuantity) {
   const index = selectedItems.findIndex(item => item.itemName === itemName);
+
+  console.log(index)
   if (index !== -1) {
-    const inventoryItem = mockInventory.find(item => item.item_name === itemName);
-    const maxQuantity = inventoryItem ? inventoryItem.available_quantity : 1;
+    const inventoryItem = itemData.find(item => itemName.includes(item["Name"]) && itemName.includes(item["Brand"])); 
+    const maxQuantity = inventoryItem ? inventoryItem["Remaining Quantity"] : 1;
     
-    newQuantity = Math.min(Math.max(1, parseInt(newQuantity) || 1), maxQuantity);
+
+    newQuantity = Math.min(Math.max(1, parseFloat(newQuantity) || 1), maxQuantity);
     selectedItems[index].quantity = newQuantity;
     
     const input = document.querySelector(`input[data-item="${itemName}"]`);
     if (input) {
+      console.log(newQuantity);
       input.value = newQuantity;
     }
   }
@@ -625,12 +632,12 @@ function addItemToTable(itemName) {
   
   if (!selectedItemsTable) return;
   
-  if (selectedItems.some(item => item.itemName === itemName)) {
+  if (selectedItems.some(item => item.itemName.includes(itemName) & item.brand.includes(itemBrand))) {
     showToast('Item already added to the list');
     return;
   }
-  
-  const inventoryItem = mockInventory.find(item => item.item_name === itemName);
+
+  const inventoryItem = itemData.find(item => itemName.includes(item["Name"]) && itemName.includes(item["Brand"]));
   if (!inventoryItem) {
     showToast('Item not found in inventory');
     return;
@@ -640,12 +647,13 @@ function addItemToTable(itemName) {
     noItemsRow.style.display = 'none';
   }
   
+  let isConsumable = (inventoryItem["Item Type"].includes('Chemicals') || inventoryItem["Item Type"].includes('Consumable Items'))? true : false;
   const row = document.createElement('tr');
   row.innerHTML = `
     <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-      ${inventoryItem.is_consumable ? '<span class="text-[#2ca14a] font-medium">*</span>' : ''}${itemName}
+      ${isConsumable ? '<span class="text-[#2ca14a] font-medium">*</span>' : ''}${itemName}
     </td>
-    <td class="px-6 py-4 whitespace-nowrap text-gray-900 text-center">${inventoryItem.available_quantity}</td>
+    <td class="px-6 py-4 whitespace-nowrap text-gray-900 text-center">${inventoryItem["Remaining Quantity"]}</td>
     <td class="px-6 py-4 whitespace-nowrap text-gray-900">
       <div class="flex items-center justify-center w-full space-x-2">
         <button type="button" 
@@ -657,7 +665,7 @@ function addItemToTable(itemName) {
           type="number" 
           value="1"
           min="1"
-          max="${inventoryItem.available_quantity}"
+          max="${inventoryItem["Remaining Quantity"]}"
           data-item="${itemName}"
           class="w-16 text-center rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           onchange="updateItemQuantity('${itemName}', this.value)"
@@ -683,12 +691,12 @@ function addItemToTable(itemName) {
   `;
   
   selectedItemsTable.appendChild(row);
-  selectedItems.push({ itemName, quantity: 1 });
+  selectedItems.push({ itemName, quantity: 1});
 }
 
 // Remove item from the selected items table
 function removeItem(itemName) {
-  selectedItems = selectedItems.filter(item => item.itemName !== itemName);
+  selectedItems = selectedItems.filter(item => item.itemName === itemName);
   
   const selectedItemsTable = document.getElementById('selectedItemsTable');
   if (!selectedItemsTable) return;
@@ -944,6 +952,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Directly show borrow items modal, skip transaction type modal
       showModal('borrowItemsModal');
       initializeItemsList();
+      await dbhandler.prepareUser();
       verifyAdminForm.reset();
     } else {
       const errorDiv = document.getElementById('verifyAdminError');
@@ -957,7 +966,7 @@ document.addEventListener('DOMContentLoaded', () => {
   borrowBtn?.addEventListener('click', () => {
     hideModal('transactionTypeModal');
     showModal('borrowItemsModal');
-    initializeItemsList();
+    // initializeItemsList();
   });
 
   returnBtn?.addEventListener('click', () => {
@@ -1000,6 +1009,7 @@ document.addEventListener('DOMContentLoaded', () => {
   borrowItemsForm?.addEventListener('submit', (e) => {
     e.preventDefault();
     if (selectedItems.length > 0) {
+
       hideModal('borrowItemsModal');
       showModal('confirmationModal');
     } else {
@@ -1007,12 +1017,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  confirmTransactionBtn?.addEventListener('click', () => {
+  // TODO: ADD transaction
+  confirmTransactionBtn?.addEventListener('click', async () => {
     hideModal('confirmationModal');
-    showToast('Transaction completed successfully!');
-    clearItemsTable();
-    const borrowRemarks = document.getElementById('borrowRemarks');
-    if (borrowRemarks) borrowRemarks.value = '';
+
+    let itemIdArray = Array();
+    let borrowQuantityArray = Array();
+
+    // selected items (itemName, quantity)
+    // itemName consists of : Name (Brand)
+    selectedItems.forEach((item) => {
+      var tempItem = itemData.find(tempItemData => item.itemName.includes(tempItemData["Name"]) == true && item.itemName.includes(tempItemData["Brand"]) == true)
+
+      itemIdArray.push(tempItem["Item ID"]);
+      borrowQuantityArray.push(item.quantity);
+      console.log(tempItem["Item ID"], " ", item.quantity)
+    });
+
+    let result = await dbhandler.addTransactionRecord(currentAdminId, borrowRemarks.value.trim(), itemIdArray, borrowQuantityArray);
+    
+    if (result.includes("ERROR")){
+      showToast(result, true)
+    } else {
+      showToast('Transaction completed successfully!', false);
+      clearItemsTable();
+      const borrowRemarks = document.getElementById('borrowRemarks');
+      if (borrowRemarks) borrowRemarks.value = '';
+    }
   });
 
   cancelVerifyBtn?.addEventListener('click', () => {
@@ -1023,6 +1054,8 @@ document.addEventListener('DOMContentLoaded', () => {
   cancelBorrowBtn?.addEventListener('click', () => {
     hideModal('borrowItemsModal');
     selectedItems = [];
+    clearItemsTable();
+    document.getElementById('borrowRemarks').value = '';
     const selectedItemsTable = document.getElementById('selectedItemsTable');
     if (selectedItemsTable) selectedItemsTable.innerHTML = '';
   });
@@ -1068,24 +1101,6 @@ function hideModal(modalId) {
   modal.classList.remove('flex');
 }
 
-// Initialize items list for borrowing
-function initializeItemsList() {
-  const itemsList = document.getElementById('itemsList');
-  if (!itemsList) return;
-
-  // Clear existing options
-  itemsList.innerHTML = '';
-  console.log(itemsList);
-
-  // Add items from mock inventory
-  mockInventory.forEach(item => {
-    const option = document.createElement('option');
-    option.value = item.item_name;
-    option.textContent = `${item.item_name} (${item.available_quantity} available)`;
-    itemsList.appendChild(option);
-  });
-}
-
 // Initialize the page when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize the page
@@ -1103,6 +1118,8 @@ document.addEventListener('DOMContentLoaded', () => {
     closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
   }
 });
+
+// This is after adding a new transaction
 
 // Add a new transaction and refresh the transaction history table
 window.addNewTransaction = function(newTransaction) {
@@ -1319,3 +1336,48 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 });
+
+// ================================================================
+// Backend Methods
+
+async function initializeItemsList() {
+  try {
+    itemData = await dbhandler.getAllItemMasterListNameBrandRecords();
+
+    if (itemData.length == 0) {
+      console.error("Item Master List table has no records.");
+      return;
+    }
+
+    const itemsList = document.getElementById('itemsList');
+    if (!itemsList) return;
+
+    // Clear existing options
+    itemsList.innerHTML = '';
+    console.log(itemsList);
+    
+    // Commented for the mean time (Not fully implemented yet.)
+    itemData.forEach((item) => {
+      if (Number(item["Remaining Quantity"]) == 0)
+        return;
+
+      const option = document.createElement('option');
+      option.value = item["Name"] + " (" + item["Brand"] + ")";
+      option.textContent = `${item["Remaining Quantity"]} ${item["Unit Type"]} available`;
+      itemsList.appendChild(option);
+    })
+
+    // Add items from mock inventory
+    // mockInventory.forEach(item => {
+    //   const option = document.createElement('option');
+    //   option.value = item.item_name;
+    //   option.textContent = `${item.item_name} (${item.available_quantity} available)`;
+    //   itemsList.appendChild(option);
+    // });
+
+  } catch (generalError) {
+    console.error(generalError);
+  } finally {
+    hideLoading();
+  }
+}
