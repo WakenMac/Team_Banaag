@@ -6,7 +6,7 @@
     <head>
       <meta charset="utf-8" />
       <meta content="width=device-width, initial-scale=1" name="viewport" />
-      <title>CARES | CAS Automated Resource and Equipment System</title>
+      <title>CARES | Equipment Management</title>
       <script src="https://cdn.tailwindcss.com"></script>
       <link
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
@@ -29,13 +29,13 @@
         >
           <img
             alt="CAS Lab logo with green and yellow colors, circular emblem with text"
-            class="w-12 h-12 object-contain transition-transform"
+            class="object-contain w-12 h-12 transition-transform"
             height="48"
             src="/Frontend_Code/images/cas_logo.png"
             width="48"
           />
           <div class="flex flex-col leading-tight">
-            <span class="font-semibold text-black text-sm"> CARES. </span>
+            <span class="text-sm font-semibold text-black"> CARES. </span>
             <span class="text-[9px] font-semibold text-black/80 tracking-tight">
               CENTRALIZED RESOURCE
             </span>
@@ -43,7 +43,7 @@
               AND EQUIPMENT SYSTEM
             </span>
           </div>
-          <div class="border-l border-black/40 h-10 ml-4"></div>
+          <div class="h-10 ml-4 border-l border-black/40"></div>
         </a>
         <!-- Right side: Navigation Links -->
         <ul class="flex space-x-8 text-[13px] font-normal text-black">
@@ -64,11 +64,11 @@
               type="button"
             >
               Masterlist
-              <i class="fas fa-chevron-down ml-1 text-xs"> </i>
+              <i class="ml-1 text-xs fas fa-chevron-down"> </i>
             </button>
             <ul
               aria-labelledby="masterlistBtn"
-              class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+              class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-36"
               id="masterlistMenu"
               role="menu"
             >
@@ -103,11 +103,11 @@
               type="button"
             >
               Consumables
-              <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+              <i class="ml-1 text-xs text-black fas fa-chevron-down"> </i>
             </button>
             <ul
               aria-labelledby="consumablesBtn"
-              class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+              class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-36"
               id="consumablesMenu"
               role="menu"
             >
@@ -142,11 +142,11 @@
               type="button"
             >
               Non-consumables
-              <i class="fas fa-chevron-down ml-1 text-xs"> </i>
+              <i class="ml-1 text-xs fas fa-chevron-down"> </i>
             </button>
             <ul
               aria-labelledby="nonconsumablesBtn"
-              class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+              class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-44"
               id="nonconsumablesMenu"
               role="menu"
             >
@@ -191,11 +191,11 @@
               type="button"
             >
               Properties
-              <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+              <i class="ml-1 text-xs text-black fas fa-chevron-down"> </i>
             </button>
             <ul
               aria-labelledby="propertiesBtn"
-              class="absolute left-0 top-full mt-1 w-40 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+              class="absolute left-0 z-10 invisible w-40 mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full"
               id="propertiesMenu"
               role="menu"
             >
@@ -247,12 +247,12 @@
           </li>
         </ul>
       </nav>
-      <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 mt-6">
+      <main class="max-w-full px-4 mx-auto mt-6 sm:px-6 lg:px-12">
         <div
-          class="flex flex-col sm:flex-row justify-between items-center w-full gap-3 sm:gap-0"
+          class="flex flex-col items-center justify-between w-full gap-3 sm:flex-row sm:gap-0"
         >
           <div
-            class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto"
+            class="flex flex-col items-center w-full gap-3 sm:flex-row sm:gap-4 sm:w-auto"
           >
             <input
               id="searchInput"
@@ -261,7 +261,7 @@
               placeholder="Search..."
               type="search"
             />
-            <div class="relative max-w-xs w-full sm:w-48"></div>
+            <div class="relative w-full max-w-xs sm:w-48"></div>
           </div>
           <button
             aria-controls="addEquipmentModal"
@@ -273,51 +273,51 @@
             Add Equipment
           </button>
         </div>
-        <h2 class="font-semibold text-gray-900 text-sm mb-3 mt-4">
+        <h2 class="mt-4 mb-3 text-sm font-semibold text-gray-900">
           Non-consumables - Equipment
         </h2>
-        <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
-          <table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50 sticky top-0 z-10">
+        <div class="overflow-x-auto bg-white border border-gray-100 rounded-md">
+          <table class="min-w-full text-sm divide-y divide-gray-200">
+            <thead class="sticky top-0 z-10 bg-gray-50">
               <tr>
                 <th
-                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
                   scope="col"
                 >
                   Item ID
                 </th>
                 <th
-                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
                   scope="col"
                 >
                   Name
                 </th>
                 <th
-                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
                   scope="col"
                 >
                   Unit
                 </th>
                 <th
-                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
                   scope="col"
                 >
                   Location
                 </th>
                 <th
-                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
                   scope="col"
                 >
                   Brand
                 </th>
                 <th
-                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
                   scope="col"
                 >
                   Quantity
                 </th>
                 <th
-                  class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                  class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
                   scope="col"
                 ></th>
               </tr>
@@ -328,24 +328,24 @@
             >
               <!-- Example row -->
               <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900">1</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900">
+                <td class="px-6 py-4 text-gray-900 whitespace-nowrap">1</td>
+                <td class="px-6 py-4 text-gray-900 whitespace-nowrap">
                   Equipment Name
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900">mL</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900">
+                <td class="px-6 py-4 text-gray-900 whitespace-nowrap">mL</td>
+                <td class="px-6 py-4 text-gray-900 whitespace-nowrap">
                   Stock Room
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900">
+                <td class="px-6 py-4 text-gray-900 whitespace-nowrap">
                   Brand Name
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-900">10</td>
+                <td class="px-6 py-4 text-gray-900 whitespace-nowrap">10</td>
                 <td
-                  class="px-8 py-4 whitespace-nowrap flex items-center justify-end gap-3"
+                  class="flex items-center justify-end gap-3 px-8 py-4 whitespace-nowrap"
                 >
                   <button
                     aria-label="Info"
-                    class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
+                    class="flex items-center justify-center text-gray-700 border border-gray-700 rounded-full w-7 h-7 hover:bg-gray-100"
                     data-csn="SN1234"
                     data-cbd="2023-01-01"
                     data-fcb="6 months"
@@ -354,7 +354,7 @@
                   </button>
                   <button
                     aria-label="Add remarks"
-                    class="text-gray-700 border border-gray-700 rounded-full w-7 h-7 flex items-center justify-center hover:bg-gray-100"
+                    class="flex items-center justify-center text-gray-700 border border-gray-700 rounded-full w-7 h-7 hover:bg-gray-100"
                     data-equipment-id="${equipmentId}"
                   >
                     <i class="fas fa-comment-alt text-[14px]"></i>
@@ -376,31 +376,31 @@
       <div
         aria-labelledby="modalTitle"
         aria-modal="true"
-        class="fixed inset-0 z-50 hidden items-center justify-center"
+        class="fixed inset-0 z-50 items-center justify-center hidden"
         id="addEquipmentModal"
         role="dialog"
       >
         <div
-          class="modal-backdrop fixed inset-0 bg-black opacity-50"
+          class="fixed inset-0 bg-black opacity-50 modal-backdrop"
           id="modalBackdropAddEquipment"
         ></div>
         <div
-          class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+          class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg"
         >
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3">
               <img
                 src="/Frontend_Code/images/cas_logo.png"
                 alt="CARES logo"
-                class="w-12 h-12 object-contain"
+                class="object-contain w-12 h-12"
               />
-              <span class="font-black text-3xl text-black">Add Equipment</span>
+              <span class="text-3xl font-black text-black">Add Equipment</span>
             </div>
           </div>
           <form class="space-y-4" id="addEquipmentForm">
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="equipmentName"
               >
                 Name <span class="text-red-500">*</span>
@@ -416,7 +416,7 @@
             </div>
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="equipmentUnit"
               >
                 Unit <span class="text-red-500">*</span>
@@ -436,7 +436,7 @@
             </div>
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="equipmentLocation"
               >
                 Location <span class="text-red-500">*</span>
@@ -456,7 +456,7 @@
             </div>
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="equipmentBrand"
               >
                 Brand <span class="text-red-500">*</span>
@@ -472,7 +472,7 @@
             </div>
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="equipmentCalibrationDate"
               >
                 Calibration Date
@@ -487,7 +487,7 @@
             </div>
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="equipmentSerialNumber"
               >
                 Compress Serial Number <span class="text-red-500">*</span>
@@ -502,7 +502,7 @@
             </div>
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="equipmentFreqOfCalibration"
               >
                 Frequency of Calibration
@@ -515,7 +515,7 @@
                 placeholder="e.g. Semi-Anually"
               />
             </div>
-            <div class="flex justify-end space-x-3 pt-4">
+            <div class="flex justify-end pt-4 space-x-3">
               <button
                 class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
                 id="cancelEquipmentBtn"
@@ -539,31 +539,31 @@
       <div
         aria-labelledby="editModalTitle"
         aria-modal="true"
-        class="fixed inset-0 z-50 hidden items-center justify-center"
+        class="fixed inset-0 z-50 items-center justify-center hidden"
         id="editEquipmentModal"
         role="dialog"
       >
         <div
-          class="modal-backdrop fixed inset-0 bg-black opacity-50"
+          class="fixed inset-0 bg-black opacity-50 modal-backdrop"
           id="modalBackdropEditEquipment"
         ></div>
         <div
-          class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+          class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg"
         >
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3">
               <img
                 src="/Frontend_Code/images/cas_logo.png"
                 alt="CARES logo"
-                class="w-12 h-12 object-contain"
+                class="object-contain w-12 h-12"
               />
-              <span class="font-black text-3xl text-black">Edit Equipment</span>
+              <span class="text-3xl font-black text-black">Edit Equipment</span>
             </div>
           </div>
           <form class="space-y-4" id="editEquipmentForm">
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="editEquipmentId"
               >
                 Equipment ID
@@ -579,7 +579,7 @@
             </div>
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="editEquipmentName"
               >
                 Name
@@ -594,7 +594,7 @@
             </div>
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="editEquipmentUnit"
               >
                 Unit
@@ -614,7 +614,7 @@
             </div>
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="editEquipmentLocation"
               >
                 Location
@@ -635,7 +635,7 @@
             </div>
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="editEquipmentBrand"
               >
                 Brand
@@ -650,7 +650,7 @@
             </div>
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="editEquipmentCalibrationDate"
               >
                 Calibration Date
@@ -665,7 +665,7 @@
             </div>
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="editEquipmentSerialNumber"
               >
                 Compress Serial Number
@@ -680,7 +680,7 @@
             </div>
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="editEquipmentFreqOfCalibration"
               >
                 Frequency of Calibration
@@ -693,7 +693,7 @@
                 placeholder="Enter MSDS"
               />
             </div>
-            <div class="flex justify-end space-x-3 pt-4">
+            <div class="flex justify-end pt-4 space-x-3">
               <button
                 class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
                 id="cancelEditBtn"
@@ -717,25 +717,25 @@
       <div
         aria-labelledby="remarksModalTitle"
         aria-modal="true"
-        class="fixed inset-0 z-50 hidden items-center justify-center"
+        class="fixed inset-0 z-50 items-center justify-center hidden"
         id="remarksModal"
         role="dialog"
       >
         <div
-          class="modal-backdrop fixed inset-0 bg-black opacity-50"
+          class="fixed inset-0 bg-black opacity-50 modal-backdrop"
           id="modalBackdropRemarks"
         ></div>
         <div
-          class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+          class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg"
         >
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3">
               <img
                 src="/Frontend_Code/images/cas_logo.png"
                 alt="CARES logo"
-                class="w-12 h-12 object-contain"
+                class="object-contain w-12 h-12"
               />
-              <span class="font-black text-3xl text-black">Add Remarks</span>
+              <span class="text-3xl font-black text-black">Add Remarks</span>
             </div>
           </div>
           <form class="space-y-4" id="remarksForm">
@@ -746,7 +746,7 @@
             />
             <div>
               <label
-                class="block text-sm font-medium text-gray-700 mb-1"
+                class="block mb-1 text-sm font-medium text-gray-700"
                 for="remarksText"
               >
                 Remarks
@@ -759,7 +759,7 @@
                 placeholder="e.g. This equipment is in good condition."
               ></textarea>
             </div>
-            <div class="flex justify-end space-x-3 pt-4">
+            <div class="flex justify-end pt-4 space-x-3">
               <button
                 class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
                 id="cancelRemarksBtn"
@@ -783,30 +783,30 @@
       <div
         aria-labelledby="deleteEquipmentModalTitle"
         aria-modal="true"
-        class="fixed inset-0 z-50 hidden items-center justify-center"
+        class="fixed inset-0 z-50 items-center justify-center hidden"
         id="deleteEquipmentModal"
         role="dialog"
       >
         <div
-          class="modal-backdrop fixed inset-0 bg-black opacity-50"
+          class="fixed inset-0 bg-black opacity-50 modal-backdrop"
           id="modalBackdropDeleteEquipment"
         ></div>
         <div
-          class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+          class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg"
         >
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3">
               <img
                 src="/Frontend_Code/images/cas_logo.png"
                 alt="CARES logo"
-                class="w-12 h-12 object-contain"
+                class="object-contain w-12 h-12"
               />
-              <span class="font-black text-3xl text-black"
+              <span class="text-3xl font-black text-black"
                 >Delete Equipment</span
               >
             </div>
           </div>
-          <p class="text-gray-700 mb-6">
+          <p class="mb-6 text-gray-700">
             Are you sure you want to delete this equipment? This action cannot
             be undone.
           </p>
@@ -819,7 +819,7 @@
               Cancel
             </button>
             <button
-              class="px-4 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              class="px-4 py-2 font-semibold text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
               id="confirmDeleteEquipmentBtn"
               type="button"
             >

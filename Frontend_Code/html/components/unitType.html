@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <title>CARES | CAS Automated Resource and Equipment System</title>
+    <title>CARES | Unit Type Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
@@ -30,13 +30,13 @@
       >
         <img
           alt="CAS Lab logo with green and yellow colors, circular emblem with text"
-          class="w-12 h-12 object-contain transition-transform"
+          class="object-contain w-12 h-12 transition-transform"
           height="48"
           src="/Frontend_Code/images/cas_logo.png"
           width="48"
         />
         <div class="flex flex-col leading-tight">
-          <span class="font-semibold text-black text-sm"> CARES. </span>
+          <span class="text-sm font-semibold text-black"> CARES. </span>
           <span class="text-[9px] font-semibold text-black/80 tracking-tight">
             CENTRALIZED RESOURCE
           </span>
@@ -44,7 +44,7 @@
             AND EQUIPMENT SYSTEM
           </span>
         </div>
-        <div class="border-l border-black/40 h-10 ml-4"></div>
+        <div class="h-10 ml-4 border-l border-black/40"></div>
       </a>
       <!-- Right side: Navigation Links -->
       <ul class="flex space-x-8 text-[13px] font-normal text-black">
@@ -65,11 +65,11 @@
             type="button"
           >
             Masterlist
-            <i class="fas fa-chevron-down ml-1 text-xs"> </i>
+            <i class="ml-1 text-xs fas fa-chevron-down"> </i>
           </button>
           <ul
             aria-labelledby="masterlistBtn"
-            class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+            class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-36"
             id="masterlistMenu"
             role="menu"
           >
@@ -104,11 +104,11 @@
             type="button"
           >
             Consumables
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+            <i class="ml-1 text-xs text-black fas fa-chevron-down"> </i>
           </button>
           <ul
             aria-labelledby="consumablesBtn"
-            class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+            class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-36"
             id="consumablesMenu"
             role="menu"
           >
@@ -143,11 +143,11 @@
             type="button"
           >
             Non-consumables
-            <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+            <i class="ml-1 text-xs text-black fas fa-chevron-down"> </i>
           </button>
           <ul
             aria-labelledby="nonconsumablesBtn"
-            class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+            class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-44"
             id="nonconsumablesMenu"
             role="menu"
           >
@@ -192,11 +192,11 @@
             type="button"
           >
             Properties
-            <i class="fas fa-chevron-down ml-1 text-xs"> </i>
+            <i class="ml-1 text-xs fas fa-chevron-down"> </i>
           </button>
           <ul
             aria-labelledby="propertiesBtn"
-            class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+            class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-44"
             id="propertiesMenu"
             role="menu"
           >
@@ -248,8 +248,8 @@
         </li>
       </ul>
     </nav>
-    <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 mt-6">
-      <div class="flex justify-between items-center w-full">
+    <main class="max-w-full px-4 mx-auto mt-6 sm:px-6 lg:px-12">
+      <div class="flex items-center justify-between w-full">
         <input
           id="searchInput"
           aria-label="Search"
@@ -260,39 +260,39 @@
         <button
           aria-controls="addUnitTypeModal"
           aria-haspopup="dialog"
-          class="custom-btn ml-4"
+          class="ml-4 custom-btn"
           id="addUnitTypeBtn"
           type="button"
         >
           Add unit type
         </button>
       </div>
-      <h2 class="font-semibold text-gray-900 text-sm mb-3 mt-4">
+      <h2 class="mt-4 mb-3 text-sm font-semibold text-gray-900">
         Properties - Unit Type
       </h2>
-      <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
-        <table class="min-w-full divide-y divide-gray-200 text-sm">
-          <thead class="bg-gray-50 sticky top-0 z-10">
+      <div class="overflow-x-auto bg-white border border-gray-100 rounded-md">
+        <table class="min-w-full text-sm divide-y divide-gray-200">
+          <thead class="sticky top-0 z-10 bg-gray-50">
             <tr>
               <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
                 scope="col"
               >
                 Unit Type ID
               </th>
               <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
                 scope="col"
               >
                 Name
               </th>
               <th
-                class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200"
+                class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200"
                 scope="col"
               ></th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-gray-200 divide-y">
+          <tbody class="bg-white divide-y divide-gray-200">
             <!-- Unit Type Table -->
           </tbody>
         </table>
@@ -303,35 +303,35 @@
     <div
       aria-labelledby="modalTitle"
       aria-modal="true"
-      class="fixed inset-0 z-50 hidden items-center justify-center"
+      class="fixed inset-0 z-50 items-center justify-center hidden"
       id="editUnitTypeModal"
       role="dialog"
     >
       <div
-        class="modal-backdrop fixed inset-0 bg-black opacity-50"
+        class="fixed inset-0 bg-black opacity-50 modal-backdrop"
         id="modalBackdropEditUnitType"
       ></div>
       <div
-        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+        class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg"
       >
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
             <img
               src="/Frontend_Code/images/cas_logo.png"
               alt="CARES logo"
-              class="w-12 h-12 object-contain"
+              class="object-contain w-12 h-12"
             />
-            <span class="font-black text-3xl text-black">Edit Unit Type</span>
+            <span class="text-3xl font-black text-black">Edit Unit Type</span>
           </div>
         </div>
         <form class="space-y-4" id="editUnitTypeForm">
           <div
             id="editUnitTypeError"
-            class="hidden mb-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded px-3 py-2"
+            class="hidden px-3 py-2 mb-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded"
           ></div>
           <div>
             <label
-              class="block text-sm font-medium text-gray-700 mb-1"
+              class="block mb-1 text-sm font-medium text-gray-700"
               for="editUnitTypeId"
             >
               Unit Type ID
@@ -347,7 +347,7 @@
           </div>
           <div>
             <label
-              class="block text-sm font-medium text-gray-700 mb-1"
+              class="block mb-1 text-sm font-medium text-gray-700"
               for="editUnitTypeName"
             >
               Name
@@ -360,7 +360,7 @@
               type="text"
             />
           </div>
-          <div class="flex justify-end space-x-3 pt-4">
+          <div class="flex justify-end pt-4 space-x-3">
             <button
               class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
               id="cancelBtnEditUnitType"
@@ -382,35 +382,35 @@
     <div
       aria-labelledby="modalTitle"
       aria-modal="true"
-      class="fixed inset-0 z-50 hidden items-center justify-center"
+      class="fixed inset-0 z-50 items-center justify-center hidden"
       id="addUnitTypeModal"
       role="dialog"
     >
       <div
-        class="modal-backdrop fixed inset-0 bg-black opacity-50"
+        class="fixed inset-0 bg-black opacity-50 modal-backdrop"
         id="modalBackdropUnitType"
       ></div>
       <div
-        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+        class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg"
       >
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
             <img
               src="/Frontend_Code/images/cas_logo.png"
               alt="CARES logo"
-              class="w-12 h-12 object-contain"
+              class="object-contain w-12 h-12"
             />
-            <span class="font-black text-3xl text-black">Add Unit Type</span>
+            <span class="text-3xl font-black text-black">Add Unit Type</span>
           </div>
         </div>
         <form class="space-y-4" id="addUnitTypeForm">
           <div
             id="addUnitTypeError"
-            class="hidden mb-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded px-3 py-2"
+            class="hidden px-3 py-2 mb-2 text-sm text-red-600 bg-red-100 border border-red-300 rounded"
           ></div>
           <div>
             <label
-              class="block text-sm font-medium text-gray-700 mb-1"
+              class="block mb-1 text-sm font-medium text-gray-700"
               for="unitTypeName"
               aria-required="true"
             >
@@ -424,7 +424,7 @@
               type="text"
             />
           </div>
-          <div class="flex justify-end space-x-3 pt-4">
+          <div class="flex justify-end pt-4 space-x-3">
             <button
               class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
               id="cancelBtn"
@@ -447,28 +447,28 @@
     <div
       aria-labelledby="deleteModalTitle"
       aria-modal="true"
-      class="fixed inset-0 z-50 hidden items-center justify-center"
+      class="fixed inset-0 z-50 items-center justify-center hidden"
       id="deleteUnitTypeModal"
       role="dialog"
     >
       <div
-        class="modal-backdrop fixed inset-0 bg-black opacity-50"
+        class="fixed inset-0 bg-black opacity-50 modal-backdrop"
         id="modalBackdropDeleteUnitType"
       ></div>
       <div
-        class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative"
+        class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg"
       >
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
             <img
               src="/Frontend_Code/images/cas_logo.png"
               alt="CARES logo"
-              class="w-12 h-12 object-contain"
+              class="object-contain w-12 h-12"
             />
-            <span class="font-black text-3xl text-black">Delete Unit Type</span>
+            <span class="text-3xl font-black text-black">Delete Unit Type</span>
           </div>
         </div>
-        <p class="text-gray-700 mb-6">
+        <p class="mb-6 text-gray-700">
           Are you sure you want to delete this unit type? This action cannot be
           undone.
         </p>
@@ -481,7 +481,7 @@
             Cancel
           </button>
           <button
-            class="px-4 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+            class="px-4 py-2 font-semibold text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
             id="confirmDeleteBtn"
             type="button"
           >
