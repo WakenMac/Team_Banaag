@@ -201,7 +201,7 @@ async function initializePage() {
   try {
     showLoading();
     setupEventListeners();
-    await initializeTransactionData(); // For loading all transactions
+    // await initializeTransactionData(); // For loading all transactions
     await loadTransactionHistory(); // For returning
     hideLoading();
   } catch (error) {
@@ -1242,6 +1242,8 @@ window.addNewTransaction = function (newTransaction) {
 async function validateLogin(event) {
   event.preventDefault();
 
+  console.log("I am alive");
+
   const adminId = document.getElementById('adminId').value;
   const password = document.getElementById('password').value;
   const adminIdField = document.getElementById('adminId');
@@ -1271,6 +1273,7 @@ async function validateLogin(event) {
       .catch(() => { }) // Ignore errors, just for timing
       .finally(() => {
         hideLoading();
+        console.log("I am also alive")
         const baseUrl = window.location.origin;
         const path = '/Frontend_Code/html/dashboard.html';
         window.location.href = baseUrl + path;
@@ -1338,6 +1341,7 @@ async function validateSignIn(event) {
     adminIdField.classList.add('border-red-500', 'focus:ring-red-500');
     adminIdError.textContent = 'ID number is already used.';
     adminIdError.classList.remove('hidden');
+    console.log("AAAAAHHHHH");
   } else {
     // Show toast notification
     showNotification('Registration successful! Redirecting...', 'success');
@@ -1385,6 +1389,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (loginForm) {
     loginForm.addEventListener('submit', validateLogin);
   } else if (regForm) {
+    console.log("REgister")
     regForm.addEventListener('submit', validateSignIn);
   }
 });
