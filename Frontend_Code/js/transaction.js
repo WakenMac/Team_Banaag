@@ -164,8 +164,34 @@ let filteredTransactions = [];
 
 // Mock admin credentials for testing
 const mockAdmin = {
-    id: "123",
-    password: "admin123"
+  id: "123",
+  password: "admin123"
+};
+
+// Mock data for charts
+const mockChartData = {
+  fastMovingConsumables: {
+    labels: ['Petri Dish', 'Test Tubes', 'Gloves', 'Masks', 'Alcohol', 'Cotton', 'Syringes', 'Bandages', 'Gauze', 'Tape'],
+    data: [85, 78, 72, 65, 60, 55, 50, 45, 40, 35]
+  },
+  consumptionTrend: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    chemicals: [120, 150, 180, 90, 160, 200],
+    items: [80, 100, 120, 60, 140, 160]
+  },
+  borrowingTrend: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    apparatus: [45, 40, 35, 30, 25, 20],
+    glassware: [50, 45, 40, 35, 30, 25],
+    equipment: [30, 25, 20, 18, 15, 12]
+  },
+  topBorrowedNonConsumables: {
+    labels: [
+      'Test Tube', 'Beaker', 'Pipette', 'Erlenmeyer Flask', 'Burette',
+      'Volumetric Flask', 'Microscope', 'Centrifuge', 'pH Meter', 'Hot Plate'
+    ],
+    data: [50, 45, 45, 40, 40, 35, 30, 25, 20, 18]
+  }
 };
 
 // Initialize the page
@@ -188,11 +214,11 @@ async function initializePage() {
 function showLoading() {
   const loadingSpinner = document.getElementById('loadingSpinner');
   const tableLoadingState = document.getElementById('tableLoadingState');
-  
+
   if (loadingSpinner) {
     loadingSpinner.style.display = 'flex';
   }
-  
+
   if (tableLoadingState) {
     tableLoadingState.style.display = 'block';
   }
@@ -201,11 +227,11 @@ function showLoading() {
 function hideLoading() {
   const loadingSpinner = document.getElementById('loadingSpinner');
   const tableLoadingState = document.getElementById('tableLoadingState');
-  
+
   if (loadingSpinner) {
     loadingSpinner.style.display = 'none';
   }
-  
+
   if (tableLoadingState) {
     tableLoadingState.style.display = 'none';
   }
@@ -214,15 +240,15 @@ function hideLoading() {
 function showToast(message, isError = false) {
   const toast = document.getElementById('toastNotification');
   const toastMessage = document.getElementById('toastMessage');
-  
+
   if (!toast || !toastMessage) return;
-  
+
   toastMessage.textContent = message;
   toast.classList.remove('hidden');
   toast.classList.add('flex');
-  
+
   toast.style.backgroundColor = isError ? 'rgba(220, 38, 38, 0.95)' : 'rgba(44, 161, 74, 0.95)';
-  
+
   setTimeout(() => {
     toast.classList.add('hidden');
     toast.classList.remove('flex');
@@ -271,7 +297,7 @@ async function loadTransactionHistory() {
     const endDate = document.getElementById('endDate')?.value;
 
     filteredTransactions = mockTransactionHistory.filter(transaction => {
-      const matchesSearch = 
+      const matchesSearch =
         transaction.transaction_id.toLowerCase().includes(searchTerm) ||
         transaction.admin_name.toLowerCase().includes(searchTerm);
 
@@ -279,7 +305,7 @@ async function loadTransactionHistory() {
 
       const transactionDate = new Date(transaction.date);
       const matchesDateRange = (!startDate || transactionDate >= new Date(startDate)) &&
-                              (!endDate || transactionDate <= new Date(endDate));
+        (!endDate || transactionDate <= new Date(endDate));
 
       return matchesSearch && matchesStatus && matchesDateRange;
     });
@@ -453,7 +479,7 @@ function setupEventListeners() {
 }
 
 // Make all necessary functions available globally
-window.showTransactionDetails = function(transactionId) {
+window.showTransactionDetails = function (transactionId) {
   const transaction = filteredTransactions.find(t => t.transaction_id === transactionId);
   if (!transaction) return;
 
@@ -538,7 +564,7 @@ window.showTransactionDetails = function(transactionId) {
 };
 
 // TODO: What does this do?
-window.processReturn = async function(transactionId, itemName) {
+window.processReturn = async function (transactionId, itemName) {
   const quantityInput = document.querySelector(`input[data-item="${itemName}"]`);
   if (!quantityInput) return;
   const remarkInput = document.querySelector(`textarea[data-item-remark="${itemName}"]`);
@@ -586,7 +612,7 @@ async function verifyAdmin(adminId, password) {
   try {
 
     // Keep for now for the presentation
-    var adminExists = mockAdmins.some(admin => 
+    var adminExists = mockAdmins.some(admin =>
       admin.admin_id === adminId && admin.password === password
     );
 
@@ -610,13 +636,13 @@ function updateItemQuantity(itemName, newQuantity) {
 
   console.log(index)
   if (index !== -1) {
-    const inventoryItem = itemData.find(item => itemName.includes(item["Name"]) && itemName.includes(item["Brand"])); 
+    const inventoryItem = itemData.find(item => itemName.includes(item["Name"]) && itemName.includes(item["Brand"]));
     const maxQuantity = inventoryItem ? inventoryItem["Remaining Quantity"] : 1;
-    
+
 
     newQuantity = Math.min(Math.max(1, parseFloat(newQuantity) || 1), maxQuantity);
     selectedItems[index].quantity = newQuantity;
-    
+
     const input = document.querySelector(`input[data-item="${itemName}"]`);
     if (input) {
       console.log(newQuantity);
@@ -629,9 +655,9 @@ function updateItemQuantity(itemName, newQuantity) {
 function addItemToTable(itemName) {
   const selectedItemsTable = document.getElementById('selectedItemsTable');
   const noItemsRow = document.getElementById('noItemsRow');
-  
+
   if (!selectedItemsTable) return;
-  
+
   if (selectedItems.some(item => item.itemName.includes(itemName))) {
     showToast('Item already added to the list');
     return;
@@ -642,12 +668,12 @@ function addItemToTable(itemName) {
     showToast('Item not found in inventory');
     return;
   }
-  
+
   if (noItemsRow) {
     noItemsRow.style.display = 'none';
   }
-  
-  let isConsumable = (inventoryItem["Item Type"].includes('Chemicals') || inventoryItem["Item Type"].includes('Consumable Items'))? true : false;
+
+  let isConsumable = (inventoryItem["Item Type"].includes('Chemicals') || inventoryItem["Item Type"].includes('Consumable Items')) ? true : false;
   const row = document.createElement('tr');
   row.innerHTML = `
     <td class="px-6 py-4 whitespace-nowrap text-gray-900">
@@ -689,20 +715,20 @@ function addItemToTable(itemName) {
       </div>
     </td>
   `;
-  
+
   selectedItemsTable.appendChild(row);
-  selectedItems.push({ itemName, quantity: 1});
+  selectedItems.push({ itemName, quantity: 1 });
 }
 
 // Remove item from the selected items table
 function removeItem(itemName) {
   selectedItems = selectedItems.filter(item => item.itemName === itemName);
-  
+
   const selectedItemsTable = document.getElementById('selectedItemsTable');
   if (!selectedItemsTable) return;
-  
+
   const rows = selectedItemsTable.getElementsByTagName('tr');
-  
+
   for (let row of rows) {
     const cellText = row.cells[0].textContent.trim().replace('*', '');
     if (cellText === itemName) {
@@ -710,7 +736,7 @@ function removeItem(itemName) {
       break;
     }
   }
-  
+
   const noItemsRow = document.getElementById('noItemsRow');
   if (selectedItems.length === 0 && noItemsRow) {
     noItemsRow.style.display = '';
@@ -722,11 +748,11 @@ function clearItemsTable() {
   selectedItems = [];
   const selectedItemsTable = document.getElementById('selectedItemsTable');
   if (!selectedItemsTable) return;
-  
+
   while (selectedItemsTable.children.length > 1) {
     selectedItemsTable.removeChild(selectedItemsTable.lastChild);
   }
-  
+
   const noItemsRow = document.getElementById('noItemsRow');
   if (noItemsRow) {
     noItemsRow.style.display = '';
@@ -736,7 +762,7 @@ function clearItemsTable() {
 // Return functionality
 async function loadBorrowedItems() {
   const borrowedItemsTable = document.getElementById('borrowedItemsTable');
-  
+
   if (!borrowedItemsTable) {
     console.error('Borrowed items table not found');
     return;
@@ -803,7 +829,7 @@ async function loadBorrowedItems() {
 async function handleReturnItems() {
   const checkedItems = document.querySelectorAll('.return-item-checkbox:checked');
   const returnNotes = document.getElementById('returnNotes')?.value.trim() || '';
-  
+
   if (checkedItems.length === 0) {
     showToast('Please select items to return', true);
     return;
@@ -823,33 +849,33 @@ async function handleReturnItems() {
 
   try {
     const itemsToReturn = [];
-    
+
     // Validate all items first
     for (const checkbox of checkedItems) {
       const row = checkbox.closest('tr');
       if (!row) continue;
-      
+
       const transactionId = checkbox.dataset.itemId;
       const returnQuantityInput = row.querySelector('.return-quantity');
       const returnQuantity = parseInt(returnQuantityInput?.value);
       const maxQuantity = parseInt(returnQuantityInput?.getAttribute('max'));
-      
+
       // Debug logging
       console.log(`Transaction ${transactionId}:`, {
         returnQuantity,
         maxQuantity,
         comparison: returnQuantity > maxQuantity
       });
-      
+
       // Validate return quantity
       if (!returnQuantity || isNaN(returnQuantity) || returnQuantity < 1) {
         throw new Error(`Invalid return quantity for transaction ${transactionId}`);
       }
-      
+
       if (returnQuantity > maxQuantity) {
         throw new Error(`Cannot return more items than borrowed for transaction ${transactionId}`);
       }
-      
+
       itemsToReturn.push({ transactionId, returnQuantity });
     }
 
@@ -862,7 +888,7 @@ async function handleReturnItems() {
 
       // Update mock data
       borrowedItem.returned_quantity = (borrowedItem.returned_quantity || 0) + item.returnQuantity;
-      
+
       // If all items are returned, mark as fully returned
       if (borrowedItem.returned_quantity >= borrowedItem.quantity) {
         borrowedItem.is_returned = true;
@@ -880,10 +906,10 @@ async function handleReturnItems() {
 
     showToast('Items returned successfully');
     closeReturnModal();
-    
+
     // Refresh the borrowed items list
     await loadBorrowedItems();
-    
+
   } catch (error) {
     console.error('Error processing returns:', error);
     showToast(error.message || 'Error processing returns. Please try again.', true);
@@ -899,7 +925,7 @@ async function handleReturnItems() {
 function closeReturnModal() {
   const returnItemsModal = document.getElementById('returnItemsModal');
   if (!returnItemsModal) return;
-  
+
   hideModal('returnItemsModal');
   const returnNotes = document.getElementById('returnNotes');
   const returnSearchInput = document.getElementById('returnSearchInput');
@@ -945,7 +971,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     const adminId = document.getElementById('verifyAdminId').value;
     const password = document.getElementById('verifyAdminPassword').value;
-    
+
     const isVerified = await verifyAdmin(adminId, password);
     if (isVerified) {
       hideModal('verifyAdminModal');
@@ -1035,8 +1061,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     let result = await dbhandler.addTransactionRecord(currentAdminId, borrowRemarks.value.trim(), itemIdArray, borrowQuantityArray);
-    
-    if (result.includes("ERROR")){
+
+    if (result.includes("ERROR")) {
       showToast(result, true)
     } else {
       showToast('Transaction completed successfully!', false);
@@ -1065,11 +1091,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Add event listeners for closing the transaction details modal
   const closeBtn = document.getElementById('closeDetailsBtn');
   const closeModalBtn = document.getElementById('closeDetailsModalBtn');
-  
+
   if (closeBtn) {
     closeBtn.onclick = () => hideModal('transactionDetailsModal');
   }
-  
+
   if (closeModalBtn) {
     closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
   }
@@ -1109,11 +1135,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Add event listeners for closing the transaction details modal
   const closeBtn = document.getElementById('closeDetailsBtn');
   const closeModalBtn = document.getElementById('closeDetailsModalBtn');
-  
+
   if (closeBtn) {
     closeBtn.onclick = () => hideModal('transactionDetailsModal');
   }
-  
+
   if (closeModalBtn) {
     closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
   }
@@ -1122,7 +1148,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // This is after adding a new transaction
 
 // Add a new transaction and refresh the transaction history table
-window.addNewTransaction = function(newTransaction) {
+window.addNewTransaction = function (newTransaction) {
   const transactions = mockTransactionHistory || [];
   transactions.push(newTransaction);
   mockTransactionHistory = transactions;
@@ -1133,54 +1159,54 @@ window.addNewTransaction = function(newTransaction) {
 
 // Function to validate login
 async function validateLogin(event) {
-    event.preventDefault();
-    
-    const adminId = document.getElementById('adminId').value;
-    const password = document.getElementById('password').value;
-    const adminIdField = document.getElementById('adminId');
-    const passwordField = document.getElementById('password');
-    const adminIdError = document.getElementById('adminIdError');
-    const passwordError = document.getElementById('passwordError');
-    
-    // Reset previous error states
-    adminIdField.classList.remove('border-red-500', 'focus:ring-red-500');
-    passwordField.classList.remove('border-red-500', 'focus:ring-red-500');
-    adminIdError.classList.add('hidden');
-    passwordError.classList.add('hidden');
-    
+  event.preventDefault();
+
+  const adminId = document.getElementById('adminId').value;
+  const password = document.getElementById('password').value;
+  const adminIdField = document.getElementById('adminId');
+  const passwordField = document.getElementById('password');
+  const adminIdError = document.getElementById('adminIdError');
+  const passwordError = document.getElementById('passwordError');
+
+  // Reset previous error states
+  adminIdField.classList.remove('border-red-500', 'focus:ring-red-500');
+  passwordField.classList.remove('border-red-500', 'focus:ring-red-500');
+  adminIdError.classList.add('hidden');
+  passwordError.classList.add('hidden');
+
   let result = await dbhandler.adminExists(adminId, password);
   console.log(result);
 
-    // Validate credentials
-    if (result === true) {
-        // Successful login
-        showNotification('Login successful! Redirecting...', 'success');
-        localStorage.setItem("loggedInAdmin", adminId)
-        // Show loading spinner
-        showLoading();
-        // Use a real network request to measure actual connectivity
-        await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
-          .then(response => response.json())
-          .catch(() => {}) // Ignore errors, just for timing
-          .finally(() => {
-            hideLoading();
-            const baseUrl = window.location.origin;
-            const path = '/Frontend_Code/html/dashboard.html';
-            window.location.href = baseUrl + path;
-          });
-    } else {
-        // Failed login
-        if (adminId !== mockAdmin.id) {
-            adminIdField.classList.add('border-red-500', 'focus:ring-red-500');
-            adminIdError.textContent = 'Invalid ID number';
-            adminIdError.classList.remove('hidden');
-        }
-        if (password !== mockAdmin.password) {
-            passwordField.classList.add('border-red-500', 'focus:ring-red-500');
-            passwordError.textContent = 'Invalid password';
-            passwordError.classList.remove('hidden');
-        }
+  // Validate credentials
+  if (result === true) {
+    // Successful login
+    showNotification('Login successful! Redirecting...', 'success');
+    localStorage.setItem("loggedInAdmin", adminId)
+    // Show loading spinner
+    showLoading();
+    // Use a real network request to measure actual connectivity
+    await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
+      .then(response => response.json())
+      .catch(() => { }) // Ignore errors, just for timing
+      .finally(() => {
+        hideLoading();
+        const baseUrl = window.location.origin;
+        const path = '/Frontend_Code/html/dashboard.html';
+        window.location.href = baseUrl + path;
+      });
+  } else {
+    // Failed login
+    if (adminId !== mockAdmin.id) {
+      adminIdField.classList.add('border-red-500', 'focus:ring-red-500');
+      adminIdError.textContent = 'Invalid ID number';
+      adminIdError.classList.remove('hidden');
     }
+    if (password !== mockAdmin.password) {
+      passwordField.classList.add('border-red-500', 'focus:ring-red-500');
+      passwordError.textContent = 'Invalid password';
+      passwordError.classList.remove('hidden');
+    }
+  }
 }
 
 /**
@@ -1192,7 +1218,7 @@ async function validateLogin(event) {
  *
  * To enable backend integration later, replace this logic with a call to your backend handler.
  */
-async function validateSignIn(event){
+async function validateSignIn(event) {
   event.preventDefault();
 
   const adminId = document.getElementById('adminId').value.trim();
@@ -1227,7 +1253,7 @@ async function validateSignIn(event){
   let result = await dbhandler.addAdminRecord(adminId, firstName, middleName, lastName, password)
   console.log(result);
 
-  if (result.includes("ERROR")){
+  if (result.includes("ERROR")) {
     adminIdField.classList.add('border-red-500', 'focus:ring-red-500');
     adminIdError.textContent = 'ID number is already used.';
     adminIdError.classList.remove('hidden');
@@ -1239,7 +1265,7 @@ async function validateSignIn(event){
     // Use a real network request to measure actual connectivity
     await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
       .then(response => response.json())
-      .catch(() => {}) // Ignore errors, just for timing
+      .catch(() => { }) // Ignore errors, just for timing
       .finally(() => {
         console.log("I am logged in")
         window.location.href = '/Frontend_Code/html/dashboard.html';
@@ -1249,38 +1275,37 @@ async function validateSignIn(event){
 
 // Function to show notifications
 function showNotification(message, type) {
-    // Remove any existing notifications
-    const existingNotification = document.querySelector('.notification');
-    if (existingNotification) {
-        existingNotification.remove();
-    }
-    
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+  // Remove any existing notifications
+  const existingNotification = document.querySelector('.notification');
+  if (existingNotification) {
+    existingNotification.remove();
+  }
+
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `notification fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'
     } text-white`;
-    notification.textContent = message;
-    
-    // Add to document
-    document.body.appendChild(notification);
-    
-    // Remove after 3 seconds
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
+  notification.textContent = message;
+
+  // Add to document
+  document.body.appendChild(notification);
+
+  // Remove after 3 seconds
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
 }
 
 // Add event listener to login form
 document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('logIn');
-    const regForm = document.getElementById('signIn');
+  const loginForm = document.getElementById('logIn');
+  const regForm = document.getElementById('signIn');
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', validateLogin);
-    } else if (regForm){
-        regForm.addEventListener('submit', validateSignIn);
-    }
+  if (loginForm) {
+    loginForm.addEventListener('submit', validateLogin);
+  } else if (regForm) {
+    regForm.addEventListener('submit', validateSignIn);
+  }
 });
 
 // REGISTER.HTML REGISTRATION LOGIC
@@ -1294,47 +1319,47 @@ document.addEventListener('DOMContentLoaded', () => {
   const closePrivacyModal = document.getElementById('closePrivacyModal');
 
   // Modal handling
-    if (openTermsModal) {
-      openTermsModal.addEventListener('click', function(e) {
-        e.preventDefault();
-        termsModal.classList.remove('hidden');
-        termsModal.classList.add('flex');
-      });
-    }
-
-    if (openPrivacyModal) {
-      openPrivacyModal.addEventListener('click', function(e) {
-        e.preventDefault();
-        privacyModal.classList.remove('hidden');
-        privacyModal.classList.add('flex');
-      });
-    }
-
-    if (closeTermsModal) {
-      closeTermsModal.addEventListener('click', function() {
-        termsModal.classList.add('hidden');
-        termsModal.classList.remove('flex');
-      });
-    }
-
-    if (closePrivacyModal) {
-      closePrivacyModal.addEventListener('click', function() {
-        privacyModal.classList.add('hidden');
-        privacyModal.classList.remove('flex');
-      });
-    }
-
-    // Close modals when clicking outside
-    window.addEventListener('click', function(e) {
-      if (e.target === termsModal) {
-        termsModal.classList.add('hidden');
-        termsModal.classList.remove('flex');
-      }
-      if (e.target === privacyModal) {
-        privacyModal.classList.add('hidden');
-        privacyModal.classList.remove('flex');
-      }
+  if (openTermsModal) {
+    openTermsModal.addEventListener('click', function (e) {
+      e.preventDefault();
+      termsModal.classList.remove('hidden');
+      termsModal.classList.add('flex');
     });
+  }
+
+  if (openPrivacyModal) {
+    openPrivacyModal.addEventListener('click', function (e) {
+      e.preventDefault();
+      privacyModal.classList.remove('hidden');
+      privacyModal.classList.add('flex');
+    });
+  }
+
+  if (closeTermsModal) {
+    closeTermsModal.addEventListener('click', function () {
+      termsModal.classList.add('hidden');
+      termsModal.classList.remove('flex');
+    });
+  }
+
+  if (closePrivacyModal) {
+    closePrivacyModal.addEventListener('click', function () {
+      privacyModal.classList.add('hidden');
+      privacyModal.classList.remove('flex');
+    });
+  }
+
+  // Close modals when clicking outside
+  window.addEventListener('click', function (e) {
+    if (e.target === termsModal) {
+      termsModal.classList.add('hidden');
+      termsModal.classList.remove('flex');
+    }
+    if (e.target === privacyModal) {
+      privacyModal.classList.add('hidden');
+      privacyModal.classList.remove('flex');
+    }
+  });
 });
 
 // ================================================================
@@ -1355,7 +1380,7 @@ async function initializeItemsList() {
     // Clear existing options
     itemsList.innerHTML = '';
     console.log(itemsList);
-    
+
     // Commented for the mean time (Not fully implemented yet.)
     itemData.forEach((item) => {
       if (Number(item["Remaining Quantity"]) == 0)
@@ -1381,3 +1406,29 @@ async function initializeItemsList() {
     hideLoading();
   }
 }
+
+// Password visibility toggle
+document.addEventListener('DOMContentLoaded', function () {
+  const togglePassword = document.getElementById('togglePassword');
+  const passwordInput = document.getElementById('password');
+
+  if (togglePassword && passwordInput) {
+    togglePassword.addEventListener('click', function () {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+
+      // Toggle eye icon
+      const eyeIcon = this.querySelector('svg');
+      if (type === 'text') {
+        eyeIcon.innerHTML = `
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        `;
+      } else {
+        eyeIcon.innerHTML = `
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        `;
+      }
+    });
+  }
+});

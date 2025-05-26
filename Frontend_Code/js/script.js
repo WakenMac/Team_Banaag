@@ -86,16 +86,16 @@ document.addEventListener('DOMContentLoaded', () => {
 const dashboardMockData = {
   chemicals: {
     topMoving: [
-      { name: 'Sodium Chloride', quantity: 150 },
-      { name: 'Hydrochloric Acid', quantity: 120 },
-      { name: 'Sodium Hydroxide', quantity: 100 },
-      { name: 'Ethanol', quantity: 90 },
-      { name: 'Acetone', quantity: 85 },
-      { name: 'Methanol', quantity: 80 },
-      { name: 'Sulfuric Acid', quantity: 75 },
-      { name: 'Nitric Acid', quantity: 70 },
-      { name: 'Potassium Hydroxide', quantity: 65 },
-      { name: 'Ammonia', quantity: 60 }
+      { name: 'Sodium Chloride', quantity: 100 },
+      { name: 'Hydrochloric Acid', quantity: 90 },
+      { name: 'Sodium Hydroxide', quantity: 80 },
+      { name: 'Ethanol', quantity: 70 },
+      { name: 'Acetone', quantity: 67 },
+      { name: 'Methanol', quantity: 65 },
+      { name: 'Sulfuric Acid', quantity: 60 },
+      { name: 'Nitric Acid', quantity: 54 },
+      { name: 'Potassium Hydroxide', quantity: 50 },
+      { name: 'Ammonia', quantity: 30 }
     ],
     totalConsumed: 895,
     soonToExpire: [
@@ -108,16 +108,16 @@ const dashboardMockData = {
   },
   items: {
     topMoving: [
-      { name: 'Gloves', quantity: 200 },
-      { name: 'Face Masks', quantity: 180 },
-      { name: 'Test Tubes', quantity: 150 },
-      { name: 'Pipettes', quantity: 120 },
-      { name: 'Petri Dishes', quantity: 100 },
-      { name: 'Filter Paper', quantity: 90 },
-      { name: 'Cotton Swabs', quantity: 85 },
-      { name: 'Alcohol Wipes', quantity: 80 },
-      { name: 'Syringes', quantity: 75 },
-      { name: 'Needles', quantity: 70 }
+      { name: 'Gloves', quantity: 100 },
+      { name: 'Face Masks', quantity: 90 },
+      { name: 'Test Tubes', quantity: 67 },
+      { name: 'Pipettes', quantity: 65 },
+      { name: 'Petri Dishes', quantity: 51 },
+      { name: 'Filter Paper', quantity: 45 },
+      { name: 'Cotton Swabs', quantity: 40 },
+      { name: 'Alcohol Wipes', quantity: 34 },
+      { name: 'Syringes', quantity: 33 },
+      { name: 'Needles', quantity: 30 }
     ],
     totalConsumed: 1150,
     soonToExpire: [
@@ -274,11 +274,11 @@ function renderDashboardSummaryRow() {
       <div class="text-3xl font-extrabold text-gray-900">${totalItems}</div>
     </div>
     <div class="bg-green-50 rounded-xl shadow flex flex-col items-center justify-center p-4">
-      <div class="text-sm text-gray-500 mb-1">Consumed</div>
+      <div class="text-sm text-gray-500 mb-1">Total Consumables</div>
       <div class="text-3xl font-extrabold text-green-600">${totalConsumed}</div>
     </div>
     <div class="bg-blue-50 rounded-xl shadow flex flex-col items-center justify-center p-4">
-      <div class="text-sm text-gray-500 mb-1">Borrowed</div>
+      <div class="text-sm text-gray-500 mb-1">Total Non-Consumables</div>
       <div class="text-3xl font-extrabold text-blue-600">${totalBorrowed}</div>
     </div>
     <div class="bg-purple-50 rounded-xl shadow flex flex-col items-center justify-center p-4">
@@ -292,19 +292,19 @@ function renderDashboardSummaryRow() {
 function renderConsumptionTrendChart() {
   const ctx = document.getElementById('consumptionTrendChart');
   if (!ctx) return;
-  
+
   new Chart(ctx, {
     type: 'line',
     data: {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
       datasets: [{
-        label: 'Consumables',
+        label: 'Items',
         data: [65, 59, 80, 81, 56, 55],
         borderColor: '#2ca14a',
         tension: 0.4,
         fill: false
       }, {
-        label: 'Non-consumables',
+        label: 'Chemicals',
         data: [28, 48, 40, 19, 86, 27],
         borderColor: '#3b82f6',
         tension: 0.4,
@@ -331,7 +331,7 @@ function renderConsumptionTrendChart() {
 function renderMonthlyStatsChart() {
   const ctx = document.getElementById('monthlyStatsChart');
   if (!ctx) return;
-  
+
   new Chart(ctx, {
     type: 'line',
     data: {
@@ -406,7 +406,7 @@ function renderTopConsumablesBarChart() {
   if (parent) {
     const total = top10.reduce((sum, item) => sum + item.quantity, 0);
     const badge = document.createElement('div');
-    badge.className = 'chart-summary mt-2 text-green-700 font-bold text-lg';
+    badge.className = 'mt-2 text-lg font-bold text-green-700 chart-summary';
     badge.innerHTML = `<i class='fas fa-box-open mr-1'></i>Total Consumed: <span class='bg-green-100 px-2 py-1 rounded'>${total}</span>`;
     ctx.parentElement.after(badge);
   }
@@ -457,8 +457,8 @@ function renderTopNonconsumablesBarChart() {
   if (parent) {
     const total = top10.reduce((sum, item) => sum + item.times, 0);
     const badge = document.createElement('div');
-    badge.className = 'chart-summary mt-2 text-blue-700 font-bold text-lg';
-    
+    badge.className = 'mt-2 text-lg font-bold text-blue-700 chart-summary';
+
     badge.innerHTML = `<i class='fas fa-hand-holding mr-1'></i>Total Borrowed: <span class='bg-blue-100 px-2 py-1 rounded'>${total}</span>`;
     ctx.parentElement.after(badge);
   }
@@ -474,7 +474,7 @@ function renderBorrowedDoughnutChart() {
   const parent = ctx.closest('.flex-col');
   if (parent && !parent.querySelector('.chart-summary')) {
     const badge = document.createElement('div');
-    badge.className = 'chart-summary mb-2 text-purple-700 font-bold text-lg';
+    badge.className = 'mb-2 text-lg font-bold text-purple-700 chart-summary';
     badge.innerHTML = `<i class='fas fa-pie-chart mr-1'></i>Borrowed: <span class='bg-purple-100 px-2 py-1 rounded'>${borrowed}</span> &nbsp; Available: <span class='bg-green-100 px-2 py-1 rounded'>${available}</span>`;
     parent.insertBefore(badge, ctx.parentElement);
   }
@@ -542,11 +542,11 @@ function renderDashboardSections() {
           <div class="text-2xl font-bold text-gray-800">${overallItemQuantity}</div>
         </div>
         <div class="bg-white rounded-lg p-4 shadow-sm">
-          <div class="text-sm text-gray-500">Consumed</div>
+          <div class="text-sm text-gray-500">Total Consumables</div>
           <div class="text-2xl font-bold text-green-600">${overallConsumedItems}</div>
         </div>
         <div class="bg-white rounded-lg p-4 shadow-sm">
-          <div class="text-sm text-gray-500">Borrowed</div>
+          <div class="text-sm text-gray-500">Total Non-consumables</div>
           <div class="text-2xl font-bold text-blue-600">${overallItemsBorrowed}</div>
         </div>
         <div class="bg-white rounded-lg p-4 shadow-sm">
@@ -585,7 +585,7 @@ function renderDashboardSections() {
   if (topItemsContainer) {
     const top10Consumables = [...(dashboardMockData.chemicals.topMoving || []), ...(dashboardMockData.items.topMoving || [])].sort((a, b) => b.quantity - a.quantity).slice(0, 5);
     const top10Nonconsumables = [...(dashboardMockData.apparatus.topBorrowed || []), ...(dashboardMockData.glassware.topBorrowed || []), ...(dashboardMockData.equipment.topBorrowed || [])].sort((a, b) => b.times - a.times).slice(0, 5);
-    
+
     topItemsContainer.innerHTML = `
       <div class="grid grid-cols-2 gap-4">
         <div class="bg-white rounded-lg p-4 shadow-sm">
@@ -625,7 +625,7 @@ function renderDashboardSections() {
   if (alertsContainer) {
     const soonToExpire = [...(dashboardMockData.chemicals.soonToExpire || []), ...(dashboardMockData.items.soonToExpire || [])];
     const currentlyBorrowed = [...(dashboardMockData.apparatus.currentlyBorrowed || []), ...(dashboardMockData.glassware.currentlyBorrowed || []), ...(dashboardMockData.equipment.currentlyBorrowed || [])];
-    
+
     alertsContainer.innerHTML = `
       <div class="grid grid-cols-2 gap-4">
         <div class="bg-white rounded-lg p-4 shadow-sm">
