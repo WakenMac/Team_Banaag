@@ -2837,6 +2837,72 @@ export async function removeRestocksRecordByRestockId(restockId = 0){
 }
 
 
+export async function prepareUser(){
+    try {
+        const {data, error} = await supabase.auth.signInWithPassword({
+            email: `maclangw26@gmail.com`,
+            password: `2023-00570`
+        })
+        
+    } catch (error){
+        console.error(error)
+    }
+}
+
+//=======================================================================================================================================
+// Methods for Transactions
+
+/**
+ * Method to get all of the records on the Transactions table
+ * @returns A record consisting of 4 columns (Transaction ID, Admin Name, Transaction Date, Status)
+ */
+export async function getAllTransactionRecords(){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_transaction_records');
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to add a new Transaction
+ * @param {string} adminId                 Admin ID to conduct the transaction
+ * @param {int []} itemIdArray             Array of item ids
+ * @param {float4} borrowQuantityArray     Array of borrowed quantities
+ */
+export async function addTransactionRecord(
+    adminId, itemIdArray, borrowQuantityArray
+){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('main_add_transaction', {
+            admin_id : adminId,
+            item_id_array : itemIdArray,
+            borrow_quantity_array : borrowQuantityArray
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        console.log(data);
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
 //=======================================================================================================================================
 // HELPER METHODS
 
