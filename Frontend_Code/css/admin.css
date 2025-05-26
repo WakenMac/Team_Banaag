@@ -76,3 +76,28 @@ button.custom-btn:hover {
 select:invalid {
   color: #9ca3af !important; /* Tailwind's text-gray-400 */
 }
+
+
+/* Statistics.html */
+.summary-card {
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.summary-card:hover {
+  box-shadow: 0 8px 32px 0 rgba(60, 180, 90, 0.15);
+  transform: translateY(-2px) scale(1.03);
+}
+.top10-scroll {
+  max-height: 260px;
+  overflow-y: auto;
+} 
+/* .summary-card {
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.summary-card:hover {
+  box-shadow: 0 8px 32px 0 rgba(60, 180, 90, 0.15);
+  transform: translateY(-2px) scale(1.03);
+}
+.top10-scroll {
+  max-height: 260px;
+  overflow-y: auto;
+} */
