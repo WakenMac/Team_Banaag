@@ -1242,8 +1242,6 @@ window.addNewTransaction = function (newTransaction) {
 async function validateLogin(event) {
   event.preventDefault();
 
-  console.log("I am alive");
-
   const adminId = document.getElementById('adminId').value;
   const password = document.getElementById('password').value;
   const adminIdField = document.getElementById('adminId');
@@ -1258,6 +1256,7 @@ async function validateLogin(event) {
   passwordError.classList.add('hidden');
 
   let result = await dbhandler.adminExists(adminId, password);
+  console.log(result);
 
   // Validate credentials
   if (result === true) {
@@ -1266,15 +1265,17 @@ async function validateLogin(event) {
     localStorage.setItem("loggedInAdmin", adminId)
     // Show loading spinner
     showLoading();
+    const path = '/Frontend_Code/html/dashboard.html';
+    window.location.href = window.location.origin + path;
+
     // Use a real network request to measure actual connectivity
-    await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
-      .then(response => response.json())
-      .catch(() => { }) // Ignore errors, just for timing
-      .finally(async () => {
-        hideLoading();
-        const path = '/Frontend_Code/html/dashboard.html';
-        window.location.href = window.location.origin + path;
-      });
+    // await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
+    //   .then(response => response.json())
+    //   .catch(() => { }) // Ignore errors, just for timing
+    //   .finally(async () => {
+    //     hideLoading();
+        
+    //   });
   } else {
     // Failed login
     if (adminId !== mockAdmin.id) {
@@ -1322,18 +1323,18 @@ async function validateSignIn(event) {
   // Basic validation
   if (!adminId || !firstName || !middleName || !lastName || !password) {
     showToast('Please fill in all required fields', true);
-    console.log("ENtry error")
+    console.log("Entry error")
     return;
-  }
-  if (password.length < 8) {
+  } else if (password.length < 8) {
     passwordField.classList.add('border-red-500', 'focus:ring-red-500');
     passwordError.textContent = 'Kindly use a longer password';
     passwordError.classList.remove('hidden');
-    console.log("Password Error")
+    console.log("Password Length Error")
     return;
   }
 
   let result = await dbhandler.addAdminRecord(adminId, firstName, middleName, lastName, password)
+  console.log(result);
 
   if (!result || result.includes("ERROR")) {
     adminIdField.classList.add('border-red-500', 'focus:ring-red-500');
@@ -1343,15 +1344,15 @@ async function validateSignIn(event) {
     // Show toast notification
     showNotification('Registration successful! Redirecting...', 'success');
     localStorage.setItem('loggedInAdmin', adminId)
+    window.location.href = window.location.origin + '/Frontend_Code/html/dashboard.html';
 
     // Use a real network request to measure actual connectivity
-    await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
-      .then(response => response.json())
-      .catch(() => { }) // Ignore errors, just for timing
-      .finally(async () => {
-        console.log("I am logged in")
-        window.location.href = window.location.origin + '/Frontend_Code/html/dashboard.html';
-      });
+    // await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
+    //   .then(response => response.json())
+    //   .catch(() => { }) // Ignore errors, just for timing
+    //   .finally(async () => {
+    //     window.location.href = window.location.origin + '/Frontend_Code/html/dashboard.html';
+    // });
   }
 }
 
