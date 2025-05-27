@@ -3,6 +3,8 @@ import * as dbhandler from "../../Backend_Code/mainHandler.js";
 
 // Global data
 var itemData;
+var transactionData;
+var itemsTransactedData;
 
 // Mock data for testing
 const mockAdmins = [
@@ -199,6 +201,7 @@ async function initializePage() {
   try {
     showLoading();
     setupEventListeners();
+    // await initializeTransactionData(); // For loading all transactions
     await loadTransactionHistory(); // For returning
     hideLoading();
   } catch (error) {
@@ -258,13 +261,21 @@ function showToast(message, isError = false) {
 function getStatusStyle(status) {
   switch (status) {
     case 'completed':
+    case 'Completed':
       return 'bg-green-100 text-green-800';
+
     case 'pending_return':
+    case 'Pending Return':
       return 'bg-yellow-100 text-yellow-800';
+
     case 'partially_returned':
+    case 'Partially Returned':
       return 'bg-orange-100 text-orange-800';
+
     case 'not_returnable':
-      return 'bg-red-100 text-red-800'
+    case 'Not Returnable':
+      return 'bg-red-100 text-red-800';
+
     default:
       return 'bg-gray-100 text-gray-800';
   }
@@ -284,83 +295,153 @@ function formatDateTime(dateString) {
 async function loadTransactionHistory() {
   const table = document.getElementById('transactionHistoryTable');
   if (!table) return;
-
+  
   try {
     showTableLoading();
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Use in-memory mockTransactionHistory
-    // Apply filters
     const searchTerm = document.getElementById('transactionSearch')?.value.toLowerCase() || '';
     const status = document.getElementById('transactionFilter')?.value || 'all';
     const startDate = document.getElementById('startDate')?.value;
     const endDate = document.getElementById('endDate')?.value;
 
-    filteredTransactions = mockTransactionHistory.filter(transaction => {
-      const matchesSearch =
-        transaction.transaction_id.toLowerCase().includes(searchTerm) ||
-        transaction.admin_name.toLowerCase().includes(searchTerm);
+    var isMockData = true;
+    if (isMockData == true){
+      filteredTransactions = mockTransactionHistory.filter(transaction => {
+        const matchesSearch = 
+          transaction.transaction_id.toLowerCase().includes(searchTerm) ||
+          transaction.admin_name.toLowerCase().includes(searchTerm);
 
-      const matchesStatus = status === 'all' || transaction.status === status;
+        const matchesStatus = status === 'all' || transaction.status === status;
 
-      const transactionDate = new Date(transaction.date);
-      const matchesDateRange = (!startDate || transactionDate >= new Date(startDate)) &&
-        (!endDate || transactionDate <= new Date(endDate));
+        const transactionDate = new Date(transaction.date);
+        const matchesDateRange = (!startDate || transactionDate >= new Date(startDate)) &&
+                                (!endDate || transactionDate <= new Date(endDate));
 
-      return matchesSearch && matchesStatus && matchesDateRange;
-    });
+        return matchesSearch && matchesStatus && matchesDateRange;
+      });
 
-    // Sort by date (most recent first)
-    filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+      filteredTransactions.sort((a, b) => new Date(b["Transaction Date"]) - new Date(a["Transaction Date"]));
 
-    if (filteredTransactions.length === 0) {
-      table.innerHTML = `
-        <tr class="h-[250px] text-center text-gray-500 italic">
-          <td colspan="7" class="align-middle">
-            No transactions found
-          </td>
-        </tr>
-      `;
-      hideTableLoading();
-      return;
-    }
-
-    // Render transactions
-    table.innerHTML = filteredTransactions.map(transaction => {
-      // Truncate remarks if too long
-      const maxRemarkLength = 40;
-      let displayRemark = transaction.remarks || '';
-      let isTruncated = false;
-      if (displayRemark.length > maxRemarkLength) {
-        displayRemark = displayRemark.slice(0, maxRemarkLength) + '...';
-        isTruncated = true;
+      if (filteredTransactions.length === 0) {
+        table.innerHTML = `
+          <tr class="h-[250px] text-center text-gray-500 italic">
+            <td colspan="7" class="align-middle">
+              No transactions found
+            </td>
+          </tr>
+        `;
+        hideTableLoading();
+        return;
       }
-      return `
-        <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" 
-            onclick="showTransactionDetails('${transaction.transaction_id}')"
-            data-transaction-id="${transaction.transaction_id}">
-          <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
-            ${transaction.transaction_id || ''}
-          </td>
-          <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
-            ${formatDateTime(transaction.date) || ''}
-          </td>
-          <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
-            ${transaction.admin_name || ''}
-          </td>
-          <td class="px-6 py-4 text-left whitespace-nowrap text-sm">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
-              ${getStatusStyle(transaction.status)}">
-              ${(transaction.status || '').replace('_', ' ')}
-            </span>
-          </td>
-          <td class="px-6 py-4 text-left whitespace-normal text-sm text-gray-900" title="${isTruncated ? transaction.remarks : ''}">
-            ${displayRemark || '<span class=\'italic text-gray-400\'>No remarks</span>'}
-          </td>
-        </tr>
-      `;
-    }).join('');
 
+      // Render transactions
+      table.innerHTML = filteredTransactions.map(transaction => {
+        // Truncate remarks if too long
+        const maxRemarkLength = 40;
+        let displayRemark = transaction.remarks || '';
+        let isTruncated = false;
+        if (displayRemark.length > maxRemarkLength) {
+          displayRemark = displayRemark.slice(0, maxRemarkLength) + '...';
+          isTruncated = true;
+        }
+          return `
+            <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" 
+                onclick="showTransactionDetails('${transaction.transaction_id}')"
+                data-transaction-id="${transaction.transaction_id}">
+              <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
+                ${transaction.transaction_id || ''}
+              </td>
+              <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
+                ${formatDateTime(transaction.date) || ''}
+              </td>
+              <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
+                ${transaction.admin_name || ''}
+              </td>
+              <td class="px-6 py-4 text-left whitespace-nowrap text-sm">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
+                  ${getStatusStyle(transaction.status)}">
+                  ${(transaction.status || '').replace('_', ' ')}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-left whitespace-normal text-sm text-gray-900" title="${isTruncated ? transaction.remarks : ''}">
+                ${displayRemark || '<span class=\'italic text-gray-400\'>No remarks</span>'}
+              </td>
+            </tr>
+          `;
+      }).join('');
+
+    } else {
+
+      // Use in-memory mockTransactionHistory
+      // Apply filters
+      filteredTransactions = transactionData.filter(transaction => {
+        console.log(transaction);
+        const matchesSearch = 
+          String(transaction["Transaction ID"]).toLowerCase().includes(searchTerm) ||
+          transaction["Admin Name"].toLowerCase().includes(searchTerm);
+
+        const matchesStatus = status === 'all' || transaction["Status"] === status;
+
+        const transactionDate = new Date(transaction["Transaction Date"]);
+        const matchesDateRange = (!startDate || transactionDate >= new Date(startDate)) &&
+                                (!endDate || transactionDate <= new Date(endDate));
+
+        return matchesSearch && matchesStatus && matchesDateRange;
+      });
+
+      filteredTransactions.sort((a, b) => new Date(b["Transaction Date"]) - new Date(a["Transaction Date"]));
+
+      if (filteredTransactions.length === 0) {
+        table.innerHTML = `
+          <tr class="h-[250px] text-center text-gray-500 italic">
+            <td colspan="7" class="align-middle">
+              No transactions found
+            </td>
+          </tr>
+        `;
+        hideTableLoading();
+        return;
+      }
+
+      table.innerHTML = filteredTransactions.map(transaction => {
+        console.log(transaction["Status"], getStatusStyle(transaction["Status"]))
+
+        // Truncate remarks if too long
+        const maxRemarkLength = 40;
+        let displayRemark = (!transaction["Remarks"] || transaction["Remarks"] == "")? '' : transaction["Remarks"];
+        let isTruncated = false;
+        if (displayRemark.length > maxRemarkLength) {
+          displayRemark = displayRemark.slice(0, maxRemarkLength) + '...';
+          isTruncated = true;
+        }
+          return `
+            <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" 
+                onclick="showTransactionDetails('${transaction["Transaction ID"]}')"
+                data-transaction-id="${transaction["Transaction ID"]}">
+              <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
+                ${transaction["Transaction ID"] || ''}
+              </td>
+              <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
+                ${formatDateTime(transaction["Transaction Date"]) || ''}
+              </td>
+              <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
+                ${transaction["Admin Name"] || ''}
+              </td>
+              <td class="px-6 py-4 text-left whitespace-nowrap text-sm">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
+                  ${getStatusStyle(transaction["Status"])}">
+                  ${(transaction["Status"] || '').replace('_', ' ')}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-left whitespace-normal text-sm text-gray-900" title="${isTruncated ? transaction["Remarks"] : ''}">
+                ${displayRemark || '<span class=\'italic text-gray-400\'>No remarks</span>'}
+              </td>
+            </tr>
+          `;
+      }).join('');
+    }
+    
     hideTableLoading();
   } catch (error) {
     console.error('Error loading transactions:', error);
@@ -1184,16 +1265,17 @@ async function validateLogin(event) {
     localStorage.setItem("loggedInAdmin", adminId)
     // Show loading spinner
     showLoading();
+    const path = '/Frontend_Code/html/dashboard.html';
+    window.location.href = window.location.origin + path;
+
     // Use a real network request to measure actual connectivity
-    await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
-      .then(response => response.json())
-      .catch(() => { }) // Ignore errors, just for timing
-      .finally(() => {
-        hideLoading();
-        const baseUrl = window.location.origin;
-        const path = '/Frontend_Code/html/dashboard.html';
-        window.location.href = baseUrl + path;
-      });
+    // await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
+    //   .then(response => response.json())
+    //   .catch(() => { }) // Ignore errors, just for timing
+    //   .finally(async () => {
+    //     hideLoading();
+        
+    //   });
   } else {
     // Failed login
     if (adminId !== mockAdmin.id) {
@@ -1241,19 +1323,20 @@ async function validateSignIn(event) {
   // Basic validation
   if (!adminId || !firstName || !middleName || !lastName || !password) {
     showToast('Please fill in all required fields', true);
+    console.log("Entry error")
     return;
-  }
-  if (password.length < 8) {
+  } else if (password.length < 8) {
     passwordField.classList.add('border-red-500', 'focus:ring-red-500');
     passwordError.textContent = 'Kindly use a longer password';
     passwordError.classList.remove('hidden');
+    console.log("Password Length Error")
     return;
   }
 
   let result = await dbhandler.addAdminRecord(adminId, firstName, middleName, lastName, password)
   console.log(result);
 
-  if (result.includes("ERROR")) {
+  if (!result || result.includes("ERROR")) {
     adminIdField.classList.add('border-red-500', 'focus:ring-red-500');
     adminIdError.textContent = 'ID number is already used.';
     adminIdError.classList.remove('hidden');
@@ -1261,15 +1344,15 @@ async function validateSignIn(event) {
     // Show toast notification
     showNotification('Registration successful! Redirecting...', 'success');
     localStorage.setItem('loggedInAdmin', adminId)
+    window.location.href = window.location.origin + '/Frontend_Code/html/dashboard.html';
 
     // Use a real network request to measure actual connectivity
-    await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
-      .then(response => response.json())
-      .catch(() => { }) // Ignore errors, just for timing
-      .finally(() => {
-        console.log("I am logged in")
-        window.location.href = '/Frontend_Code/html/dashboard.html';
-      });
+    // await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
+    //   .then(response => response.json())
+    //   .catch(() => { }) // Ignore errors, just for timing
+    //   .finally(async () => {
+    //     window.location.href = window.location.origin + '/Frontend_Code/html/dashboard.html';
+    // });
   }
 }
 
@@ -1298,12 +1381,13 @@ function showNotification(message, type) {
 
 // Add event listener to login form
 document.addEventListener('DOMContentLoaded', () => {
-  const loginForm = document.getElementById('logIn');
-  const regForm = document.getElementById('signIn');
+    const loginForm = document.getElementById('signInForm');
+    const regForm = document.getElementById('signIn');
 
   if (loginForm) {
     loginForm.addEventListener('submit', validateLogin);
   } else if (regForm) {
+    console.log("REgister")
     regForm.addEventListener('submit', validateSignIn);
   }
 });

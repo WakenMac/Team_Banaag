@@ -282,7 +282,7 @@ function renderDashboardSummaryRow() {
       <div class="text-3xl font-extrabold text-blue-600">${totalBorrowed}</div>
     </div>
     <div class="bg-purple-50 rounded-xl shadow flex flex-col items-center justify-center p-4">
-      <div class="text-sm text-gray-500 mb-1">Transactions</div>
+      <div class="text-sm text-gray-500 mb-1">Total Requests</div>
       <div class="text-3xl font-extrabold text-purple-600">42</div>
     </div>
   `;
@@ -525,7 +525,7 @@ function renderBorrowingTrendChart() {
   });
 }
 
-// Update renderDashboardSections function
+// UPDATE renderDashboardSections function
 function renderDashboardSections() {
   // Overall Summary Cards (Compact)
   const overallItemQuantity = (dashboardMockData.chemicals.totalConsumed || 0) + (dashboardMockData.items.totalConsumed || 0) + (dashboardMockData.apparatus.totalBorrowed || 0) + (dashboardMockData.glassware.totalBorrowed || 0) + (dashboardMockData.equipment.totalBorrowed || 0);
@@ -550,7 +550,7 @@ function renderDashboardSections() {
           <div class="text-2xl font-bold text-blue-600">${overallItemsBorrowed}</div>
         </div>
         <div class="bg-white rounded-lg p-4 shadow-sm">
-          <div class="text-sm text-gray-500">Transactions</div>
+          <div class="text-sm text-gray-500">Total Requests</div>
           <div class="text-2xl font-bold text-purple-600">${overallCompletedTransactions}</div>
         </div>
       </div>
