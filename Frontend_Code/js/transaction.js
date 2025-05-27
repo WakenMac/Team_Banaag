@@ -1258,7 +1258,6 @@ async function validateLogin(event) {
   passwordError.classList.add('hidden');
 
   let result = await dbhandler.adminExists(adminId, password);
-  console.log(result);
 
   // Validate credentials
   if (result === true) {
@@ -1271,12 +1270,10 @@ async function validateLogin(event) {
     await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
       .then(response => response.json())
       .catch(() => { }) // Ignore errors, just for timing
-      .finally(() => {
+      .finally(async () => {
         hideLoading();
-        console.log("I am also alive")
-        const baseUrl = window.location.origin;
         const path = '/Frontend_Code/html/dashboard.html';
-        window.location.href = baseUrl + path;
+        window.location.href = window.location.origin + path;
       });
   } else {
     // Failed login
@@ -1325,23 +1322,23 @@ async function validateSignIn(event) {
   // Basic validation
   if (!adminId || !firstName || !middleName || !lastName || !password) {
     showToast('Please fill in all required fields', true);
+    console.log("ENtry error")
     return;
   }
   if (password.length < 8) {
     passwordField.classList.add('border-red-500', 'focus:ring-red-500');
     passwordError.textContent = 'Kindly use a longer password';
     passwordError.classList.remove('hidden');
+    console.log("Password Error")
     return;
   }
 
   let result = await dbhandler.addAdminRecord(adminId, firstName, middleName, lastName, password)
-  console.log(result);
 
-  if (result.includes("ERROR")) {
+  if (!result || result.includes("ERROR")) {
     adminIdField.classList.add('border-red-500', 'focus:ring-red-500');
     adminIdError.textContent = 'ID number is already used.';
     adminIdError.classList.remove('hidden');
-    console.log("AAAAAHHHHH");
   } else {
     // Show toast notification
     showNotification('Registration successful! Redirecting...', 'success');
@@ -1351,9 +1348,9 @@ async function validateSignIn(event) {
     await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
       .then(response => response.json())
       .catch(() => { }) // Ignore errors, just for timing
-      .finally(() => {
+      .finally(async () => {
         console.log("I am logged in")
-        window.location.href = '/Frontend_Code/html/dashboard.html';
+        window.location.href = window.location.origin + '/Frontend_Code/html/dashboard.html';
       });
   }
 }
