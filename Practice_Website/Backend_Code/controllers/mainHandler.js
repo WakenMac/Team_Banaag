@@ -1,9 +1,9 @@
 // Prepares the connection to the database:
-// import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 const url = "https://tkuqbdxvokhgfoipyoyr.supabase.co";
 const key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRrdXFiZHh2b2toZ2ZvaXB5b3lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA3NDk4ODQsImV4cCI6MjA1NjMyNTg4NH0.zrNLQjJ7VUnHj2wLhxDxWzpN22b_tAOYPneyeh332gE";
-const supabaseClient = supabase.createClient(url, key);
-// const supabaseClient = createClient(url, key);
+// const supabaseClient = supabase.createClient(url, key);
+const supabaseClient = createClient(url, key);
 
 /**
  * Method used to test if we can access the mainHandler javascript file.
@@ -12,27 +12,29 @@ export async function testPresence(){
     console.log("Main Handler is alive.");
 }
 
+const handleSupabaseError = (res, error) => {
+    console.error('Supabase error:', error);
+    res.status(500).json({ success : false, message : 'Internal server error', error : error.message })
+}
+
 // ======================================================================================================================================
 // Methods for admins
 
 /**
- * Method to get all of the records on the Admin table
+ * @description Method to get all of the records on the Admin table
+ * @route GET /api/admin/all
  * @returns Multiple records consisting of 4 columns (Admin ID, First Name, Middle Name, Last Name)
  */
-export async function getAllAdmins(){
+exports.getAllAdmins = async (req, res) => {
     try{
         const {data, error: supabaseError} = await supabaseClient.rpc('get_all_admin_records')
         
-        if (supabaseError){
-            console.error(`Supabase Error:`, supabaseError.message);
-            return null;
-        }   else {
-            return data;
-        }
-        
+        if (supabaseError)
+            throw supabaseError;
+
+        res.status(200).json({ success : true, data})
     } catch (generalError) {
-        console.error("General error", generalError)
-        return null;
+        handleSupabaseError(res, error);
     }
 }
 
@@ -41,29 +43,22 @@ export async function getAllAdmins(){
  * @param {string} adminId Primary key of the Admin table used to find specific records
  * @returns A record consisting of 4 columns (Admin ID, First Name, Middle Name, Last Name)
  */
-export async function getAdminRecordByAdminID(adminId){
+exports.getAdminRecordByAdminID = async (req, res) => {
     try{
-        let [ sAdminId ] = converter('string', adminId);
-
-        if (typeof sAdminId !== 'string'){
-            throw new Error('ERROR: Admin ID must be a string.')
-            return null;
-        }
+        let [ sAdminId ] = req.params;
 
         const {data, error: supabaseError} = await supabaseClient.rpc('get_admin_record_by_admin_id', {
-            input_admin_id: adminId
+            input_admin_id: sAdminId
         })
         
         if (supabaseError){
-            console.error(`Supabase Error:`, supabaseError.message);
-            return null;
-        }   else {
-            return data;
+            if (supabaseError.code === 'PGRST116')
+                return res.status(404).json({ success : false, message : 'Admin record not found'})
+            throw supabaseError;
         }
-        
+        res.status(200).json({ success : true, data })
     } catch (generalError) {
-        console.error("General error", generalError)
-        return null;
+        handleSupabaseError(res, error);
     }
 }
 
@@ -74,12 +69,9 @@ export async function getAdminRecordByAdminID(adminId){
  * @param {string} lName Last name of the admin
  * @returns A record consisting of 4 columns (Admin ID, First Name, Middle Name, Last Name)
  */
-export async function getAdminRecordByName(fName, mName, lName){
+exports.getAdminRecordByName = async (req, res) => {
     try{
-        let [ sFName, sMName, sLName ] = converter('string', fName, mName, lName );
-
-        if (typeof sFName !== 'string' || typeof sMName !== 'string' || typeof sLName !== 'string')
-            throw new Error(`ERROR: getAdminRecordByName's parameters must be strings.`);
+        let { fName, mName, lName } = req.query;
 
         const {data, error: supabaseError} = await supabaseClient.rpc('get_admin_record_by_name', {
             input_f_name: fName,
@@ -87,13 +79,9 @@ export async function getAdminRecordByName(fName, mName, lName){
             input_l_id: lName
         })
         
-        if (supabaseError){
-            console.error(`Supabase Error:`, supabaseError.message);
-            return null;
-        }   else {
-            return data;
-        }
-        
+        if (supabaseError)
+            throw supabaseError;
+        res.status(200).json({ success : true, data })
     } catch (generalError) {
         console.error("General error", generalError)
         return null;
@@ -109,14 +97,9 @@ export async function getAdminRecordByName(fName, mName, lName){
  * @param {string} lName Last name of the admin
  * @returns A string containing the status of the newly added record (Success or Error)
  */
-export async function addAdminRecord(adminId, fName, mName, lName, adminPassword){
+exports.addAdminRecord = async (req, res) => {
     try{
-        console.log(adminPassword);
-        let [ sAdminId, sFName, sMName, sLName, sAdminPassword ] = converter('string', adminId, fName, mName, lName, adminPassword);
-
-        if (typeof sAdminId !== 'string' || typeof sFName !== 'string' || typeof sMName !== 'string' ||
-            typeof sLName !== 'string' || typeof sAdminPassword !== 'string')
-            throw new Error(`ERROR: addAdminRecord's parameters must be strings.`);
+        let { adminId, fName, mName, lName, adminPassword } = req.body;
 
         const {data, error: supabaseError} = await supabaseClient.rpc('add_admin_record', {
             input_admin_id: adminId, 
@@ -124,6 +107,134 @@ export async function addAdminRecord(adminId, fName, mName, lName, adminPassword
             input_m_name: mName, 
             input_l_name: lName, 
             input_admin_password: adminPassword
+        })
+        
+        if (supabaseError)
+            throw supabaseError;
+        res.status(201).json({ success : true, message : 'Admin record added successfully', data : data[0]})
+    } catch (generalError) {
+        handleSupabaseError(res, error);
+    }
+}
+
+/**
+ * Updates most of the attributes of an Admin record based on their adminId
+ * @param {string} oldAdminId       User-defined old primary key of the Admin table
+ * @param {string} newAdminId       User-defined updated primary key of the old admin id in the Admin table
+ * @param {string} oldAdminPassword The old password of the admin to be using the database
+ * @param {string} newAdminPassword The new password of the admin to be using the database
+ * @param {string} fName            First name of the admin
+ * @param {string} mName            Middle name of the admin
+ * @param {string} lName            Last name of the admin
+ * @returns A string containing the status of the updated record (Success or Error)
+ */
+exports.updateAdminRecord = async (req, res) => {
+    try{
+        let { oldAdminId } = req.params
+        let { newAdminId, fName, mName, lName, oldAdminPassword, newAdminPassword } = req.query
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_admin_record', {
+            input_old_admin_id: oldAdminId, 
+            input_new_admin_id : newAdminId,
+            input_f_name: fName, 
+            input_m_name: mName, 
+            input_l_name: lName, 
+            input_current_admin_password: oldAdminPassword,
+            input_new_admin_password : newAdminPassword
+        })
+        
+        if (supabaseError)
+            throw supabaseError
+        res.status(200).json({ status : true, message : 'Admin updated successfully', data : data[0]})
+    } catch (generalError) {
+        handleSupabaseError(res, error)
+    }
+}
+
+/**
+ * Updates the name and id attributes of an Admin record based on their oldAdminId
+ * @param {string} oldAdminId       User-defined old primary key of the Admin table
+ * @param {string} newAdminId       User-defined updated primary key of the old admin id in the Admin table
+ * @param {string} fName            First name of the admin
+ * @param {string} mName            Middle name of the admin
+ * @param {string} lName            Last name of the admin
+ * @returns A string containing the status of the updated record (Success or Error)
+ */
+export async function updateAdminRecordIdName(oldAdminId, newAdminId, fName, mName, lName){
+    try{
+        let [ sOldAdminId, sNewAdminId, sFName, sMName, sLName ] = converter('string', 
+            oldAdminId, newAdminId, fName, mName, lName);
+
+        if (typeof sOldAdminId !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Admin ID parameter must be a string.")
+            return null;
+        } else if (typeof sNewAdminId !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Admin ID parameter must be a string.")
+            return null;
+        } else if (typeof sFName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's First Name parameter must be a string.")
+            return null;
+        } else if (typeof sMName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Middle Name parameter must be a string.")
+            return null;
+        } else if (typeof sLName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Last Name parameter must be a string.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_admin_record_id_name', {
+            input_old_admin_id: sOldAdminId, 
+            input_new_admin_id : sNewAdminId,
+            input_f_name: fName, 
+            input_m_name: mName, 
+            input_l_name: lName, 
+        })
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, error.message);
+            return null;
+        }   else {
+            return data;
+        }
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Updates the name and id attributes of an Admin record based on their oldAdminId
+ * @param {string} adminId       User-defined old primary key of the Admin table
+ * @param {string} fName         First name of the admin
+ * @param {string} mName         Middle name of the admin
+ * @param {string} lName         Last name of the admin
+ * @returns A string containing the status of the updated record (Success or Error)
+ */
+export async function updateAdminRecordName(adminId, fName, mName, lName){
+    try{
+        let [ sAdminId, sFName, sMName, sLName ] = converter('string', 
+            adminId, fName, mName, lName);
+
+        if (typeof sAdminId !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Admin ID parameter must be a string.")
+            return null;
+        } else if (typeof sFName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's First Name parameter must be a string.")
+            return null;
+        } else if (typeof sMName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Middle Name parameter must be a string.")
+            return null;
+        } else if (typeof sLName !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Last Name parameter must be a string.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_admin_record_id_name', {
+            input_admin_id: sAdminId, 
+            input_f_name: fName, 
+            input_m_name: mName, 
+            input_l_name: lName, 
         })
         
         if (supabaseError){
@@ -141,20 +252,31 @@ export async function addAdminRecord(adminId, fName, mName, lName, adminPassword
 
 /**
  * Updates the password of a record in the Admin table based on the adminId
- * @param {string} adminId User-defined primary key of the Admin table
- * @param {string} adminPassword Password of the admin to be using the database
+ * @param {string} adminId          User-defined primary key of the Admin table
+ * @param {string} oldAdminPassword The old assword of the admin to be using the database
+ * @param {string} newAdminPassword The new password of the admin to be using the database
  * @returns A string containing the status of the updated record (Success or Error)
  */
-export async function updateAdminRecordPassword(adminId, adminPassword){
+export async function updateAdminRecordPassword(adminId, oldAdminPassword, newAdminPassword){
     try{
-        let [ sAdminId, sAdminPassword ] = converter('string', adminId, adminPassword);
+        let [ sAdminId, sOldAdminPassword, sNewAdminPassword ] = converter('string', 
+            adminId, oldAdminPassword, newAdminPassword);
 
-        if (typeof sAdminId !== 'string' || typeof sAdminPassword !== 'string')
-            throw new Error(`ERROR: updateAdminRecord's parameters must be strings.`);
+        if (typeof sAdminId !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Admin ID parameter must be a string.")
+            return null;
+        } else if (typeof sOldAdminPassword !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Old Password parameter must be a string.")
+            return null;
+        } else if (typeof sNewAdminPassword !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's New Password parameter must be a string.")
+            return null;
+        }
 
         const {data, error: supabaseError} = await supabaseClient.rpc('update_admin_record_password', {
-            input_admin_id: adminId, 
-            input_admin_password: adminPassword
+            input_admin_id: sAdminId, 
+            input_current_admin_password: sOldAdminPassword,
+            input_new_admin_password : sNewAdminPassword
         })
         
         if (supabaseError){
@@ -171,28 +293,27 @@ export async function updateAdminRecordPassword(adminId, adminPassword){
 }
 
 /**
- * Updates most of the attributes of an Admin record based on their adminId
- * @param {string} adminId User-defined primary key of the Admin table
- * @param {string} adminPassword Password of the admin to be using the database
- * @param {string} fName First name of the admin
- * @param {string} mName Middle name of the admin
- * @param {string} lName Last name of the admin
+ * Checks if an admin with a id and password combination exists in the database
+ * @param {string} adminId          User-defined primary key of the Admin table
+ * @param {string} adminPassword    The old assword of the admin to be using the database
  * @returns A string containing the status of the updated record (Success or Error)
  */
-export async function updateAdminRecord(adminId, fName, mName, lName, adminPassword){
+export async function adminExists(adminId, adminPassword){
     try{
-        let [ sAdminId, sFName, sMName, sLName, sAdminPassword ] = converter('string', adminId, fName, mName, lName, adminPassword);
+        let [ sAdminId, sAdminPassword ] = converter('string', 
+            adminId, adminPassword);
 
-        if (typeof sAdminId !== 'string' || typeof sFName !== 'string' || typeof sMName !== 'string' ||
-            typeof sLName !== 'string' || typeof sAdminPassword !== 'string')
-            throw new Error(`ERROR: updateAdminRecord's parameters must be strings.`);
+        if (typeof sAdminId !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Admin ID parameter must be a string.")
+            return null;
+        } else if (typeof sAdminPassword !== 'string'){
+            console.error("PARAMETER ERROR: addChemicalsRecord's Old Password parameter must be a string.")
+            return null;
+        }
 
-        const {data, error: supabaseError} = await supabaseClient.rpc('update_admin_record', {
-            input_admin_id: adminId, 
-            input_f_name: fName, 
-            input_m_name: mName, 
-            input_l_name: lName, 
-            input_admin_password: adminPassword
+        const {data, error: supabaseError} = await supabaseClient.rpc('admin_exists', {
+            input_admin_id: sAdminId, 
+            input_admin_password: sAdminPassword,
         })
         
         if (supabaseError){
@@ -790,6 +911,48 @@ export async function unitTypeExists(locationId = 0){
 export async function   getAllItemMasterListRecords(){
     try{
         const {data, error: supabaseError} = await supabaseClient.rpc('get_all_item_master_list_records');
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to get all of the records from the Item Master List table
+ * @returns A record consisting of 1 column (Name)
+ */
+export async function   getAllItemMasterListNameRecords(){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_item_master_list_name_records');
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to get all of the records from the Item Master List table
+ * @returns A record consisting of 2 columns (Item ID, Name, Brand, Unit Type, Item Type, Remaining Quantity)
+ */
+export async function   getAllItemMasterListNameBrandRecords(){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_item_master_list_name_brand_records');
         
         if (supabaseError){
             console.error(`Supabase Error:`, supabaseError.message);
@@ -1410,12 +1573,12 @@ export async function getAllGlasswaresRecords(){
  * @param {integer} itemId The primary key of the Glasswares table
  * @returns A record consisting of  columns (Item ID, Name, Unit, Location, Brand, Quantity, Remarks)
  */
-export async function getGlasswaresRecordByItetmId(itemId = 0){
+export async function getGlasswaresRecordByItemId(itemId = 0){
     try{
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getGlasswaresRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: getGlasswaresRecordByItemmId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -1502,24 +1665,24 @@ export async function updateGlasswaresRecordByAll(itemId = 0, itemName, location
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof sLocationName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Location Name parameter must be a string.")
+            console.error("PARAMETER ERROR: updateGlasswaresRecordByAll's Location Name parameter must be a string.")
             return null;
         } else if (typeof sUnitTypeName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Unit Type Name parameter must be a string.")
+            console.error("PARAMETER ERROR: updateGlasswaresRecordByAll's Unit Type Name parameter must be a string.")
             return null;
         } else if (typeof sItemName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Item Name parameter must be a string.")
+            console.error("PARAMETER ERROR: updateGlasswaresRecordByAll's Item Name parameter must be a string.")
             return null;
         } else if (typeof sBrandModel !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Brand/Model parameter must be a string.")
+            console.error("PARAMETER ERROR: updateGlasswaresRecordByAll's Brand/Model parameter must be a string.")
             return null;
         } else if (typeof sRemarks !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Remarks parameter must be a string.")
+            console.error("PARAMETER ERROR: updateGlasswaresRecordByAll's Remarks parameter must be a string.")
             return null;
         }
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getGlasswaresRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: updateGlasswaresRecordByAll's itemID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -1597,7 +1760,7 @@ export async function deleteGlasswaresRecordByItemId(itemId = 0){
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getGlasswaresRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: deleteGlasswaresRecordByItemId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -1647,12 +1810,12 @@ export async function getAllLabApparatusRecords(){
  * @param {integer} itemId The primary key of the Lab Apparatus table
  * @returns A record consisting of 7 columns (Item ID, Name, Unit, Location, Brand, Quantity, Remarks)
  */
-export async function getLabApparatusRecordByItetmId(itemId = 0){
+export async function getLabApparatusRecordByItemId(itemId = 0){
     try{
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getLabApparatusRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: getLabApparatusRecordByItemId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -1740,24 +1903,24 @@ export async function updateLabApparatusRecordByAll(itemId = 0, itemName, locati
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof sLocationName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Location Name parameter must be a string.")
+            console.error("PARAMETER ERROR: updateLabApparatusRecordByAll's Location Name parameter must be a string.")
             return null;
         } else if (typeof sUnitTypeName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Unit Type Name parameter must be a string.")
+            console.error("PARAMETER ERROR: updateLabApparatusRecordByAll's Unit Type Name parameter must be a string.")
             return null;
         } else if (typeof sItemName !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Item Name parameter must be a string.")
+            console.error("PARAMETER ERROR: updateLabApparatusRecordByAll's Item Name parameter must be a string.")
             return null;
         } else if (typeof sBrandModel !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Brand/Model parameter must be a string.")
+            console.error("PARAMETER ERROR: updateLabApparatusRecordByAll's Brand/Model parameter must be a string.")
             return null;
         } else if (typeof sRemarks !== 'string'){
-            console.error("PARAMETER ERROR: addChemicalsRecord's Remarks parameter must be a string.")
+            console.error("PARAMETER ERROR: updateLabApparatusRecordByAll's Remarks parameter must be a string.")
             return null;
         }
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getLabApparatusRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: updateLabApparatusRecordByAll's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -1835,7 +1998,7 @@ export async function deleteLabApparatusRecordByItemId(itemId = 0){
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getLabApparatusRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: deleteLabApparatusRecordByItemId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -1887,12 +2050,12 @@ export async function getAllLabEquipmentsRecords(){
  * @returns A record consisting of 10 columns (Item ID, Name, Unit, Location, Brand, Quantity, Serial No, 
  *  Calibration Date, Frequency of Calibration, and Remarks)
  */
-export async function getLabEquipmentsRecordByItetmId(itemId = 0){
+export async function getLabEquipmentsRecordByItemId(itemId = 0){
     try{
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getLabEquipmentsRecordByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: getLabEquipmentsRecordByItemId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -2158,12 +2321,12 @@ export async function getAllConsumableItemsRecords(){
  * @param {integer} itemId The primary key of the Consumable Items table
  * @returns A record consisting of 7 columns (Item ID, Name, Unit, Location, Brand, Quantity, and Remarks)
  */
-export async function getAllConsumableItemsRecordsByItetmId(itemId = 0){
+export async function getAllConsumableItemsRecordsByItemId(itemId = 0){
     try{
         const [ iItemId ] = converter('int', itemId);
 
         if (typeof iItemId !== 'number' || iItemId < 1){
-            console.error("PARAMETER ERROR: getAllConsumableItemsRecordsByItetmId's itermID parameter must be a positive non-zero integer.")
+            console.error("PARAMETER ERROR: getAllConsumableItemsRecordsByItemId's itermID parameter must be a positive non-zero integer.")
             return null;
         }
 
@@ -2372,44 +2535,325 @@ export async function deleteConsumableItemsRecordByItemId(itemId = 0){
 // ======================================================================================================================================
 // Methods for Restocks
 
+/**
+ * Method to get all of the records on the Consumable Items table
+ * @returns A record consisting of 7 columns (Restock ID, Name, Initial Quantity, Used Quantity, Brand, Restock Date, and Expiry Date)
+ */
 export async function getAllRestocksRecords(){
     try{
-        const {data, error} = await supabaseClient.rpc('get_all_restocks_records');
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_restocks_records');
         
-        if (error){
-            console.error(`Supabase Error:`, error.message);
-            return;
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
         }
-
-        console.log(data);
+        
         return data;
         
-    } catch (error) {
-        console.error("General error", error)
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
     }
 }
 
-export async function getRestocksRecordByRestockID(restockID = 0){
+/**
+ * Method to get one record from the Consumable Items table based on its item ID
+ * @param {integer} itemId The primary key of the Consumable Items table
+ * @returns A record consisting of 7 columns (Restock ID, Name, Initial Quantity, Used Quantity, Brand, Restock Date, and Expiry Date)
+ */
+export async function getRestocksRecordsByItemId(itemId = 0){
     try{
-        if (typeof restockID !== "number"){
-            console.error("PARAMETER ERROR: getItemMasterListByID's item_id parameter must be a positive integer from 1 onwards.")
-            return;
+        const [ iItemId ] = converter('int', itemId);
+
+        if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: getAllRestocksRecordsByItetmId's itermID parameter must be a positive non-zero integer.")
+            return null;
         }
 
-        const {data, error} = await supabaseClient.rpc('get_restocks_record_by_restock_id', {
-            input_restock_id : restockID
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_restocks_record_by_restock_id', {
+            input_item_id : iItemId
         });
         
-        if (error){
-            console.error(`Supabase Error:`, error.message);
-            return;
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Gets all valid restocks to set to the restocks table (Front End)
+ * @param {integer} itemId The primary key of the Consumable Items table
+ * @returns A record consisting of 7 columns (Restock ID, Name, Initial Quantity, Used Quantity, Brand, Restock Date, and Expiry Date)
+ */
+export async function getAllValidRestocksRecords(){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_valid_restocks_record_view', {
+            input_item_id : iItemId
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to add a new row to the Restocks Table
+ * @param {number} itemId               Primary Key of the item, to determince which item will be restocked
+ * @param {string} restockDate          When you received the restock
+ * @param {string} expiryDate           Expiration date of the restock
+ * @param {number} initialQuantity      Quantity of the restock
+ */
+export async function addRestocksRecord(
+    itemId, restockDate, expiryDate, initialQuantity, remarks
+){
+    try{
+        const [ sRestockDate, sExpiryDate, sRemarks ] = converter('string', restockDate, expiryDate, remarks);
+        const [ iItemId ] = converter('int', itemId);
+        const [ iInitialQuantity ] = converter('float', initialQuantity);
+
+        if (typeof sRestockDate !== 'string'){
+            console.error("PARAMETER ERROR: addRestocksRecord's Brand/Model parameter must be a date.") // Must be a string
+            return null;
+        } else if (typeof sExpiryDate !== 'string'){
+            console.error("PARAMETER ERROR: addRestocksRecord's Expiry Date must be a date.") // Must be a string
+            return null;
+        } else if (typeof sRemarks !== 'string'){
+            console.error("PARAMETER ERROR: addRestocksRecord's Remarks parameter must be a date.") // Must be a string
+            return null;
+        } else if (typeof iInitialQuantity !== 'number' || iInitialQuantity < 1){
+            console.error("PARAMETER ERROR: addRestocksRecord's Initial Quantity must be a positive non-zero integer.")
+            return null;
+        } else if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: addRestocksRecord's Item ID must be a positive non-zero integer.")
+            return null;
         }
 
+        const {data, error: supabaseError} = await supabaseClient.rpc('main_add_restocks_record', {
+            input_item_id : iItemId,
+            input_restock_date : sRestockDate,
+            input_expiry_date : sExpiryDate, 
+            initial_quantity : iInitialQuantity,
+            input_remarks : sRemarks
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to add a update a record from the Lab Equipments Table based on thier Item ID
+ * @param {number} itemId               Primary Key of the item, to determince which item will be restocked
+ * @param {string} restockDate          When you received the restock
+ * @param {string} expiryDate           Expiration date of the restock
+ * @param {number} initialQuantity      Quantity of the restock
+ */
+export async function updateRestocksRecordByAll(
+    itemId, restockDate, expiryDate, initial_quantity
+){
+    try{
+        const [ sRestockDate, sExpiryDate ] = converter('string', restockDate, expiryDate);
+        const [ iItemId ] = converter('int', itemId);
+        const [ iInitialQuantity ] = converter('float', iInitialQuantity);
+
+        if (typeof sRestockDate !== 'string'){
+            console.error("PARAMETER ERROR: updateRestocksRecordByAll's Brand/Model parameter must be a date.") // Must be a string
+            return null;
+        } else if (typeof sExpiryDate !== 'string'){
+            console.error("PARAMETER ERROR: updateRestocksRecordByAll's Expiry Date must be a date.") // Must be a string
+            return null;
+        } else if (typeof iInitialQuantity !== 'number' || iInitialQuantity < 1){
+            console.error("PARAMETER ERROR: updateRestocksRecordByAll's Initial Quantity must be a positive non-zero integer.")
+            return null;
+        } else if (typeof iItemId !== 'number' || iItemId < 1){
+            console.error("PARAMETER ERROR: updateRestocksRecordByAll's Item ID must be a positive non-zero integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('updateRestocksRecordByAll', {
+            input_item_id : iItemId,
+            input_restock_date : sRestockDate,
+            input_expiry_date : sExpiryDate, 
+            initial_quantity : iInitialQuantity
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ /**
+ * Method to update an existing record's remarks in the Restocks Table based on its restock ID
+ * 
+ * @param {int} restockId               Primary key of the Restocks table
+ * @param {string} remarks              Remarks of one specific item
+ * 
+ * @returns A string containing the status of the deleted record (Success or Error)
+ */
+export async function updateRestocksRemarksByRestockId(restockId, remarks = ''){
+    try{
+        const [ sRemarks ] = converter('string', remarks);
+        const [ iRestockId ] = converter('int', restockId);
+        
+        if (typeof sRemarks !== 'string'){
+            console.error("PARAMETER ERROR: updateRestocksRemarksByItemId's Remarks parameter must be a string.")
+            return null;
+        }
+
+        if (typeof iRestockId !== 'number' || iRestockId < 1){
+            console.error("PARAMETER ERROR: updateRestocksRemarksByItemId's Restock ID must be a positive non-zero integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('update_restocks_remarks_by_restock_id', {
+            input_restock_id : iRestockId,
+            input_remarks : sRemarks
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to remove a record to the Lab Equipments table
+ * @param {int} restockId The primary key of the Lab Equipments table
+ * @returns A string containing the status of the deleted record (Success or Error)
+ */
+export async function removeRestocksRecordByRestockId(restockId = 0){
+    try{
+        const [ iRestockId ] = converter('int', restockId);
+
+        if (typeof iRestockId !== 'number' || iRestockId < 1){
+            console.error("PARAMETER ERROR: removeRestocksRecordByRestockId's Restock ID's parameter must be a positive non-zero integer.")
+            return null;
+        }
+
+        const {data, error: supabaseError} = await supabaseClient.rpc('remove_restocks_record_by_restock_id', {
+            input_restock_id : iRestockId
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+
+export async function prepareUser(){
+    try {
+        const {data, error} = await supabaseClient.auth.signInWithPassword({
+            email: `maclangw26@gmail.com`,
+            password: `2023-00570`
+        })
+        
+
+    } catch (error){
+        console.error(error)
+    }
+}
+
+//=======================================================================================================================================
+// Methods for Transactions
+
+/**
+ * Method to get all of the records on the Transactions table
+ * @returns A record consisting of 4 columns (Transaction ID, Admin Name, Transaction Date, Status)
+ */
+export async function getAllTransactionRecords(){
+    try{
+        await prepareUser();
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_transaction_records');
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to add a new Transaction
+ * @param {string} adminId                 Admin ID to conduct the transaction
+ * @param {int []} itemIdArray             Array of item ids
+ * @param {float4} borrowQuantityArray     Array of borrowed quantities
+ */
+export async function addTransactionRecord(
+    adminId, remarks, itemIdArray, borrowQuantityArray
+){
+    try{
+        await prepareUser();
+        const {data, error: supabaseError} = await supabaseClient.rpc('main_add_transaction', {
+            admin_id : adminId,
+            remarks : remarks,
+            item_id_array : itemIdArray,
+            borrow_quantity_array : borrowQuantityArray
+        });
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
         console.log(data);
         return data;
         
-    } catch (error) {
-        console.error("General error", error)
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
     }
 }
 
@@ -2426,7 +2870,9 @@ export function converter(condition = '', ...objectArray){
         throw new Error('Kindly specify the condition for this method')
     }
 
+    // TODO: Remove once everything is implemented.
     console.log(objectArray);
+
     let newArray = new Array(objectArray.length);
 
     for (let i = 0; i < objectArray.length; i++){
