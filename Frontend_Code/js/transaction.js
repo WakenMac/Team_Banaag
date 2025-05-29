@@ -1,5 +1,6 @@
 // Import the database handler
 import * as dbhandler from "../../Backend_Code/mainHandler.js";
+import * as login from "./login.js";
 
 // Global data
 var itemData;
@@ -203,6 +204,7 @@ async function initializePage() {
     setupEventListeners();
     // await initializeTransactionData(); // For loading all transactions
     await loadTransactionHistory(); // For returning
+    login.initializePasswordToggle();
     hideLoading();
   } catch (error) {
     console.error('Error initializing page:', error);
@@ -1238,124 +1240,6 @@ window.addNewTransaction = function (newTransaction) {
   }
 };
 
-// Function to validate login
-async function validateLogin(event) {
-  event.preventDefault();
-
-  const adminId = document.getElementById('adminId').value;
-  const password = document.getElementById('password').value;
-  const adminIdField = document.getElementById('adminId');
-  const passwordField = document.getElementById('password');
-  const adminIdError = document.getElementById('adminIdError');
-  const passwordError = document.getElementById('passwordError');
-
-  // Reset previous error states
-  adminIdField.classList.remove('border-red-500', 'focus:ring-red-500');
-  passwordField.classList.remove('border-red-500', 'focus:ring-red-500');
-  adminIdError.classList.add('hidden');
-  passwordError.classList.add('hidden');
-
-  let result = await dbhandler.adminExists(adminId, password);
-  console.log(result);
-
-  // Validate credentials
-  if (result === true) {
-    // Successful login
-    showNotification('Login successful! Redirecting...', 'success');
-    localStorage.setItem("loggedInAdmin", adminId)
-    // Show loading spinner
-    showLoading();
-    const path = '/Frontend_Code/html/dashboard.html';
-    window.location.href = window.location.origin + path;
-
-    // Use a real network request to measure actual connectivity
-    // await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
-    //   .then(response => response.json())
-    //   .catch(() => { }) // Ignore errors, just for timing
-    //   .finally(async () => {
-    //     hideLoading();
-        
-    //   });
-  } else {
-    // Failed login
-    if (adminId !== mockAdmin.id) {
-      adminIdField.classList.add('border-red-500', 'focus:ring-red-500');
-      adminIdError.textContent = 'Invalid ID number';
-      adminIdError.classList.remove('hidden');
-    }
-    if (password !== mockAdmin.password) {
-      passwordField.classList.add('border-red-500', 'focus:ring-red-500');
-      passwordError.textContent = 'Invalid password';
-      passwordError.classList.remove('hidden');
-    }
-  }
-}
-
-/**
- * Registration handler for testing (no backend/database yet)
- * - Validates the registration form fields
- * - Shows a success alert
- * - Redirects to dashboard.html after successful registration
- * - No backend/database call is made
- *
- * To enable backend integration later, replace this logic with a call to your backend handler.
- */
-async function validateSignIn(event) {
-  event.preventDefault();
-
-  const adminId = document.getElementById('adminId').value.trim();
-  const firstName = document.getElementById('firstName').value.trim();
-  const middleName = document.getElementById('middleName').value.trim();
-  const lastName = document.getElementById('lastName').value.trim();
-  const password = document.getElementById('password').value;
-
-  const adminIdField = document.getElementById('adminId');
-  const passwordField = document.getElementById('password');
-  const adminIdError = document.getElementById('adminIdError');
-  const passwordError = document.getElementById('passwordError');
-
-  // Reset previous error states
-  adminIdField.classList.remove('border-red-500', 'focus:ring-red-500');
-  passwordField.classList.remove('border-red-500', 'focus:ring-red-500');
-  adminIdError.classList.add('hidden');
-  passwordError.classList.add('hidden');
-
-  // Basic validation
-  if (!adminId || !firstName || !middleName || !lastName || !password) {
-    showToast('Please fill in all required fields', true);
-    console.log("Entry error")
-    return;
-  } else if (password.length < 8) {
-    passwordField.classList.add('border-red-500', 'focus:ring-red-500');
-    passwordError.textContent = 'Kindly use a longer password';
-    passwordError.classList.remove('hidden');
-    console.log("Password Length Error")
-    return;
-  }
-
-  let result = await dbhandler.addAdminRecord(adminId, firstName, middleName, lastName, password)
-  console.log(result);
-
-  if (!result || result.includes("ERROR")) {
-    adminIdField.classList.add('border-red-500', 'focus:ring-red-500');
-    adminIdError.textContent = 'ID number is already used.';
-    adminIdError.classList.remove('hidden');
-  } else {
-    // Show toast notification
-    showNotification('Registration successful! Redirecting...', 'success');
-    localStorage.setItem('loggedInAdmin', adminId)
-    window.location.href = window.location.origin + '/Frontend_Code/html/dashboard.html';
-
-    // Use a real network request to measure actual connectivity
-    // await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
-    //   .then(response => response.json())
-    //   .catch(() => { }) // Ignore errors, just for timing
-    //   .finally(async () => {
-    //     window.location.href = window.location.origin + '/Frontend_Code/html/dashboard.html';
-    // });
-  }
-}
-
 // Function to show notifications
 function showNotification(message, type) {
   // Remove any existing notifications
@@ -1378,73 +1262,6 @@ function showNotification(message, type) {
     notification.remove();
   }, 3000);
 }
-
-// Add event listener to login form
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('signInForm');
-    const regForm = document.getElementById('signIn');
-
-  if (loginForm) {
-    loginForm.addEventListener('submit', validateLogin);
-  } else if (regForm) {
-    console.log("REgister")
-    regForm.addEventListener('submit', validateSignIn);
-  }
-});
-
-// REGISTER.HTML REGISTRATION LOGIC
-document.addEventListener('DOMContentLoaded', () => {
-  // Terms Modal
-  const termsModal = document.getElementById('termsModal');
-  const privacyModal = document.getElementById('privacyModal');
-  const openTermsModal = document.getElementById('openTermsModal');
-  const openPrivacyModal = document.getElementById('openPrivacyModal');
-  const closeTermsModal = document.getElementById('closeTermsModal');
-  const closePrivacyModal = document.getElementById('closePrivacyModal');
-
-  // Modal handling
-  if (openTermsModal) {
-    openTermsModal.addEventListener('click', function (e) {
-      e.preventDefault();
-      termsModal.classList.remove('hidden');
-      termsModal.classList.add('flex');
-    });
-  }
-
-  if (openPrivacyModal) {
-    openPrivacyModal.addEventListener('click', function (e) {
-      e.preventDefault();
-      privacyModal.classList.remove('hidden');
-      privacyModal.classList.add('flex');
-    });
-  }
-
-  if (closeTermsModal) {
-    closeTermsModal.addEventListener('click', function () {
-      termsModal.classList.add('hidden');
-      termsModal.classList.remove('flex');
-    });
-  }
-
-  if (closePrivacyModal) {
-    closePrivacyModal.addEventListener('click', function () {
-      privacyModal.classList.add('hidden');
-      privacyModal.classList.remove('flex');
-    });
-  }
-
-  // Close modals when clicking outside
-  window.addEventListener('click', function (e) {
-    if (e.target === termsModal) {
-      termsModal.classList.add('hidden');
-      termsModal.classList.remove('flex');
-    }
-    if (e.target === privacyModal) {
-      privacyModal.classList.add('hidden');
-      privacyModal.classList.remove('flex');
-    }
-  });
-});
 
 // ================================================================
 // Backend Methods
@@ -1490,29 +1307,3 @@ async function initializeItemsList() {
     hideLoading();
   }
 }
-
-// Password visibility toggle
-document.addEventListener('DOMContentLoaded', function () {
-  const togglePassword = document.getElementById('togglePassword');
-  const passwordInput = document.getElementById('password');
-
-  if (togglePassword && passwordInput) {
-    togglePassword.addEventListener('click', function () {
-      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      passwordInput.setAttribute('type', type);
-
-      // Toggle eye icon
-      const eyeIcon = this.querySelector('svg');
-      if (type === 'text') {
-        eyeIcon.innerHTML = `
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        `;
-      } else {
-        eyeIcon.innerHTML = `
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        `;
-      }
-    });
-  }
-});

@@ -116,7 +116,7 @@ export async function addAdminRecord(adminId, fName, mName, lName, adminPassword
 
         if (typeof sAdminId !== 'string' || typeof sFName !== 'string' || typeof sMName !== 'string' ||
             typeof sLName !== 'string' || typeof sAdminPassword !== 'string')
-            throw new Error(`ERROR: addAdminRecord's parameters must be strings.`);
+            throw `ERROR: addAdminRecord's parameters must be strings.`;
 
         const {data, error: supabaseError} = await supabaseClient.rpc('add_admin_record', {
             input_admin_id: adminId, 
@@ -130,7 +130,6 @@ export async function addAdminRecord(adminId, fName, mName, lName, adminPassword
             console.error(`Supabase Error:`, supabaseError.message);
             return null;
         }   else {
-            console.log("Added admin auccessfully")
             return data;
         }
         
@@ -369,14 +368,13 @@ export async function adminExists(adminId, adminPassword){
         
         if (supabaseError){
             console.error(`Supabase Error:`, error.message);
-            return null;
+            return false;
         }   else {
-            return data;
+            return true;
         }
         
     } catch (generalError) {
         console.error("General error", generalError)
-        return null;
     }
 }
 

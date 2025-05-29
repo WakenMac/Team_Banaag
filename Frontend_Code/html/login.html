@@ -173,77 +173,7 @@
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script type="module" src="/Frontend_Code/js/transaction.js"></script>
-  <script> // Palipat sa login.js hihi -Dave
-    document.addEventListener('DOMContentLoaded', function () {
-      const loginForm = document.getElementById('signInForm') || document.getElementById('logIn');
-      const registerForm = document.getElementById('signIn');
-      const overlay = document.getElementById('pageLoadingOverlay');
-      const registerLink = document.querySelector('a[href*="register"]');
-      const loginLink = document.querySelector('a[href*="login"]');
-      const MIN_LOADING = 1000; // 1 second
-
-      function showOverlay() {
-        if (overlay) {
-          overlay.classList.remove('hidden');
-          overlay.classList.add('flex');
-          overlay.style.opacity = '1';
-        }
-      }
-
-      // Helper for navigation with delay
-      function delayedNavigate(href) {
-        showOverlay();
-        setTimeout(() => {
-          window.location.href = href;
-        }, MIN_LOADING);
-      }
-
-      // Login form submit
-      if (loginForm) {
-        loginForm.addEventListener('submit', function (e) {
-          e.preventDefault();
-          showOverlay();
-          setTimeout(() => {
-            loginForm.submit();
-          }, MIN_LOADING);
-        });
-      }
-
-      // Register form submit
-      if (registerForm) {
-        registerForm.addEventListener('submit', function (e) {
-          e.preventDefault();
-          showOverlay();
-          setTimeout(() => {
-            registerForm.submit();
-          }, MIN_LOADING);
-        });
-      }
-
-      // Register link (from login)
-      if (registerLink) {
-        registerLink.addEventListener('click', function (e) {
-          e.preventDefault();
-          delayedNavigate(registerLink.href);
-        });
-      }
-
-      // Login link (from register)
-      if (loginLink) {
-        loginLink.addEventListener('click', function (e) {
-          e.preventDefault();
-          delayedNavigate(loginLink.href);
-        });
-      }
-
-      // Hide overlay on page load
-      if (overlay) {
-        overlay.classList.add('hidden');
-        overlay.classList.remove('flex');
-      }
-    });
-  </script>
+  <script type="module" src="/Frontend_Code/js/login.js"></script>
 </body>
 
 </html>
