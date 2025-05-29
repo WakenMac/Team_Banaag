@@ -38,24 +38,24 @@
   <!-- Loading Spinner -->
   <div id="loadingSpinner" class="fixed inset-0 z-[9998] flex items-center justify-center bg-[#f3f7f7]">
     <div class="absolute inset-0 bg-[#f3f7f7] opacity-90"></div>
-    <div class="flex flex-col items-center bg-white p-8 rounded-lg shadow-lg z-10">
+    <div class="z-10 flex flex-col items-center p-8 bg-white rounded-lg shadow-lg">
       <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2ca14a]"></div>
-      <p class="mt-4 text-gray-700 text-lg font-medium loading-message">Loading Chemicals Management...</p>
-      <p class="mt-2 text-gray-500 text-sm">Please wait while we prepare everything for you...</p>
+      <p class="mt-4 text-lg font-medium text-gray-700 loading-message">Loading Chemicals Management...</p>
+      <p class="mt-2 text-sm text-gray-500">Please wait while we prepare everything for you...</p>
     </div>
   </div>
 
   <!-- Table Loading State -->
   <div id="tableLoadingState" class="hidden fixed inset-0 z-[9999] flex items-center justify-center bg-[#f3f7f7]">
     <div class="absolute inset-0 bg-[#f3f7f7] opacity-90"></div>
-    <div class="w-full max-w-6xl mx-auto p-6 z-10">
-      <div class="animate-pulse space-y-4">
+    <div class="z-10 w-full max-w-6xl p-6 mx-auto">
+      <div class="space-y-4 animate-pulse">
         <!-- Table header shimmer -->
-        <div class="h-8 bg-gray-200 rounded w-1/4"></div>
+        <div class="w-1/4 h-8 bg-gray-200 rounded"></div>
         <!-- Search bar and button shimmer -->
-        <div class="flex justify-between items-center">
-          <div class="h-10 bg-gray-200 rounded w-64"></div>
-          <div class="h-10 bg-gray-200 rounded w-32"></div>
+        <div class="flex items-center justify-between">
+          <div class="w-64 h-10 bg-gray-200 rounded"></div>
+          <div class="w-32 h-10 bg-gray-200 rounded"></div>
         </div>
         <!-- Table header shimmer -->
         <div class="h-12 bg-gray-200 rounded"></div>
@@ -69,7 +69,7 @@
         </div>
         <!-- Loading message -->
         <div class="flex items-center justify-center mt-6">
-          <p class="text-gray-500 text-sm loading-message">Loading chemicals data...</p>
+          <p class="text-sm text-gray-500 loading-message">Loading chemicals data...</p>
         </div>
       </div>
     </div>
@@ -79,10 +79,10 @@
     <!-- Left side: Logo and Title -->
     <a href="/Frontend_Code/html/dashboard.html" class="flex items-center space-x-3 group">
       <img alt="CAS Lab logo with green and yellow colors, circular emblem with text"
-        class="w-12 h-12 object-contain transition-transform" height="48" src="/Frontend_Code/images/cas_logo.png"
+        class="object-contain w-12 h-12 transition-transform" height="48" src="/Frontend_Code/images/cas_logo.png"
         width="48" />
       <div class="flex flex-col leading-tight">
-        <span class="font-semibold text-black text-sm"> CARES. </span>
+        <span class="text-sm font-semibold text-black"> CARES. </span>
         <span class="text-[9px] font-semibold text-black/80 tracking-tight">
           CENTRALIZED RESOURCE
         </span>
@@ -90,7 +90,7 @@
           AND EQUIPMENT SYSTEM
         </span>
       </div>
-      <div class="border-l border-black/40 h-10 ml-4"></div>
+      <div class="h-10 ml-4 border-l border-black/40"></div>
     </a>
 
     <!-- Right side: Navigation Links -->
@@ -106,10 +106,10 @@
           class="inline-flex items-center cursor-pointer select-none focus:outline-none" id="masterlistBtn"
           type="button">
           Masterlist
-          <i class="fas fa-chevron-down ml-1 text-xs"> </i>
+          <i class="ml-1 text-xs fas fa-chevron-down"> </i>
         </button>
         <ul aria-labelledby="masterlistBtn"
-          class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+          class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-36"
           id="masterlistMenu" role="menu">
           <li role="none">
             <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
@@ -130,10 +130,10 @@
           class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none"
           id="consumablesBtn" type="button">
           Consumables
-          <i class="fas fa-chevron-down ml-1 text-xs"> </i>
+          <i class="ml-1 text-xs fas fa-chevron-down"> </i>
         </button>
         <ul aria-labelledby="consumablesBtn"
-          class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+          class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-36"
           id="consumablesMenu" role="menu">
           <li role="none">
             <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
@@ -154,10 +154,10 @@
           class="inline-flex items-center cursor-pointer select-none focus:outline-none" id="nonconsumablesBtn"
           type="button">
           Non-consumables
-          <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+          <i class="ml-1 text-xs text-black fas fa-chevron-down"> </i>
         </button>
         <ul aria-labelledby="nonconsumablesBtn"
-          class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+          class="absolute left-0 z-10 invisible mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full w-44"
           id="nonconsumablesMenu" role="menu">
           <li role="none">
             <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
@@ -184,10 +184,10 @@
           class="inline-flex items-center cursor-pointer select-none focus:outline-none" id="propertiesBtn"
           type="button">
           Properties
-          <i class="fas fa-chevron-down ml-1 text-black text-xs"> </i>
+          <i class="ml-1 text-xs text-black fas fa-chevron-down"> </i>
         </button>
         <ul aria-labelledby="propertiesBtn"
-          class="absolute left-0 top-full mt-1 w-40 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10"
+          class="absolute left-0 z-10 invisible w-40 mt-1 transition-opacity bg-white border border-gray-300 rounded shadow-md opacity-0 top-full"
           id="propertiesMenu" role="menu">
           <li role="none">
             <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white"
@@ -220,9 +220,9 @@
       </li>
     </ul>
   </nav>
-  <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 mt-6">
-    <div class="flex flex-col sm:flex-row justify-between items-center w-full gap-3 sm:gap-0">
-      <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
+  <main class="max-w-full px-4 mx-auto mt-6 sm:px-6 lg:px-12">
+    <div class="flex flex-col items-center justify-between w-full gap-3 sm:flex-row sm:gap-0">
+      <div class="flex flex-col items-center w-full gap-3 sm:flex-row sm:gap-4 sm:w-auto">
         <input id="searchInput" aria-label="Search"
           class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-64"
           placeholder="Search chemicals..." type="search" />
@@ -235,36 +235,36 @@
     <div class="flex items-center justify-between mt-4 mb-3">
       <h2 class="text-sm font-semibold text-gray-900">Consumables - Chemicals</h2>
       <button id="downloadPdfBtn"
-        class="px-3 py-1.5 border border-green-600 text-green-700 bg-white rounded-lg hover:bg-green-50 font-medium text-sm shadow-sm transition">
+        class="px-1.5 py-1.5 border border-green-600 text-green-700 bg-white rounded-lg hover:bg-green-50 font-medium text-sm shadow-sm transition">
         Download PDF Report
       </button>
     </div>
-    <div class="overflow-x-auto border border-gray-100 rounded-md bg-white">
-      <table class="min-w-full divide-y divide-gray-200 text-sm">
-        <thead class="bg-gray-50 sticky top-0 z-10">
+    <div class="overflow-x-auto bg-white border border-gray-100 rounded-md">
+      <table class="min-w-full text-sm divide-y divide-gray-200">
+        <thead class="sticky top-0 z-10 bg-gray-50">
           <tr>
-            <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200" scope="col">
+            <th class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200" scope="col">
               Chemical ID
             </th>
-            <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200" scope="col">
+            <th class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200" scope="col">
               Name
             </th>
-            <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200" scope="col">
+            <th class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200" scope="col">
               Unit
             </th>
-            <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200" scope="col">
+            <th class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200" scope="col">
               Location
             </th>
-            <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200" scope="col">
+            <th class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200" scope="col">
               Brand
             </th>
-            <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200" scope="col">
+            <th class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200" scope="col">
               Bottle Count
             </th>
-            <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200" scope="col">
+            <th class="px-6 py-3 font-semibold text-left text-gray-900 border-b border-gray-200" scope="col">
               Container Size
             </th>
-            <th class="px-6 py-3 text-center font-semibold text-gray-900 border-b border-gray-200" scope="col">
+            <th class="px-6 py-3 font-semibold text-center text-gray-900 border-b border-gray-200" scope="col">
               Remaining Quantity
             </th>
           </tr>
@@ -277,19 +277,19 @@
   </main>
 
   <!-- Edit Modal -->
-  <div aria-labelledby="editModalTitle" aria-modal="true" class="fixed inset-0 z-50 hidden items-center justify-center"
+  <div aria-labelledby="editModalTitle" aria-modal="true" class="fixed inset-0 z-50 items-center justify-center hidden"
     id="editChemicalModal" role="dialog">
-    <div class="modal-backdrop fixed inset-0 bg-black opacity-50" id="modalBackdropEditChemical"></div>
-    <div class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative">
+    <div class="fixed inset-0 bg-black opacity-50 modal-backdrop" id="modalBackdropEditChemical"></div>
+    <div class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
-          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
-          <span class="font-black text-3xl text-black">Edit Chemical</span>
+          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="object-contain w-12 h-12" />
+          <span class="text-3xl font-black text-black">Edit Chemical</span>
         </div>
       </div>
       <form class="space-y-4" id="editChemicalForm">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="editChemicalId">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="editChemicalId">
             Chemical ID
           </label>
           <input
@@ -297,7 +297,7 @@
             id="editChemicalId" name="editChemicalId" type="text" readonly placeholder="Enter chemical ID" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="editChemicalName">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="editChemicalName">
             Name
           </label>
           <input
@@ -305,7 +305,7 @@
             id="editChemicalName" name="editChemicalName" type="text" placeholder="Enter chemical name" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="editChemicalUnit">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="editChemicalUnit">
             Unit
           </label>
           <select
@@ -319,7 +319,7 @@
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="editChemicalLocation">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="editChemicalLocation">
             Location
           </label>
           <select
@@ -334,7 +334,7 @@
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="editChemicalBrand">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="editChemicalBrand">
             Brand
           </label>
           <input
@@ -342,7 +342,7 @@
             id="editChemicalBrand" name="editChemicalBrand" type="text" placeholder="Enter brand" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="editChemicalContainerSize">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="editChemicalContainerSize">
             Container Size
           </label>
           <input
@@ -351,7 +351,7 @@
             placeholder="Enter container size" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="editChemicalCASNo">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="editChemicalCASNo">
             CAS No.
           </label>
           <input
@@ -360,7 +360,7 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="editChemicalMSDS">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="editChemicalMSDS">
             MSDS
           </label>
           <input
@@ -368,7 +368,7 @@
             id="editChemicalMSDS" name="editChemicalMSDS" type="text" placeholder="Enter MSDS" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="editChemicalBarCode">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="editChemicalBarCode">
             Bar Code
           </label>
           <input
@@ -376,7 +376,7 @@
             id="editChemicalBarCode" name="editChemicalBarCode" type="text" placeholder="Enter bar code" />
         </div>
 
-        <div class="flex justify-end space-x-3 pt-4">
+        <div class="flex justify-end pt-4 space-x-3">
           <button
             class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
             id="cancelEditBtn" type="button">
@@ -393,19 +393,19 @@
   </div>
 
   <!-- Add Modal -->
-  <div aria-labelledby="modalTitle" aria-modal="true" class="fixed inset-0 z-50 hidden items-center justify-center"
+  <div aria-labelledby="modalTitle" aria-modal="true" class="fixed inset-0 z-50 items-center justify-center hidden"
     id="addChemicalModal" role="dialog">
-    <div class="modal-backdrop fixed inset-0 bg-black opacity-50" id="modalBackdropAddChemical"></div>
-    <div class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative">
+    <div class="fixed inset-0 bg-black opacity-50 modal-backdrop" id="modalBackdropAddChemical"></div>
+    <div class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
-          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
-          <span class="font-black text-3xl text-black">Add Chemical</span>
+          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="object-contain w-12 h-12" />
+          <span class="text-3xl font-black text-black">Add Chemical</span>
         </div>
       </div>
       <form class="space-y-4" id="addChemicalForm">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalName">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="chemicalName">
             Name <span class="text-red-500">*</span>
           </label>
           <input
@@ -413,7 +413,7 @@
             id="chemicalName" name="chemicalName" required="" type="text" placeholder="e.g. Acetic Acid" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalUnit">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="chemicalUnit">
             Unit <span class="text-red-500">*</span>
           </label>
           <select
@@ -427,7 +427,7 @@
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalLocation">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="chemicalLocation">
             Location <span class="text-red-500">*</span>
           </label>
           <select
@@ -441,7 +441,7 @@
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalBrand">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="chemicalBrand">
             Brand <span class="text-red-500">*</span>
           </label>
           <input
@@ -450,7 +450,7 @@
             placeholder="e.g. Merck (N/A if not applicable)" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalContainerSize">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="chemicalContainerSize">
             Container Size <span class="text-red-500">*</span>
           </label>
           <input
@@ -458,7 +458,7 @@
             id="chemicalContainerSize" name="chemicalContainerSize" required="" type="text" placeholder="e.g. 500 mL" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalCASNo">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="chemicalCASNo">
             CAS No.
           </label>
           <input
@@ -466,7 +466,7 @@
             id="chemicalCASNo" name="chemicalCASNo" type="text" placeholder="e.g. 64-19-7" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalMSDS">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="chemicalMSDS">
             MSDS
           </label>
           <input
@@ -474,14 +474,14 @@
             id="chemicalMSDS" name="chemicalMSDS" rows="3" placeholder="e.g. idk unsay porma" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="chemicalBarCode">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="chemicalBarCode">
             Bar Code
           </label>
           <input
             class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
             id="chemicalBarCode" name="chemicalBarCode" type="text" placeholder="e.g. 1234567890123" />
         </div>
-        <div class="flex justify-end space-x-3 pt-4">
+        <div class="flex justify-end pt-4 space-x-3">
           <button
             class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
             id="cancelBtn" type="button">
@@ -500,26 +500,26 @@
 
   <!-- Remarks Modal -->
   <div aria-labelledby="remarksModalTitle" aria-modal="true"
-    class="fixed inset-0 z-50 hidden items-center justify-center" id="remarksModal" role="dialog">
-    <div class="modal-backdrop fixed inset-0 bg-black opacity-50" id="modalBackdropRemarks"></div>
-    <div class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative">
+    class="fixed inset-0 z-50 items-center justify-center hidden" id="remarksModal" role="dialog">
+    <div class="fixed inset-0 bg-black opacity-50 modal-backdrop" id="modalBackdropRemarks"></div>
+    <div class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
-          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
-          <span class="font-black text-3xl text-black">Add Remarks</span>
+          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="object-contain w-12 h-12" />
+          <span class="text-3xl font-black text-black">Add Remarks</span>
         </div>
       </div>
       <form class="space-y-4" id="remarksForm">
         <input type="hidden" id="remarksChemicalId" name="remarksChemicalId" />
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1" for="remarksText">
+          <label class="block mb-1 text-sm font-medium text-gray-700" for="remarksText">
             Remarks
           </label>
           <textarea
             class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
             id="remarksText" name="remarksText" rows="4" placeholder="Enter your remarks here..."></textarea>
         </div>
-        <div class="flex justify-end space-x-3 pt-4">
+        <div class="flex justify-end pt-4 space-x-3">
           <button
             class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
             id="cancelRemarksBtn" type="button">
@@ -538,16 +538,16 @@
 
   <!-- Delete Chemical Modal -->
   <div aria-labelledby="deleteChemicalModalTitle" aria-modal="true"
-    class="fixed inset-0 z-50 hidden items-center justify-center" id="deleteChemicalModal" role="dialog">
-    <div class="modal-backdrop fixed inset-0 bg-black opacity-50" id="modalBackdropDeleteChemical"></div>
-    <div class="bg-white rounded-lg shadow-lg max-w-md w-full z-50 p-6 relative">
+    class="fixed inset-0 z-50 items-center justify-center hidden" id="deleteChemicalModal" role="dialog">
+    <div class="fixed inset-0 bg-black opacity-50 modal-backdrop" id="modalBackdropDeleteChemical"></div>
+    <div class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
-          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
-          <span class="font-black text-3xl text-black">Delete Chemical</span>
+          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="object-contain w-12 h-12" />
+          <span class="text-3xl font-black text-black">Delete Chemical</span>
         </div>
       </div>
-      <p class="text-gray-700 mb-6">
+      <p class="mb-6 text-gray-700">
         Are you sure you want to delete this chemical? This action cannot be
         undone.
       </p>
@@ -558,7 +558,7 @@
           Cancel
         </button>
         <button
-          class="px-4 py-2 rounded-md bg-red-600 text-white font-semibold hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+          class="px-4 py-2 font-semibold text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
           id="confirmDeleteChemicalBtn" type="button">
           Delete
         </button>
@@ -568,19 +568,19 @@
 
 
   <!-- Date Input Modal for PDF -->
-  <div id="dateInputModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30 hidden">
-    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
-      <h3 class="text-xl font-bold mb-4 text-center text-green-700">Inventory Report Dates</h3>
+  <div id="dateInputModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-30">
+    <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+      <h3 class="mb-4 text-xl font-bold text-center text-green-700">Inventory Report Dates</h3>
       <form id="dateInputForm" class="space-y-4">
         <div id="dateFields" class="space-y-3">
           <div class="flex items-center gap-2">
-            <label class="block text-gray-700 font-medium" for="dateField0">Date 1:</label>
-            <input type="date" id="dateField0" class="date-input flex-1 border rounded px-3 py-2" required />
+            <label class="block font-medium text-gray-700" for="dateField0">Date 1:</label>
+            <input type="date" id="dateField0" class="flex-1 px-3 py-2 border rounded date-input" required />
           </div>
         </div>
         <div class="flex justify-between mt-2">
-          <button type="button" id="addDateField" class="text-green-700 font-semibold">+ Add Date</button>
-          <button type="button" id="removeDateField" class="text-red-600 font-semibold">- Remove</button>
+          <button type="button" id="addDateField" class="font-semibold text-green-700">+ Add Date</button>
+          <button type="button" id="removeDateField" class="font-semibold text-red-600">- Remove</button>
         </div>
         <div class="flex justify-end gap-2 mt-4">
           <button type="button" id="cancelDateInput"

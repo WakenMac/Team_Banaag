@@ -725,7 +725,7 @@ function initializeInfoHovers() {
 
     const tooltip = document.createElement("div");
     tooltip.className =
-      "custom-tooltip absolute z-50 bg-gray-800 text-white text-xs rounded shadow-lg";
+      "absolute z-50 text-xs text-white bg-gray-800 rounded shadow-lg custom-tooltip";
     tooltip.style.position = "absolute";
     tooltip.style.pointerEvents = "none";
     tooltip.innerHTML = tooltipContent;
@@ -930,13 +930,13 @@ addDateBtn.addEventListener('click', () => {
   const wrapper = document.createElement('div');
   wrapper.className = 'flex items-center gap-2';
   const label = document.createElement('label');
-  label.className = 'block text-gray-700 font-medium';
+  label.className = 'block font-medium text-gray-700';
   label.textContent = `Date ${idx + 1}:`;
   label.setAttribute('for', `dateField${idx}`);
   const input = document.createElement('input');
   input.type = 'date';
   input.id = `dateField${idx}`;
-  input.className = 'date-input flex-1 border rounded px-3 py-2';
+  input.className = 'flex-1 px-3 py-2 border rounded date-input';
   input.required = true;
   wrapper.appendChild(label);
   wrapper.appendChild(input);
@@ -965,33 +965,48 @@ dateForm.addEventListener('submit', async (e) => {
   const dates = Array.from(dateFields.querySelectorAll('input')).map(input => formatDate(input.value)).filter(Boolean);
   dateModal.classList.add('hidden');
   dateModal.classList.remove('flex');
-  const pdfRows = equipmentData.map(item => {
+  const pdfRows = Array.from(document.querySelectorAll('#equipmentsTableBody tr')).map(row => {
+    const tds = row.querySelectorAll('td');
+    const infoBtn = row.querySelector('button[aria-label="Info"]');
+    // Get values from the info button's data attributes
+    const csn = infoBtn ? infoBtn.getAttribute('data-csn') || '' : '';
+    const cbd = infoBtn ? infoBtn.getAttribute('data-cbd') || '' : '';
+    const fcb = infoBtn ? infoBtn.getAttribute('data-fcb') || '' : '';
+    // Get remarks from the remarks button
+    const remarksBtn = row.querySelector('button[aria-label="Add remarks"]');
+    const remarks = remarksBtn ? remarksBtn.getAttribute('data-remarks') || '' : '';
+    // Build the row - ORDER MATTERS HERE: columns data, then remarks, then date columns
     const base = [
-      item["Item ID"],
-      item["Name"],
-      item["Location"],
-      item["Brand"],
-      // item["Quantity"],
-      item["Remarks"] || ''
+      tds[0]?.innerText || '', // Item ID
+      tds[1]?.innerText || '', // Name
+      tds[3]?.innerText || '', // Location
+      tds[4]?.innerText || '', // Brand
+      csn,
+      cbd,
+      fcb,
+      remarks
     ];
+
     if (dates && dates.length > 0) {
-      dates.forEach(() => base.push(item["Quantity"]));
+      dates.forEach(() => base.push(tds[5]?.innerText || ''));
     }
     return base;
   });
+
   const columns = [
     { header: 'ITEM ID', dataKey: 'id' },
     { header: 'NAME', dataKey: 'name' },
     { header: 'LOCATION', dataKey: 'location' },
     { header: 'BRAND', dataKey: 'brand' },
-    // { header: 'QUANTITY', dataKey: 'qty' },
-    // { header: 'REMARKS', dataKey: 'remarks' }
+    { header: 'COMPRESSED SERIAL NO.', dataKey: 'csn' },
+    { header: 'CALIBRATION DATE', dataKey: 'cbd' },
+    { header: 'FREQUENCY OF CALIBRATION', dataKey: 'fcb' }
   ];
   await generateInventoryPdfReport({
     title: 'LABORATORY EQUIPMENT',
     columns,
     filename: 'equipment_inventory_report.pdf',
     dateColumns: dates,
-    data: pdfRows
+    data: pdfRows 
   });
 });

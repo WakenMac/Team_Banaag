@@ -947,6 +947,7 @@ dateForm.addEventListener('submit', async (e) => {
   const dates = Array.from(dateFields.querySelectorAll('input')).map(input => formatDate(input.value)).filter(Boolean);
   dateModal.classList.add('hidden');
   dateModal.classList.remove('flex');
+
   // Build rows for PDF from chemicalsData
   const pdfRows = chemicalsData.map(item => {
     const base = [
@@ -954,26 +955,26 @@ dateForm.addEventListener('submit', async (e) => {
       item["Name"],
       item["Location"],
       item["Brand"],
-      item["Initial Qty."], // Bottle Count
+      item["Initial Qty."],
       item["Container Size"],
-      item["Remaining Qty."],
       item["Remarks"] || ''
     ];
+    // Add the remaining quantity for each date column
     if (dates && dates.length > 0) {
       dates.forEach(() => base.push(item["Remaining Qty."]));
     }
     return base;
   });
+
   const columns = [
     { header: 'ITEM ID', dataKey: 'id' },
     { header: 'NAME', dataKey: 'name' },
     { header: 'LOCATION', dataKey: 'location' },
     { header: 'BRAND', dataKey: 'brand' },
-    { header: 'BOTTLE COUNT', dataKey: 'bottle_count' },
+    { header: 'INITIAL QUANTITY (Per Bottle)', dataKey: 'bottle_count' },
     { header: 'CONTAINER SIZE', dataKey: 'container_size' },
-    { header: 'REMAINING QUANTITY', dataKey: 'remaining_qty' },
-    { header: 'REMARKS', dataKey: 'remarks' }
   ];
+
   await generateInventoryPdfReport({
     title: 'LABORATORY CHEMICALS',
     columns,
