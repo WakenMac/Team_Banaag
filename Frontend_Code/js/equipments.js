@@ -837,7 +837,10 @@ async function initializeLabEquipmentsTable() {
         data[i]["Unit"],
         data[i]["Location"],
         data[i]["Brand"],
-        data[i]["Quantity"]
+        data[i]["Quantity"],
+        data[i]["Serial No"],
+        data[i]["Calibration Date"],
+        data[i]["Frequency of Calibration"]
       );
       await createNewRemarks(data[i]["Remarks"], data[i]["Item ID"]);
     }

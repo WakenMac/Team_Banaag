@@ -306,7 +306,6 @@ async function loadTransactionHistory() {
       }
 
       table.innerHTML = filteredTransactions.map(transaction => {
-        console.log(transaction);
         // Truncate remarks if too long
         const maxRemarkLength = 40;
         let displayRemark = (!transaction["Remarks"] || transaction["Remarks"] == "")? '' : transaction["Remarks"];
