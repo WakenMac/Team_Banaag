@@ -367,7 +367,7 @@ export async function adminExists(adminId, adminPassword){
         })
         
         if (supabaseError){
-            console.error(`Supabase Error:`, error.message);
+            console.error(`Supabase Error:`, supabaseError.message);
             return false;
         }   else {
             return true;

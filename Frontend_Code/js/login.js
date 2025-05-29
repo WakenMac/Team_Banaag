@@ -3,9 +3,11 @@ import * as dbhandler from '../../Backend_Code/mainHandler.js';
 
 // Initializes Components
 document.addEventListener('DOMContentLoaded', () => {
-  initializeTermsAndServices();
-  initializeAdminVerifier();
-  initializePasswordToggle();
+  if (document.getElementById('signIn') || document.getElementById('signInForm')){
+    initializeTermsAndServices();
+    initializeAdminVerifier();
+    initializePasswordToggle();
+  }
 });
 
 function initializeTermsAndServices(){
@@ -207,9 +209,9 @@ async function validateLogin(event) {
   if (result === true) {
     // Successful login
     showOverlay(true);
+    showLoading();
     showNotification('Login successful! Redirecting...', 'success');
     localStorage.setItem("loggedInAdmin", adminId)
-    showLoading();
     window.location.href = window.location.origin + '/Frontend_Code/html/dashboard.html';
   } else {
     // Failed Login

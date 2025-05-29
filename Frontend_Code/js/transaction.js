@@ -2,8 +2,7 @@
 import * as dbhandler from "../../Backend_Code/mainHandler.js";
 import * as login from "./login.js";
 
-// Global data
-var itemData;
+// Global Data
 var transactionData;
 var itemsTransactedData;
 
@@ -160,9 +159,6 @@ const mockBorrowedItems = [
   }
 ];
 
-// Global state
-let currentAdminId = null; // Use localStorage later.
-let selectedItems = [];
 let filteredTransactions = [];
 
 // Mock admin credentials for testing
@@ -197,103 +193,7 @@ const mockChartData = {
   }
 };
 
-// Initialize the page
-async function initializePage() {
-  try {
-    showLoading();
-    setupEventListeners();
-    // await initializeTransactionData(); // For loading all transactions
-    await loadTransactionHistory(); // For returning
-    login.initializePasswordToggle();
-    hideLoading();
-  } catch (error) {
-    console.error('Error initializing page:', error);
-    hideLoading();
-    showToast('Error loading page. Please refresh.', true);
-  }
-}
-
-// TODO: Dave there is an error regarding the tableLoadingState lines that are commented. 
-
-// Helper Functions
-function showLoading() {
-  const loadingSpinner = document.getElementById('loadingSpinner');
-  const tableLoadingState = document.getElementById('tableLoadingState');
-
-  if (loadingSpinner) {
-    loadingSpinner.style.display = 'flex';
-  }
-
-  if (tableLoadingState) {
-    tableLoadingState.style.display = 'block';
-  }
-}
-
-function hideLoading() {
-  const loadingSpinner = document.getElementById('loadingSpinner');
-  const tableLoadingState = document.getElementById('tableLoadingState');
-
-  if (loadingSpinner) {
-    loadingSpinner.style.display = 'none';
-  }
-
-  if (tableLoadingState) {
-    tableLoadingState.style.display = 'none';
-  }
-}
-
-function showToast(message, isError = false) {
-  const toast = document.getElementById('toastNotification');
-  const toastMessage = document.getElementById('toastMessage');
-
-  if (!toast || !toastMessage) return;
-
-  toastMessage.textContent = message;
-  toast.classList.remove('hidden');
-  toast.classList.add('flex');
-
-  toast.style.backgroundColor = isError ? 'rgba(220, 38, 38, 0.95)' : 'rgba(44, 161, 74, 0.95)';
-
-  setTimeout(() => {
-    toast.classList.add('hidden');
-    toast.classList.remove('flex');
-  }, isError ? 4000 : 3000);
-}
-
-function getStatusStyle(status) {
-  switch (status) {
-    case 'completed':
-    case 'Completed':
-      return 'bg-green-100 text-green-800';
-
-    case 'pending_return':
-    case 'Pending Return':
-      return 'bg-yellow-100 text-yellow-800';
-
-    case 'partially_returned':
-    case 'Partially Returned':
-      return 'bg-orange-100 text-orange-800';
-
-    case 'not_returnable':
-    case 'Not Returnable':
-      return 'bg-red-100 text-red-800';
-
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
-}
-
-function formatDateTime(dateString) {
-  return new Date(dateString).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
-
-// Transaction History Functions
+// Loads the transaction history
 async function loadTransactionHistory() {
   const table = document.getElementById('transactionHistoryTable');
   if (!table) return;
@@ -307,7 +207,7 @@ async function loadTransactionHistory() {
     const startDate = document.getElementById('startDate')?.value;
     const endDate = document.getElementById('endDate')?.value;
 
-    var isMockData = true;
+    var isMockData = false;
     if (isMockData == true){
       filteredTransactions = mockTransactionHistory.filter(transaction => {
         const matchesSearch = 
@@ -375,7 +275,7 @@ async function loadTransactionHistory() {
 
     } else {
 
-      // Use in-memory mockTransactionHistory
+      // Use database history
       // Apply filters
       filteredTransactions = transactionData.filter(transaction => {
         console.log(transaction);
@@ -690,158 +590,7 @@ window.processReturn = async function (transactionId, itemName) {
   }
 };
 
-// Verify admin credentials using mock data for testing
-async function verifyAdmin(adminId, password) {
-  try {
-
-    // Keep for now for the presentation
-    var adminExists = mockAdmins.some(admin =>
-      admin.admin_id === adminId && admin.password === password
-    );
-
-    if (adminExists === false)
-      adminExists = await dbhandler.adminExists(adminId, password);
-
-    if (adminExists) {
-      currentAdminId = adminId;
-      return true;
-    }
-    return false;
-  } catch (error) {
-    console.error('Error verifying admin:', error);
-    return false;
-  }
-}
-
-// Update item quantity in the selectedItems array
-function updateItemQuantity(itemName, newQuantity) {
-  const index = selectedItems.findIndex(item => item.itemName === itemName);
-
-  console.log(index)
-  if (index !== -1) {
-    const inventoryItem = itemData.find(item => itemName.includes(item["Name"]) && itemName.includes(item["Brand"]));
-    const maxQuantity = inventoryItem ? inventoryItem["Remaining Quantity"] : 1;
-
-
-    newQuantity = Math.min(Math.max(1, parseFloat(newQuantity) || 1), maxQuantity);
-    selectedItems[index].quantity = newQuantity;
-
-    const input = document.querySelector(`input[data-item="${itemName}"]`);
-    if (input) {
-      console.log(newQuantity);
-      input.value = newQuantity;
-    }
-  }
-}
-
-// Add item to the selected items table
-function addItemToTable(itemName) {
-  const selectedItemsTable = document.getElementById('selectedItemsTable');
-  const noItemsRow = document.getElementById('noItemsRow');
-
-  if (!selectedItemsTable) return;
-
-  if (selectedItems.some(item => item.itemName.includes(itemName))) {
-    showToast('Item already added to the list');
-    return;
-  }
-
-  const inventoryItem = itemData.find(item => itemName.includes(item["Name"]) && itemName.includes(item["Brand"]));
-  if (!inventoryItem) {
-    showToast('Item not found in inventory');
-    return;
-  }
-
-  if (noItemsRow) {
-    noItemsRow.style.display = 'none';
-  }
-
-  let isConsumable = (inventoryItem["Item Type"].includes('Chemicals') || inventoryItem["Item Type"].includes('Consumable Items')) ? true : false;
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-      ${isConsumable ? '<span class="text-[#2ca14a] font-medium">*</span>' : ''}${itemName}
-    </td>
-    <td class="px-6 py-4 whitespace-nowrap text-gray-900 text-center">${inventoryItem["Remaining Quantity"]}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-      <div class="flex items-center justify-center w-full space-x-2">
-        <button type="button" 
-          class="w-8 h-8 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-          onclick="updateItemQuantity('${itemName}', (parseInt(document.querySelector('input[data-item=\\'${itemName}\\']').value) || 1) - 1)">
-          <i class="fas fa-minus text-gray-600"></i>
-        </button>
-        <input 
-          type="number" 
-          value="1"
-          min="1"
-          max="${inventoryItem["Remaining Quantity"]}"
-          data-item="${itemName}"
-          class="w-16 text-center rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          onchange="updateItemQuantity('${itemName}', this.value)"
-        >
-        <button type="button"
-          class="w-8 h-8 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-          onclick="updateItemQuantity('${itemName}', (parseInt(document.querySelector('input[data-item=\\'${itemName}\\']').value) || 1) + 1)">
-          <i class="fas fa-plus text-gray-600"></i>
-        </button>
-      </div>
-    </td>
-    <td class="px-6 py-4 whitespace-nowrap text-center">
-      <div class="flex justify-center">
-        <button type="button" 
-          class="w-8 h-8 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#2ca14a]" 
-          onclick="removeItem('${itemName}')"
-          title="Remove item"
-        >
-          <i class="fas fa-trash-alt text-red-600"></i>
-        </button>
-      </div>
-    </td>
-  `;
-
-  selectedItemsTable.appendChild(row);
-  selectedItems.push({ itemName, quantity: 1 });
-}
-
-// Remove item from the selected items table
-function removeItem(itemName) {
-  selectedItems = selectedItems.filter(item => item.itemName === itemName);
-
-  const selectedItemsTable = document.getElementById('selectedItemsTable');
-  if (!selectedItemsTable) return;
-
-  const rows = selectedItemsTable.getElementsByTagName('tr');
-
-  for (let row of rows) {
-    const cellText = row.cells[0].textContent.trim().replace('*', '');
-    if (cellText === itemName) {
-      row.remove();
-      break;
-    }
-  }
-
-  const noItemsRow = document.getElementById('noItemsRow');
-  if (selectedItems.length === 0 && noItemsRow) {
-    noItemsRow.style.display = '';
-  }
-}
-
-// Clear the items table and reset state
-function clearItemsTable() {
-  selectedItems = [];
-  const selectedItemsTable = document.getElementById('selectedItemsTable');
-  if (!selectedItemsTable) return;
-
-  while (selectedItemsTable.children.length > 1) {
-    selectedItemsTable.removeChild(selectedItemsTable.lastChild);
-  }
-
-  const noItemsRow = document.getElementById('noItemsRow');
-  if (noItemsRow) {
-    noItemsRow.style.display = '';
-  }
-}
-
+// For the dashbaord
 // Return functionality
 async function loadBorrowedItems() {
   const borrowedItemsTable = document.getElementById('borrowedItemsTable');
@@ -909,6 +658,7 @@ async function loadBorrowedItems() {
   }
 }
 
+// Handle return
 async function handleReturnItems() {
   const checkedItems = document.querySelectorAll('.return-item-checkbox:checked');
   const returnNotes = document.getElementById('returnNotes')?.value.trim() || '';
@@ -1020,63 +770,22 @@ function closeReturnModal() {
 }
 
 // Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // Initialize the page when the DOM is loaded
-  initializePage();
+  showLoading();
+  setupEventListeners();
+  await initializeTransactionData();
+  await loadTransactionHistory(); // For returning
 
-  // Get all modal elements
+  // Get all modal elements (Transactions)
   const returnItemsModal = document.getElementById('returnItemsModal');
 
-  // Get all form elements
-  const verifyAdminForm = document.getElementById('verifyAdminForm');
-  const borrowItemsForm = document.getElementById('borrowItemsForm');
-
-  // Get all button elements
-  const addTransactionBtn = document.getElementById('addTransactionBtn');
-  const cancelVerifyBtn = document.getElementById('cancelVerifyBtn');
-  const borrowBtn = document.getElementById('borrowBtn');
+  // Transaction history
   const returnBtn = document.getElementById('returnBtn');
-  const addItemBtn = document.getElementById('addItemBtn');
-  const cancelBorrowBtn = document.getElementById('cancelBorrowBtn');
   const cancelReturnBtn = document.getElementById('cancelReturnBtn');
-  const cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
-  const confirmTransactionBtn = document.getElementById('confirmTransactionBtn');
   const confirmReturnBtn = document.getElementById('confirmReturnBtn');
   const selectAllItems = document.getElementById('selectAllItems');
   const returnSearchInput = document.getElementById('returnSearchInput');
-
-  // Event listeners for transaction type
-  if (addTransactionBtn) {
-    addTransactionBtn.addEventListener('click', () => showModal('verifyAdminModal'));
-  }
-
-  verifyAdminForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const adminId = document.getElementById('verifyAdminId').value;
-    const password = document.getElementById('verifyAdminPassword').value;
-
-    const isVerified = await verifyAdmin(adminId, password);
-    if (isVerified) {
-      hideModal('verifyAdminModal');
-      // Directly show borrow items modal, skip transaction type modal
-      showModal('borrowItemsModal');
-      initializeItemsList();
-      await dbhandler.prepareUser();
-      verifyAdminForm.reset();
-    } else {
-      const errorDiv = document.getElementById('verifyAdminError');
-      if (errorDiv) {
-        errorDiv.textContent = 'Invalid credentials. Please try again.';
-        errorDiv.classList.remove('hidden');
-      }
-    }
-  });
-
-  borrowBtn?.addEventListener('click', () => {
-    hideModal('transactionTypeModal');
-    showModal('borrowItemsModal');
-    // initializeItemsList();
-  });
 
   returnBtn?.addEventListener('click', () => {
     hideModal('transactionTypeModal');
@@ -1106,71 +815,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Other event listeners
-  addItemBtn?.addEventListener('click', () => {
-    const itemSearch = document.getElementById('itemSearch');
-    if (itemSearch?.value) {
-      addItemToTable(itemSearch.value);
-      itemSearch.value = '';
-    }
-  });
-
-  borrowItemsForm?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (selectedItems.length > 0) {
-
-      hideModal('borrowItemsModal');
-      showModal('confirmationModal');
-    } else {
-      showToast('Please add at least one item');
-    }
-  });
-
-  // TODO: ADD transaction
-  confirmTransactionBtn?.addEventListener('click', async () => {
-    hideModal('confirmationModal');
-
-    let itemIdArray = Array();
-    let borrowQuantityArray = Array();
-
-    // selected items (itemName, quantity)
-    // itemName consists of : Name (Brand)
-    selectedItems.forEach((item) => {
-      var tempItem = itemData.find(tempItemData => item.itemName.includes(tempItemData["Name"]) == true && item.itemName.includes(tempItemData["Brand"]) == true)
-
-      itemIdArray.push(tempItem["Item ID"]);
-      borrowQuantityArray.push(item.quantity);
-      console.log(tempItem["Item ID"], " ", item.quantity)
-    });
-
-    let result = await dbhandler.addTransactionRecord(currentAdminId, borrowRemarks.value.trim(), itemIdArray, borrowQuantityArray);
-
-    if (result.includes("ERROR")) {
-      showToast(result, true)
-    } else {
-      showToast('Transaction completed successfully!', false);
-      clearItemsTable();
-      const borrowRemarks = document.getElementById('borrowRemarks');
-      if (borrowRemarks) borrowRemarks.value = '';
-    }
-  });
-
-  cancelVerifyBtn?.addEventListener('click', () => {
-    hideModal('verifyAdminModal');
-    verifyAdminForm?.reset();
-  });
-
-  cancelBorrowBtn?.addEventListener('click', () => {
-    hideModal('borrowItemsModal');
-    selectedItems = [];
-    clearItemsTable();
-    document.getElementById('borrowRemarks').value = '';
-    const selectedItemsTable = document.getElementById('selectedItemsTable');
-    if (selectedItemsTable) selectedItemsTable.innerHTML = '';
-  });
-
-  cancelConfirmBtn?.addEventListener('click', () => hideModal('confirmationModal'));
-
   // Add event listeners for closing the transaction details modal
   const closeBtn = document.getElementById('closeDetailsBtn');
   const closeModalBtn = document.getElementById('closeDetailsModalBtn');
@@ -1182,55 +826,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (closeModalBtn) {
     closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
   }
+
+  hideLoading();
 });
 
-// Make functions available globally
-window.removeItem = removeItem;
-window.updateItemQuantity = updateItemQuantity;
-window.initializeItemsList = initializeItemsList;
-
-function showModal(modalId) {
-  console.log(modalId)
-  const modal = document.getElementById(modalId);
-  if (!modal) {
-    console.error(`Modal with ID ${modalId} not found`);
-    return;
-  }
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-}
-
-function hideModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (!modal) {
-    console.error(`Modal with ID ${modalId} not found`);
-    return;
-  }
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-}
-
-// Initialize the page when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize the page
-  initializePage();
-
-  // Add event listeners for closing the transaction details modal
-  const closeBtn = document.getElementById('closeDetailsBtn');
-  const closeModalBtn = document.getElementById('closeDetailsModalBtn');
-
-  if (closeBtn) {
-    closeBtn.onclick = () => hideModal('transactionDetailsModal');
-  }
-
-  if (closeModalBtn) {
-    closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
-  }
-});
-
-// This is after adding a new transaction
-
-// Add a new transaction and refresh the transaction history table
+// Updates Transaction history. (For the transaction table)
 window.addNewTransaction = function (newTransaction) {
   const transactions = mockTransactionHistory || [];
   transactions.push(newTransaction);
@@ -1239,6 +839,56 @@ window.addNewTransaction = function (newTransaction) {
     loadTransactionHistory();
   }
 };
+
+// ===============================================================================
+// Frontend Manipulating Methods
+
+// TODO: Dave there is an error regarding the tableLoadingState lines that are commented. 
+
+// Helper Functions
+function showLoading() {
+  const loadingSpinner = document.getElementById('loadingSpinner');
+  const tableLoadingState = document.getElementById('tableLoadingState');
+
+  if (loadingSpinner) {
+    loadingSpinner.style.display = 'flex';
+  }
+
+  if (tableLoadingState) {
+    tableLoadingState.style.display = 'block';
+  }
+}
+
+function hideLoading() {
+  const loadingSpinner = document.getElementById('loadingSpinner');
+  const tableLoadingState = document.getElementById('tableLoadingState');
+
+  if (loadingSpinner) {
+    loadingSpinner.style.display = 'none';
+  }
+
+  if (tableLoadingState) {
+    tableLoadingState.style.display = 'none';
+  }
+}
+
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toastNotification');
+  const toastMessage = document.getElementById('toastMessage');
+
+  if (!toast || !toastMessage) return;
+
+  toastMessage.textContent = message;
+  toast.classList.remove('hidden');
+  toast.classList.add('flex');
+
+  toast.style.backgroundColor = isError ? 'rgba(220, 38, 38, 0.95)' : 'rgba(44, 161, 74, 0.95)';
+
+  setTimeout(() => {
+    toast.classList.add('hidden');
+    toast.classList.remove('flex');
+  }, isError ? 4000 : 3000);
+}
 
 // Function to show notifications
 function showNotification(message, type) {
@@ -1263,47 +913,78 @@ function showNotification(message, type) {
   }, 3000);
 }
 
+function showModal(modalId) {
+  console.log(modalId)
+  const modal = document.getElementById(modalId);
+  if (!modal) {
+    console.error(`Modal with ID ${modalId} not found`);
+    return;
+  }
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function hideModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) {
+    console.error(`Modal with ID ${modalId} not found`);
+    return;
+  }
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
 // ================================================================
+// Helper Methods
+
+function formatDateTime(dateString) {
+  return new Date(dateString).toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function getStatusStyle(status) {
+  switch (status) {
+    case 'completed':
+    case 'Completed':
+      return 'bg-green-100 text-green-800';
+
+    case 'pending_return':
+    case 'Pending Return':
+      return 'bg-yellow-100 text-yellow-800';
+
+    case 'partially_returned':
+    case 'Partially Returned':
+      return 'bg-orange-100 text-orange-800';
+
+    case 'not_returnable':
+    case 'Not Returnable':
+      return 'bg-red-100 text-red-800';
+
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+}
+
+// =================================================================
 // Backend Methods
 
-async function initializeItemsList() {
-  try {
-    itemData = await dbhandler.getAllItemMasterListNameBrandRecords();
+async function initializeTransactionData(){
+  try{
+    transactionData = await dbhandler.getAllTransactionRecords();
 
-    if (itemData.length == 0) {
-      console.error("Item Master List table has no records.");
-      return;
-    }
+    if (!transactionData)
+      console.log("Transaction Data is null")
+    else if (transactionData.length == 0)
+      console.log('Transaction Data is empty')
+    else
+      console.log('Loaded transaction data successfully!')
 
-    const itemsList = document.getElementById('itemsList');
-    if (!itemsList) return;
-
-    // Clear existing options
-    itemsList.innerHTML = '';
-    console.log(itemsList);
-
-    // Commented for the mean time (Not fully implemented yet.)
-    itemData.forEach((item) => {
-      if (Number(item["Remaining Quantity"]) == 0)
-        return;
-
-      const option = document.createElement('option');
-      option.value = item["Name"] + " (" + item["Brand"] + ")";
-      option.textContent = `${item["Remaining Quantity"]} ${item["Unit Type"]} available`;
-      itemsList.appendChild(option);
-    })
-
-    // Add items from mock inventory
-    // mockInventory.forEach(item => {
-    //   const option = document.createElement('option');
-    //   option.value = item.item_name;
-    //   option.textContent = `${item.item_name} (${item.available_quantity} available)`;
-    //   itemsList.appendChild(option);
-    // });
-
-  } catch (generalError) {
-    console.error(generalError);
-  } finally {
-    hideLoading();
+  } catch (error){
+    console.log(error);
   }
 }
