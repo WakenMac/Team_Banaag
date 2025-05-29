@@ -5,6 +5,7 @@ import * as login from "./login.js";
 // Global Data
 var transactionData;
 var itemsTransactedData;
+var useMockData;
 
 // Mock data for testing
 const mockAdmins = [
@@ -207,8 +208,7 @@ async function loadTransactionHistory() {
     const startDate = document.getElementById('startDate')?.value;
     const endDate = document.getElementById('endDate')?.value;
 
-    var isMockData = false;
-    if (isMockData == true){
+    if (useMockData == true){
       filteredTransactions = mockTransactionHistory.filter(transaction => {
         const matchesSearch = 
           transaction.transaction_id.toLowerCase().includes(searchTerm) ||
@@ -249,7 +249,7 @@ async function loadTransactionHistory() {
         }
           return `
             <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" 
-                onclick="showTransactionDetails('${transaction.transaction_id}')"
+                name = "${transaction.transaction_id}"
                 data-transaction-id="${transaction.transaction_id}">
               <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
                 ${transaction.transaction_id || ''}
@@ -278,7 +278,6 @@ async function loadTransactionHistory() {
       // Use database history
       // Apply filters
       filteredTransactions = transactionData.filter(transaction => {
-        console.log(transaction);
         const matchesSearch = 
           String(transaction["Transaction ID"]).toLowerCase().includes(searchTerm) ||
           transaction["Admin Name"].toLowerCase().includes(searchTerm);
@@ -307,8 +306,6 @@ async function loadTransactionHistory() {
       }
 
       table.innerHTML = filteredTransactions.map(transaction => {
-        console.log(transaction["Status"], getStatusStyle(transaction["Status"]))
-
         // Truncate remarks if too long
         const maxRemarkLength = 40;
         let displayRemark = (!transaction["Remarks"] || transaction["Remarks"] == "")? '' : transaction["Remarks"];
@@ -319,7 +316,7 @@ async function loadTransactionHistory() {
         }
           return `
             <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" 
-                onclick="showTransactionDetails('${transaction["Transaction ID"]}')"
+                id = "${transaction["Transaction ID"]}" "
                 data-transaction-id="${transaction["Transaction ID"]}">
               <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
                 ${transaction["Transaction ID"] || ''}
@@ -344,6 +341,14 @@ async function loadTransactionHistory() {
       }).join('');
     }
     
+    // Adds the "click" event listener to prepare and view the transactionDetailsModal
+    transactionData.map(transaction => {
+      let row = document.getElementById(transaction["Transaction ID"]);
+      row.addEventListener('click', (e) => {
+        showTransactionDetails(row.children[0].textContent.trim())
+      })
+    })
+
     hideTableLoading();
   } catch (error) {
     console.error('Error loading transactions:', error);
@@ -461,93 +466,197 @@ function setupEventListeners() {
   }
 }
 
-// Make all necessary functions available globally
-window.showTransactionDetails = function (transactionId) {
-  const transaction = filteredTransactions.find(t => t.transaction_id === transactionId);
-  if (!transaction) return;
+// Previews the transaction history
+function showTransactionDetails (transactionId) {
+  if (useMockData == true){
+    const transaction = filteredTransactions.find(t => t.transaction_id === transactionId);
+    if (!transaction) return;
 
-  const modal = document.getElementById('transactionDetailsModal');
-  if (!modal) return;
+    const modal = document.getElementById('transactionDetailsModal');
+    if (!modal) return;
 
-  // Update modal content
-  document.getElementById('transactionIdDisplay').textContent = transaction.transaction_id;
-  document.getElementById('adminInfoDisplay').textContent = transaction.admin_name;
-  document.getElementById('dateTimeDisplay').textContent = formatDateTime(transaction.date);
-  document.getElementById('typeDisplay').textContent = transaction.type;
-  document.getElementById('statusDisplay').innerHTML = `
-    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(transaction.status)}">
-      ${transaction.status.replace('_', ' ')}
-    </span>
-  `;
+    // Update modal content
+    document.getElementById('transactionIdDisplay').textContent = transaction.transaction_id;
+    document.getElementById('adminInfoDisplay').textContent = transaction.admin_name;
+    document.getElementById('dateTimeDisplay').textContent = formatDateTime(transaction.date);
+    document.getElementById('typeDisplay').textContent = transaction.type;
+    document.getElementById('statusDisplay').innerHTML = `
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(transaction.status)}">
+        ${transaction.status.replace('_', ' ')}
+      </span>
+    `;
 
-  // Optimized: Show both main and return remarks in one section
-  let html = '';
-  html += transaction.remarks
-    ? `<div>${transaction.remarks}</div>`
-    : '<div class="italic text-gray-400">No remarks</div>';
-  const returnRemarks = transaction.items
-    .filter(item => item.return_remark && item.return_remark.trim() !== '')
-    .map(item => `<li><span class='font-semibold text-gray-800'>${item.name}:</span> <span class='text-gray-700'>${item.return_remark}</span></li>`)
-    .join('');
-  if (returnRemarks) {
-    html += `<div class='mt-2'><span class='font-semibold'>Return Remarks:</span><ul class='list-disc ml-6 mt-1'>${returnRemarks}</ul></div>`;
-  }
-  document.getElementById('remarksDisplay').innerHTML = html;
+    // Optimized: Show both main and return remarks in one section
+    let html = '';
+    html += transaction.remarks
+      ? `<div>${transaction.remarks}</div>`
+      : '<div class="italic text-gray-400">No remarks</div>';
+    const returnRemarks = transaction.items
+      .filter(item => item.return_remark && item.return_remark.trim() !== '')
+      .map(item => `<li><span class='font-semibold text-gray-800'>${item.name}:</span> <span class='text-gray-700'>${item.return_remark}</span></li>`)
+      .join('');
+    if (returnRemarks) {
+      html += `<div class='mt-2'><span class='font-semibold'>Return Remarks:</span><ul class='list-disc ml-6 mt-1'>${returnRemarks}</ul></div>`;
+    }
+    document.getElementById('remarksDisplay').innerHTML = html;
 
-  // Populate items table with correct columns
-  const itemsTable = document.getElementById('transactionItemsTable');
-  if (itemsTable) {
-    itemsTable.innerHTML = transaction.items.map(item => {
-      const isReturned = (item.returned_quantity || 0) >= item.quantity;
-      const remainingQuantity = item.quantity - (item.returned_quantity || 0);
-      const returnedQuantity = item.returned_quantity || 0;
-      return `
-        <tr>
-          <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">${item.name}</td>
-          <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
-            ${!item.is_consumable ? `${returnedQuantity}/${item.quantity} (${remainingQuantity} remaining)` : item.quantity}
-          </td>
-          <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
-            ${item.is_consumable ? 'Consumable' : 'Non-consumable'}
-          </td>
-          <td class="px-6 py-4 align-middle whitespace-nowrap text-sm break-words">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(item.is_consumable ? 'not_returnable' : (isReturned ? 'completed' : 'pending_return'))}">
-              ${item.is_consumable ? 'Not Returnable' : (isReturned ? 'Returned' : 'Pending Return')}
-            </span>
-          </td>
-          <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
-            ${item.is_consumable ? 'No' : 'Yes'}
-          </td>
-          <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-center break-words">
-            ${!item.is_consumable && !isReturned ? `
-              <div class="flex flex-col items-center space-y-2">
-                <div class="flex items-center space-x-2">
-                  <input type="number" 
-                    class="return-quantity w-20 rounded-md border border-gray-300 px-2 py-1"
-                    min="1"
-                    max="${remainingQuantity}"
-                    value="${remainingQuantity}"
-                    data-item="${item.name}">
-                  <button onclick="window.processReturn('${transaction.transaction_id}', '${item.name}')"
-                    class="px-3 py-1 rounded-md bg-[#2dc653] text-white text-xs font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
-                    Return
-                  </button>
+    // Populate items table with correct columns
+    const itemsTable = document.getElementById('transactionItemsTable');
+    if (itemsTable) {
+      itemsTable.innerHTML = transaction.items.map(item => {
+        const isReturned = (item.returned_quantity || 0) >= item.quantity;
+        const remainingQuantity = item.quantity - (item.returned_quantity || 0);
+        const returnedQuantity = item.returned_quantity || 0;
+        return `
+          <tr data-name-tr="${item.name}" data-name-id="${transaction.transaction_id}">
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">${item.name}</td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
+              ${!item.is_consumable ? `${returnedQuantity}/${item.quantity} (${remainingQuantity} remaining)` : item.quantity}
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
+              ${item.is_consumable ? 'Consumable' : 'Non-consumable'}
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm break-words">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(item.is_consumable ? 'not_returnable' : (isReturned ? 'completed' : 'pending_return'))}">
+                ${item.is_consumable ? 'Not Returnable' : (isReturned ? 'Returned' : 'Pending Return')}
+              </span>
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
+              ${item.is_consumable ? 'No' : 'Yes'}
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-center break-words">
+              ${!item.is_consumable && !isReturned ? `
+                <div class="flex flex-col items-center space-y-2">
+                  <div class="flex items-center space-x-2">
+                    <input type="number" 
+                      class="return-quantity w-20 rounded-md border border-gray-300 px-2 py-1"
+                      min="0"
+                      max="${remainingQuantity}"
+                      value="0"
+                      data-item="${item.name}">
+                    <button data-item-button="${item["Item Name"]}"
+                      class="px-3 py-1 rounded-md bg-[#2dc653] text-white text-xs font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
+                      Return
+                    </button>
+                  </div>
+                  <textarea id='remark-${item.name}' class="return-remark w-full rounded-md border border-gray-300 px-2 py-1 text-xs" placeholder="Describe the condition, issues, or notes (optional)" data-item-remark="${item.name}"></textarea>
                 </div>
-                <textarea id='remark-${item.name}' class="return-remark w-full rounded-md border border-gray-300 px-2 py-1 text-xs" placeholder="Describe the condition, issues, or notes (optional)" data-item-remark="${item.name}"></textarea>
-              </div>
-            ` : ''}
-          </td>
-        </tr>
+              ` : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+  } else {
+    const transaction = filteredTransactions.find(t => Number(t["Transaction ID"]) === Number(transactionId));
+    
+    if (!transaction) return;
+    
+    const modal = document.getElementById('transactionDetailsModal');
+    if (!modal) return;
+    
+    const itemsTransacted = itemsTransactedData.filter(item => Number(item["Transaction ID"]) == Number(transactionId))
+
+    // Update modal content
+    document.getElementById('transactionIdDisplay').textContent = transaction["Transaction ID"];
+    document.getElementById('adminInfoDisplay').textContent = transaction["Admin Name"];
+    document.getElementById('dateTimeDisplay').textContent = formatDateTime(transaction["Transaction Date"]);
+    document.getElementById('statusDisplay').innerHTML = `
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(transaction["Status"])}">
+        ${transaction["Status"].replace('_', ' ')}
+        </span>
+    `;
+
+    // Optimized: Show both main and return remarks in one section
+    let html = '';
+    html += (!transaction["Remarks"] || transaction["Remarks"] === '') // Check if remarks is not empty
+        ? '<div class="italic text-gray-400">No remarks</div>'
+        : `<div>${transaction["Remarks"]}</div>`;
+    
+    let returnRemarks = itemsTransacted
+    .filter(item => item["Remarks"] != null && item["Remarks"] != '')
+    .map(item => `<li><span class='font-semibold text-gray-800'>${item["Item Name"]}:</span> <span class='text-gray-700'>${item["Remarks"]}</span></li>`)
+    .join('');
+
+    if (returnRemarks) 
+        html += `<div class='mt-2'><span class='font-semibold'>Return Remarks:</span><ul class='list-disc ml-6 mt-1'>${returnRemarks}</ul></div>`;
+    document.getElementById('remarksDisplay').innerHTML = html;
+
+    // Populate items table with correct columns
+    const itemsTable = document.getElementById('transactionItemsTable');
+    if (itemsTable) {
+      itemsTable.innerHTML = itemsTransacted.map(item => {
+      const returnedQuantity = (item["Initial Borrowed Quantity"] - item["Current Borrowed Quantity"]) || 0;
+      const remainingQuantity = item["Current Borrowed Quantity"] || 0;
+      const isConsumable = (!item["Item Type"] && item['Item Type'] !== 'Chemicals' && item["Item Type"] !== 'Consumable Items')? false : true
+      return `
+          <tr data-name-tr="${item["Item Name"]}" data-name-id="${transaction["Transaction ID"]}" ">
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">${item["Item Name"]}</td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
+                ${isConsumable ? `${returnedQuantity}/${item["Initial Borrowed Quantity"]} (${remainingQuantity} remaining)` : item["Initial Borrowed Quantity"]}
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
+                ${isConsumable ? 'Consumable' : 'Non-consumable'}
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm break-words">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(item["Status"])}">
+                ${item["Status"]}
+                </span>
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
+                ${isConsumable ? 'Yes' : 'No'}
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-center break-words">
+                ${(item["Status"] !== 'Non Returnable' && item["Status"] !== 'Completed') ? `
+                <div class="flex flex-col items-center space-y-2">
+                  <div class="flex items-center space-x-2">
+                    <input type="number" 
+                        class="return-quantity w-20 rounded-md border border-gray-300 px-2 py-1"
+                        min="0"
+                        max="${remainingQuantity}"
+                        value="0"
+                        data-item="${item["Item Name"]}">
+                    <button data-item-button="${item["Item Name"]}"
+                        class="px-3 py-1 rounded-md bg-[#2dc653] text-white text-xs font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
+                        Return
+                    </button>
+                  </div>
+                  <textarea id='remark-${item["Item Name"]}' class="return-remark w-full rounded-md border border-gray-300 px-2 py-1 text-xs" placeholder="Describe the condition, issues, or notes (optional)" data-item-remark="${item["Item Name"]}"></textarea>
+                </div>
+                ` : ''}
+            </td>
+          </tr>
       `;
-    }).join('');
+      }).join('');
+    }
   }
+
+  document.querySelectorAll(`tr[data-name-tr]`)
+  .forEach(row => {
+    let itemName = row.getAttribute('data-name-tr')
+    let transactionId = row.getAttribute('data-name-id')
+    let button = row.querySelector(`button[data-item-button="${itemName}"]`)
+    if (!button) return;
+
+    button.addEventListener("click", async (e) => {
+      e.preventDefault();
+      await processReturn(transactionId, itemName)
+    });
+  })
+
 
   // Show the modal
   showModal('transactionDetailsModal');
 };
 
 // TODO: What does this do?
-window.processReturn = async function (transactionId, itemName) {
+// RETURNS an item
+async function processReturn (transactionId, itemName) {
+  console.log("I work :>");
+  console.log(transactionId, itemName);
+  return;
+
+  // Temporarily used dead code before we connect it to the database
   const quantityInput = document.querySelector(`input[data-item="${itemName}"]`);
   if (!quantityInput) return;
   const remarkInput = document.querySelector(`textarea[data-item-remark="${itemName}"]`);
@@ -590,8 +699,7 @@ window.processReturn = async function (transactionId, itemName) {
   }
 };
 
-// For the dashbaord
-// Return functionality
+// This is called after returning an item.
 async function loadBorrowedItems() {
   const borrowedItemsTable = document.getElementById('borrowedItemsTable');
 
@@ -773,8 +881,10 @@ function closeReturnModal() {
 document.addEventListener('DOMContentLoaded', async () => {
   // Initialize the page when the DOM is loaded
   showLoading();
+  useMockData = false;
   setupEventListeners();
   await initializeTransactionData();
+  await initializeItemsTransacted();
   await loadTransactionHistory(); // For returning
 
   // Get all modal elements (Transactions)
@@ -962,7 +1072,7 @@ function getStatusStyle(status) {
       return 'bg-orange-100 text-orange-800';
 
     case 'not_returnable':
-    case 'Not Returnable':
+    case 'Non Returnable':
       return 'bg-red-100 text-red-800';
 
     default:
@@ -983,6 +1093,22 @@ async function initializeTransactionData(){
       console.log('Transaction Data is empty')
     else
       console.log('Loaded transaction data successfully!')
+
+  } catch (error){
+    console.log(error);
+  }
+}
+
+async function initializeItemsTransacted(){
+  try{
+    itemsTransactedData = await dbhandler.getAllItemsTransactedRecords();
+
+    if (!itemsTransactedData)
+      console.log("Items Transacted Data is null")
+    else if (itemsTransactedData.length == 0)
+      console.log('Items Transacted Data is empty')
+    else
+      console.log('Loaded Items Transacted data successfully!')
 
   } catch (error){
     console.log(error);

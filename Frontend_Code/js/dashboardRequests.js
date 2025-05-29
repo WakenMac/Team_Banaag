@@ -10,60 +10,61 @@ let selectedItems = [];
 
 // Loads the entire document
 document.addEventListener('DOMContentLoaded', () => {
-    initializeNewRequest();
-    login.initializePasswordToggle();
+  showLoading();
+  initializeNewRequest();
+  login.initializePasswordToggle();
 
-    // Get all modal elements (Transactions)
-    const returnItemsModal = document.getElementById('returnItemsModal');
+  // Get all modal elements (Transactions)
+  const returnItemsModal = document.getElementById('returnItemsModal');
 
-    // Transaction history
-    const returnBtn = document.getElementById('returnBtn');
-    const cancelReturnBtn = document.getElementById('cancelReturnBtn');
-    const confirmReturnBtn = document.getElementById('confirmReturnBtn');
-    const selectAllItems = document.getElementById('selectAllItems');
-    const returnSearchInput = document.getElementById('returnSearchInput');
+  // Transaction history
+  const returnBtn = document.getElementById('returnBtn');
+  const cancelReturnBtn = document.getElementById('cancelReturnBtn');
+  const confirmReturnBtn = document.getElementById('confirmReturnBtn');
+  const selectAllItems = document.getElementById('selectAllItems');
+  const returnSearchInput = document.getElementById('returnSearchInput');
 
-    returnBtn?.addEventListener('click', () => {
-        hideModal('transactionTypeModal');
-        loadBorrowedItems();
-        showModal('returnItemsModal');
-    });
+  returnBtn?.addEventListener('click', () => {
+      hideModal('transactionTypeModal');
+      loadBorrowedItems();
+      showModal('returnItemsModal');
+  });
 
-    // Return functionality event listeners
-    cancelReturnBtn?.addEventListener('click', () => hideModal('returnItemsModal'));
-    confirmReturnBtn?.addEventListener('click', handleReturnItems);
+  // Return functionality event listeners
+  cancelReturnBtn?.addEventListener('click', () => hideModal('returnItemsModal'));
+  confirmReturnBtn?.addEventListener('click', handleReturnItems);
 
-    returnItemsModal?.addEventListener('click', (e) => {
-        if (e.target === returnItemsModal) hideModal('returnItemsModal');
-    });
+  returnItemsModal?.addEventListener('click', (e) => {
+      if (e.target === returnItemsModal) hideModal('returnItemsModal');
+  });
 
-    selectAllItems?.addEventListener('change', (e) => {
-        const checkboxes = document.querySelectorAll('.return-item-checkbox');
-        checkboxes.forEach(checkbox => checkbox.checked = e.target.checked);
-    });
+  selectAllItems?.addEventListener('change', (e) => {
+      const checkboxes = document.querySelectorAll('.return-item-checkbox');
+      checkboxes.forEach(checkbox => checkbox.checked = e.target.checked);
+  });
 
-    returnSearchInput?.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('#borrowedItemsTable tr:not(.loading-row)');
-        rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
-        });
-    });
+  returnSearchInput?.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const rows = document.querySelectorAll('#borrowedItemsTable tr:not(.loading-row)');
+      rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(searchTerm) ? '' : 'none';
+      });
+  });
 
-    // Add event listeners for closing the transaction details modal
-    const closeBtn = document.getElementById('closeDetailsBtn');
-    const closeModalBtn = document.getElementById('closeDetailsModalBtn');
+  // Add event listeners for closing the transaction details modal
+  const closeBtn = document.getElementById('closeDetailsBtn');
+  const closeModalBtn = document.getElementById('closeDetailsModalBtn');
 
-    if (closeBtn) {
-        closeBtn.onclick = () => hideModal('transactionDetailsModal');
-    }
+  if (closeBtn) {
+      closeBtn.onclick = () => hideModal('transactionDetailsModal');
+  }
 
-    if (closeModalBtn) {
-        closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
-    }
+  if (closeModalBtn) {
+      closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
+  }
 
-    hideLoading();
+  hideLoading();
 });
 
 //================================================================
