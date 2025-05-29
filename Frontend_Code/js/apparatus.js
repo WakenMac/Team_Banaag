@@ -14,6 +14,8 @@
 // ----------------------------------------------------------
 
 import * as dbhandler from "../../Backend_Code/mainHandler.js";
+import { generateInventoryPdfReport } from '/Frontend_Code/js/pdfReport.js';
+import '/Frontend_Code/js/font/Old London-normal.js';
 
 // ===================== Initialize Components =====================
 
@@ -24,6 +26,7 @@ const editApparatusLocation = document.getElementById("editApparatusLocation");
 const editApparatusUnit = document.getElementById("editApparatusUnit");
 
 const tbody = document.querySelector("tbody");
+let apparatusData = [];
 await initialize();
 
 async function initialize() {
@@ -361,35 +364,6 @@ tbody.addEventListener("click", (e) => {
   }
 });
 
-// --- Toast Notification --- The notification that appears when an apparatus is updated.
-//Hello u can adjust the toast notification style by changing and naa sa baba hihi added some comments for you - Dave
-// function showToast(message) {
-//   let toast = document.getElementById("custom-toast");
-//   if (!toast) {
-//     toast = document.createElement("div"); // Creates a new div element
-//     toast.id = "custom-toast"; // div id
-//     toast.style.position = "fixed"; // div position (fixed means it will stay in the same place even if the page is scrolled)
-//     toast.style.bottom = "32px"; // div position from the bottom (32px from the bottom of the page)
-//     toast.style.right = "32px"; // div position from the right (32px from the right of the page)
-//     toast.style.background = "rgba(44, 161, 74, 0.95)"; // div background color
-//     toast.style.color = "white"; // text color
-//     toast.style.padding = "16px 28px"; // div padding (16px from the top & bottom, 28px from the left & right)
-//     toast.style.borderRadius = "8px"; // div border radius (rounded corners, pag gusto mo mas round make it higher)
-//     toast.style.fontSize = "16px"; // div font size
-//     toast.style.fontWeight = "regular"; // div font weight
-//     toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)"; // div box shadow
-//     toast.style.opacity = "0"; // div opacity
-//     toast.style.transition = "opacity 0.4s"; // div transition
-//     toast.style.zIndex = "9999"; // div z index
-//     document.body.appendChild(toast); // add the div to the body (body means the entire page)
-//   }
-//   toast.textContent = message; // set the text content of the div to the message
-//   toast.style.opacity = "1"; // set the opacity of the div to 1
-//   setTimeout(() => {
-//     toast.style.opacity = "0"; // set the opacity of the div to 0 after 1800ms
-//   }, 1800);
-// }
-
 // ===================== Remarks Modal Functionality Logic =====================
 
 const remarksModal = document.getElementById("remarksModal");
@@ -642,12 +616,8 @@ searchInput.addEventListener("input", searchApparatus);
 async function prepareLabApparatusTable() {
   try {
     let data = await dbhandler.getAllLabApparatusRecords();
-
-    if (data.length == 0) {
-      console.error("Lab Apparatus table has no records.");
-      return;
-    }
-
+    apparatusData = data;
+    if (data.length == 0) return;
     for (let i = 0; i < data.length; i++) {
       await createNewLabApparatusRow(
         data[i]["Item ID"],
@@ -657,12 +627,9 @@ async function prepareLabApparatusTable() {
         data[i]["Brand"],
         data[i]["Quantity"]
       );
-
       await createNewRemarks(data[i]["Remarks"], data[i]["Item ID"]);
     }
-  } catch (generalError) {
-    console.error(generalError);
-  }
+  } catch (e) { console.error(e); }
 }
 
 /**
@@ -708,3 +675,92 @@ async function prepareLocationDropdown() {
     console.error(generalError);
   }
 }
+
+// ===================== PDF REPORT GENERATION =====================
+
+const dateModal = document.getElementById('dateInputModal');
+const dateForm = document.getElementById('dateInputForm');
+const dateFields = document.getElementById('dateFields');
+const addDateBtn = document.getElementById('addDateField');
+const removeDateBtn = document.getElementById('removeDateField');
+const cancelDateBtn = document.getElementById('cancelDateInput');
+
+// Always open the modal when Download PDF is clicked
+if (downloadPdfBtn) {
+  downloadPdfBtn.addEventListener('click', () => {
+    dateModal.classList.remove('hidden');
+    dateModal.classList.add('flex');
+  });
+}
+// Add date field
+addDateBtn.addEventListener('click', () => {
+  const idx = dateFields.children.length;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'flex items-center gap-2';
+  const label = document.createElement('label');
+  label.className = 'block text-gray-700 font-medium';
+  label.textContent = `Date ${idx + 1}:`;
+  label.setAttribute('for', `dateField${idx}`);
+  const input = document.createElement('input');
+  input.type = 'date';
+  input.id = `dateField${idx}`;
+  input.className = 'date-input flex-1 border rounded px-3 py-2';
+  input.required = true;
+  wrapper.appendChild(label);
+  wrapper.appendChild(input);
+  dateFields.appendChild(wrapper);
+});
+// Remove date field
+removeDateBtn.addEventListener('click', () => {
+  if (dateFields.children.length > 1) {
+    dateFields.removeChild(dateFields.lastElementChild);
+  }
+});
+// Cancel modal
+cancelDateBtn.addEventListener('click', () => {
+  dateModal.classList.add('hidden');
+  dateModal.classList.remove('flex');
+});
+// Format date as 'Month DD, YYYY'
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: '2-digit' });
+}
+// Handle form submit
+dateForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const dates = Array.from(dateFields.querySelectorAll('input')).map(input => formatDate(input.value)).filter(Boolean);
+  dateModal.classList.add('hidden');
+  dateModal.classList.remove('flex');
+  // Build rows for PDF from apparatusData
+  const pdfRows = apparatusData.map(item => {
+    const base = [
+      item["Item ID"],
+      item["Name"],
+      // item["Unit"],
+      item["Location"],
+      item["Brand"],
+      // item["Quantity"],
+      item["Remarks"] || ''
+    ];
+    if (dates && dates.length > 0) {
+      dates.forEach(() => base.push(item["Quantity"]));
+    }
+    return base;
+  });
+  await generateInventoryPdfReport({
+    title: 'LABORATORY APPARATUS',
+    columns: [
+      { header: 'ITEM ID', dataKey: 'id' },
+      { header: 'NAME', dataKey: 'name' },
+      // { header: 'UNIT', dataKey: 'unit' },
+      { header: 'LOCATION', dataKey: 'location' },
+      { header: 'BRAND', dataKey: 'brand' },
+      // { header: 'QUANTITY', dataKey: 'qty' }
+    ],
+    filename: 'apparatus_inventory_report.pdf',
+    dateColumns: dates,
+    data: pdfRows
+  });
+});
