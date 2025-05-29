@@ -282,7 +282,7 @@ async function loadTransactionHistory() {
           String(transaction["Transaction ID"]).toLowerCase().includes(searchTerm) ||
           transaction["Admin Name"].toLowerCase().includes(searchTerm);
 
-        const matchesStatus = status === 'all' || transaction["Status"] === status;
+        const matchesStatus = status === 'all' || transaction["Status"]?.toLowerCase() === status;
 
         const transactionDate = new Date(transaction["Transaction Date"]);
         const matchesDateRange = (!startDate || transactionDate >= new Date(startDate)) &&
@@ -306,6 +306,7 @@ async function loadTransactionHistory() {
       }
 
       table.innerHTML = filteredTransactions.map(transaction => {
+        console.log(transaction);
         // Truncate remarks if too long
         const maxRemarkLength = 40;
         let displayRemark = (!transaction["Remarks"] || transaction["Remarks"] == "")? '' : transaction["Remarks"];
@@ -342,8 +343,9 @@ async function loadTransactionHistory() {
     }
     
     // Adds the "click" event listener to prepare and view the transactionDetailsModal
-    transactionData.map(transaction => {
+    filteredTransactions.map(transaction => {
       let row = document.getElementById(transaction["Transaction ID"]);
+      if(!row) return;
       row.addEventListener('click', (e) => {
         showTransactionDetails(row.children[0].textContent.trim())
       })
@@ -1061,6 +1063,8 @@ function getStatusStyle(status) {
   switch (status) {
     case 'completed':
     case 'Completed':
+    case 'not_returnable':
+    case 'Non Returnable':
       return 'bg-green-100 text-green-800';
 
     case 'pending_return':
@@ -1071,9 +1075,9 @@ function getStatusStyle(status) {
     case 'Partially Returned':
       return 'bg-orange-100 text-orange-800';
 
-    case 'not_returnable':
-    case 'Non Returnable':
-      return 'bg-red-100 text-red-800';
+    // case 'not_returnable':
+    // case 'Non Returnable':
+    //   return 'bg-red-100 text-red-800';
 
     default:
       return 'bg-gray-100 text-gray-800';

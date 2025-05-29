@@ -347,7 +347,7 @@ async function initializeNewRequest(){
     const password = document.getElementById('password').value;
 
     const isVerified = await verifyAdmin(adminId, password);
-    if (isVerified == false) {
+    if (isVerified == true) {
       hideModal('verifyAdminModal');
       showModal('borrowItemsModal');
       await initializeItemsList();
