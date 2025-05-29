@@ -362,13 +362,22 @@
             class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
             placeholder="Enter your admin ID" />
         </div>
-        <div>
+        <div class="relative">
           <label class="block mb-1 text-sm font-medium text-gray-700" for="verifyAdminPassword">
             Password <span class="text-red-500">*</span>
           </label>
-          <input type="password" id="verifyAdminPassword" name="verifyAdminPassword" required
-            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
+          <input type="password" id="password" name="verifyAdminPassword" required
+            class="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
             placeholder="Enter your password" />
+          <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
+            <svg class="w-5 h-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </button>
         </div>
         <div class="flex justify-end pt-4 space-x-3">
           <button type="button" id="cancelVerifyBtn"
@@ -695,7 +704,7 @@
 
   <!-- Script to access the dashboard -->
   <script type="module" src="/Frontend_Code/js/script.js"></script>
-  <script type="module" src="/Frontend_Code/js/transaction.js"></script>
+  <script type="module" src="/Frontend_Code/js/dashboardRequests.js"></script>
   <script type="module" src="/Frontend_Code/js/statistics.js"></script>
 </body>
 

@@ -1,5 +1,7 @@
 // This is a temporary javascript file to prepare methods to be pasted in the mainHandler.js
 
+import * as dbhandler from './mainHandler.js';
+
 // Prepares the connection to the database:
 import { createClient } from '@supabase/supabase-js';
 const url = "https://tkuqbdxvokhgfoipyoyr.supabase.co";
@@ -9,8 +11,6 @@ const supabaseClient = createClient(url, key);
 
 // ======================================================================================================================================
 // Methods for Transactions
-
-
 
 // To be implemented.
 /**

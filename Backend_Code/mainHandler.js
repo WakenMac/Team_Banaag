@@ -116,7 +116,7 @@ export async function addAdminRecord(adminId, fName, mName, lName, adminPassword
 
         if (typeof sAdminId !== 'string' || typeof sFName !== 'string' || typeof sMName !== 'string' ||
             typeof sLName !== 'string' || typeof sAdminPassword !== 'string')
-            throw new Error(`ERROR: addAdminRecord's parameters must be strings.`);
+            throw `ERROR: addAdminRecord's parameters must be strings.`;
 
         const {data, error: supabaseError} = await supabaseClient.rpc('add_admin_record', {
             input_admin_id: adminId, 
@@ -130,7 +130,6 @@ export async function addAdminRecord(adminId, fName, mName, lName, adminPassword
             console.error(`Supabase Error:`, supabaseError.message);
             return null;
         }   else {
-            console.log("Added admin auccessfully")
             return data;
         }
         
@@ -368,15 +367,14 @@ export async function adminExists(adminId, adminPassword){
         })
         
         if (supabaseError){
-            console.error(`Supabase Error:`, error.message);
-            return null;
+            console.error(`Supabase Error:`, supabaseError.message);
+            return false;
         }   else {
-            return data;
+            return true;
         }
         
     } catch (generalError) {
         console.error("General error", generalError)
-        return null;
     }
 }
 
@@ -2852,11 +2850,11 @@ export async function prepareUser(){
 }
 
 //=======================================================================================================================================
-// Methods for Transactions
+// Methods for Transactions and Items Transacted
 
 /**
  * Method to get all of the records on the Transactions table
- * @returns A record consisting of 4 columns (Transaction ID, Admin Name, Transaction Date, Status)
+ * @returns A record consisting of 5 columns (Transaction ID, Admin Name, Transaction Date, Status, Remarks)
  */
 export async function getAllTransactionRecords(){
     try{
@@ -2900,6 +2898,28 @@ export async function addTransactionRecord(
         }
         
         console.log(data);
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * @description Method to get all of the records on the Transactions table
+ * @returns A record consisting of 10 columns: (Transaction ID, Item ID, Item Name, Initial Borrow Quantity, Current Borrow Quantity, Unit Type, Item Type, Status, Returnable, Remarks)
+ */
+export async function getAllItemsTransactedRecords(){
+    try{
+        await prepareUser();
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_all_items_transacted_records');
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
         return data;
         
     } catch (generalError) {

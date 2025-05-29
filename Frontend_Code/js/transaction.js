@@ -1,10 +1,11 @@
 // Import the database handler
 import * as dbhandler from "../../Backend_Code/mainHandler.js";
+import * as login from "./login.js";
 
-// Global data
-var itemData;
+// Global Data
 var transactionData;
 var itemsTransactedData;
+var useMockData;
 
 // Mock data for testing
 const mockAdmins = [
@@ -159,9 +160,6 @@ const mockBorrowedItems = [
   }
 ];
 
-// Global state
-let currentAdminId = null; // Use localStorage later.
-let selectedItems = [];
 let filteredTransactions = [];
 
 // Mock admin credentials for testing
@@ -196,102 +194,7 @@ const mockChartData = {
   }
 };
 
-// Initialize the page
-async function initializePage() {
-  try {
-    showLoading();
-    setupEventListeners();
-    // await initializeTransactionData(); // For loading all transactions
-    await loadTransactionHistory(); // For returning
-    hideLoading();
-  } catch (error) {
-    console.error('Error initializing page:', error);
-    hideLoading();
-    showToast('Error loading page. Please refresh.', true);
-  }
-}
-
-// TODO: Dave there is an error regarding the tableLoadingState lines that are commented. 
-
-// Helper Functions
-function showLoading() {
-  const loadingSpinner = document.getElementById('loadingSpinner');
-  const tableLoadingState = document.getElementById('tableLoadingState');
-
-  if (loadingSpinner) {
-    loadingSpinner.style.display = 'flex';
-  }
-
-  if (tableLoadingState) {
-    tableLoadingState.style.display = 'block';
-  }
-}
-
-function hideLoading() {
-  const loadingSpinner = document.getElementById('loadingSpinner');
-  const tableLoadingState = document.getElementById('tableLoadingState');
-
-  if (loadingSpinner) {
-    loadingSpinner.style.display = 'none';
-  }
-
-  if (tableLoadingState) {
-    tableLoadingState.style.display = 'none';
-  }
-}
-
-function showToast(message, isError = false) {
-  const toast = document.getElementById('toastNotification');
-  const toastMessage = document.getElementById('toastMessage');
-
-  if (!toast || !toastMessage) return;
-
-  toastMessage.textContent = message;
-  toast.classList.remove('hidden');
-  toast.classList.add('flex');
-
-  toast.style.backgroundColor = isError ? 'rgba(220, 38, 38, 0.95)' : 'rgba(44, 161, 74, 0.95)';
-
-  setTimeout(() => {
-    toast.classList.add('hidden');
-    toast.classList.remove('flex');
-  }, isError ? 4000 : 3000);
-}
-
-function getStatusStyle(status) {
-  switch (status) {
-    case 'completed':
-    case 'Completed':
-      return 'bg-green-100 text-green-800';
-
-    case 'pending_return':
-    case 'Pending Return':
-      return 'bg-yellow-100 text-yellow-800';
-
-    case 'partially_returned':
-    case 'Partially Returned':
-      return 'bg-orange-100 text-orange-800';
-
-    case 'not_returnable':
-    case 'Not Returnable':
-      return 'bg-red-100 text-red-800';
-
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
-}
-
-function formatDateTime(dateString) {
-  return new Date(dateString).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
-
-// Transaction History Functions
+// Loads the transaction history
 async function loadTransactionHistory() {
   const table = document.getElementById('transactionHistoryTable');
   if (!table) return;
@@ -305,8 +208,7 @@ async function loadTransactionHistory() {
     const startDate = document.getElementById('startDate')?.value;
     const endDate = document.getElementById('endDate')?.value;
 
-    var isMockData = true;
-    if (isMockData == true){
+    if (useMockData == true){
       filteredTransactions = mockTransactionHistory.filter(transaction => {
         const matchesSearch = 
           transaction.transaction_id.toLowerCase().includes(searchTerm) ||
@@ -347,7 +249,7 @@ async function loadTransactionHistory() {
         }
           return `
             <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" 
-                onclick="showTransactionDetails('${transaction.transaction_id}')"
+                name = "${transaction.transaction_id}"
                 data-transaction-id="${transaction.transaction_id}">
               <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
                 ${transaction.transaction_id || ''}
@@ -373,15 +275,14 @@ async function loadTransactionHistory() {
 
     } else {
 
-      // Use in-memory mockTransactionHistory
+      // Use database history
       // Apply filters
       filteredTransactions = transactionData.filter(transaction => {
-        console.log(transaction);
         const matchesSearch = 
           String(transaction["Transaction ID"]).toLowerCase().includes(searchTerm) ||
           transaction["Admin Name"].toLowerCase().includes(searchTerm);
 
-        const matchesStatus = status === 'all' || transaction["Status"] === status;
+        const matchesStatus = status === 'all' || transaction["Status"]?.toLowerCase() === status;
 
         const transactionDate = new Date(transaction["Transaction Date"]);
         const matchesDateRange = (!startDate || transactionDate >= new Date(startDate)) &&
@@ -405,8 +306,7 @@ async function loadTransactionHistory() {
       }
 
       table.innerHTML = filteredTransactions.map(transaction => {
-        console.log(transaction["Status"], getStatusStyle(transaction["Status"]))
-
+        console.log(transaction);
         // Truncate remarks if too long
         const maxRemarkLength = 40;
         let displayRemark = (!transaction["Remarks"] || transaction["Remarks"] == "")? '' : transaction["Remarks"];
@@ -417,7 +317,7 @@ async function loadTransactionHistory() {
         }
           return `
             <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" 
-                onclick="showTransactionDetails('${transaction["Transaction ID"]}')"
+                id = "${transaction["Transaction ID"]}" "
                 data-transaction-id="${transaction["Transaction ID"]}">
               <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
                 ${transaction["Transaction ID"] || ''}
@@ -442,6 +342,15 @@ async function loadTransactionHistory() {
       }).join('');
     }
     
+    // Adds the "click" event listener to prepare and view the transactionDetailsModal
+    filteredTransactions.map(transaction => {
+      let row = document.getElementById(transaction["Transaction ID"]);
+      if(!row) return;
+      row.addEventListener('click', (e) => {
+        showTransactionDetails(row.children[0].textContent.trim())
+      })
+    })
+
     hideTableLoading();
   } catch (error) {
     console.error('Error loading transactions:', error);
@@ -559,93 +468,197 @@ function setupEventListeners() {
   }
 }
 
-// Make all necessary functions available globally
-window.showTransactionDetails = function (transactionId) {
-  const transaction = filteredTransactions.find(t => t.transaction_id === transactionId);
-  if (!transaction) return;
+// Previews the transaction history
+function showTransactionDetails (transactionId) {
+  if (useMockData == true){
+    const transaction = filteredTransactions.find(t => t.transaction_id === transactionId);
+    if (!transaction) return;
 
-  const modal = document.getElementById('transactionDetailsModal');
-  if (!modal) return;
+    const modal = document.getElementById('transactionDetailsModal');
+    if (!modal) return;
 
-  // Update modal content
-  document.getElementById('transactionIdDisplay').textContent = transaction.transaction_id;
-  document.getElementById('adminInfoDisplay').textContent = transaction.admin_name;
-  document.getElementById('dateTimeDisplay').textContent = formatDateTime(transaction.date);
-  document.getElementById('typeDisplay').textContent = transaction.type;
-  document.getElementById('statusDisplay').innerHTML = `
-    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(transaction.status)}">
-      ${transaction.status.replace('_', ' ')}
-    </span>
-  `;
+    // Update modal content
+    document.getElementById('transactionIdDisplay').textContent = transaction.transaction_id;
+    document.getElementById('adminInfoDisplay').textContent = transaction.admin_name;
+    document.getElementById('dateTimeDisplay').textContent = formatDateTime(transaction.date);
+    document.getElementById('typeDisplay').textContent = transaction.type;
+    document.getElementById('statusDisplay').innerHTML = `
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(transaction.status)}">
+        ${transaction.status.replace('_', ' ')}
+      </span>
+    `;
 
-  // Optimized: Show both main and return remarks in one section
-  let html = '';
-  html += transaction.remarks
-    ? `<div>${transaction.remarks}</div>`
-    : '<div class="italic text-gray-400">No remarks</div>';
-  const returnRemarks = transaction.items
-    .filter(item => item.return_remark && item.return_remark.trim() !== '')
-    .map(item => `<li><span class='font-semibold text-gray-800'>${item.name}:</span> <span class='text-gray-700'>${item.return_remark}</span></li>`)
-    .join('');
-  if (returnRemarks) {
-    html += `<div class='mt-2'><span class='font-semibold'>Return Remarks:</span><ul class='list-disc ml-6 mt-1'>${returnRemarks}</ul></div>`;
-  }
-  document.getElementById('remarksDisplay').innerHTML = html;
+    // Optimized: Show both main and return remarks in one section
+    let html = '';
+    html += transaction.remarks
+      ? `<div>${transaction.remarks}</div>`
+      : '<div class="italic text-gray-400">No remarks</div>';
+    const returnRemarks = transaction.items
+      .filter(item => item.return_remark && item.return_remark.trim() !== '')
+      .map(item => `<li><span class='font-semibold text-gray-800'>${item.name}:</span> <span class='text-gray-700'>${item.return_remark}</span></li>`)
+      .join('');
+    if (returnRemarks) {
+      html += `<div class='mt-2'><span class='font-semibold'>Return Remarks:</span><ul class='list-disc ml-6 mt-1'>${returnRemarks}</ul></div>`;
+    }
+    document.getElementById('remarksDisplay').innerHTML = html;
 
-  // Populate items table with correct columns
-  const itemsTable = document.getElementById('transactionItemsTable');
-  if (itemsTable) {
-    itemsTable.innerHTML = transaction.items.map(item => {
-      const isReturned = (item.returned_quantity || 0) >= item.quantity;
-      const remainingQuantity = item.quantity - (item.returned_quantity || 0);
-      const returnedQuantity = item.returned_quantity || 0;
-      return `
-        <tr>
-          <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">${item.name}</td>
-          <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
-            ${!item.is_consumable ? `${returnedQuantity}/${item.quantity} (${remainingQuantity} remaining)` : item.quantity}
-          </td>
-          <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
-            ${item.is_consumable ? 'Consumable' : 'Non-consumable'}
-          </td>
-          <td class="px-6 py-4 align-middle whitespace-nowrap text-sm break-words">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(item.is_consumable ? 'not_returnable' : (isReturned ? 'completed' : 'pending_return'))}">
-              ${item.is_consumable ? 'Not Returnable' : (isReturned ? 'Returned' : 'Pending Return')}
-            </span>
-          </td>
-          <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
-            ${item.is_consumable ? 'No' : 'Yes'}
-          </td>
-          <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-center break-words">
-            ${!item.is_consumable && !isReturned ? `
-              <div class="flex flex-col items-center space-y-2">
-                <div class="flex items-center space-x-2">
-                  <input type="number" 
-                    class="return-quantity w-20 rounded-md border border-gray-300 px-2 py-1"
-                    min="1"
-                    max="${remainingQuantity}"
-                    value="${remainingQuantity}"
-                    data-item="${item.name}">
-                  <button onclick="window.processReturn('${transaction.transaction_id}', '${item.name}')"
-                    class="px-3 py-1 rounded-md bg-[#2dc653] text-white text-xs font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
-                    Return
-                  </button>
+    // Populate items table with correct columns
+    const itemsTable = document.getElementById('transactionItemsTable');
+    if (itemsTable) {
+      itemsTable.innerHTML = transaction.items.map(item => {
+        const isReturned = (item.returned_quantity || 0) >= item.quantity;
+        const remainingQuantity = item.quantity - (item.returned_quantity || 0);
+        const returnedQuantity = item.returned_quantity || 0;
+        return `
+          <tr data-name-tr="${item.name}" data-name-id="${transaction.transaction_id}">
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">${item.name}</td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
+              ${!item.is_consumable ? `${returnedQuantity}/${item.quantity} (${remainingQuantity} remaining)` : item.quantity}
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
+              ${item.is_consumable ? 'Consumable' : 'Non-consumable'}
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm break-words">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(item.is_consumable ? 'not_returnable' : (isReturned ? 'completed' : 'pending_return'))}">
+                ${item.is_consumable ? 'Not Returnable' : (isReturned ? 'Returned' : 'Pending Return')}
+              </span>
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
+              ${item.is_consumable ? 'No' : 'Yes'}
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-center break-words">
+              ${!item.is_consumable && !isReturned ? `
+                <div class="flex flex-col items-center space-y-2">
+                  <div class="flex items-center space-x-2">
+                    <input type="number" 
+                      class="return-quantity w-20 rounded-md border border-gray-300 px-2 py-1"
+                      min="0"
+                      max="${remainingQuantity}"
+                      value="0"
+                      data-item="${item.name}">
+                    <button data-item-button="${item["Item Name"]}"
+                      class="px-3 py-1 rounded-md bg-[#2dc653] text-white text-xs font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
+                      Return
+                    </button>
+                  </div>
+                  <textarea id='remark-${item.name}' class="return-remark w-full rounded-md border border-gray-300 px-2 py-1 text-xs" placeholder="Describe the condition, issues, or notes (optional)" data-item-remark="${item.name}"></textarea>
                 </div>
-                <textarea id='remark-${item.name}' class="return-remark w-full rounded-md border border-gray-300 px-2 py-1 text-xs" placeholder="Describe the condition, issues, or notes (optional)" data-item-remark="${item.name}"></textarea>
-              </div>
-            ` : ''}
-          </td>
-        </tr>
+              ` : ''}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+  } else {
+    const transaction = filteredTransactions.find(t => Number(t["Transaction ID"]) === Number(transactionId));
+    
+    if (!transaction) return;
+    
+    const modal = document.getElementById('transactionDetailsModal');
+    if (!modal) return;
+    
+    const itemsTransacted = itemsTransactedData.filter(item => Number(item["Transaction ID"]) == Number(transactionId))
+
+    // Update modal content
+    document.getElementById('transactionIdDisplay').textContent = transaction["Transaction ID"];
+    document.getElementById('adminInfoDisplay').textContent = transaction["Admin Name"];
+    document.getElementById('dateTimeDisplay').textContent = formatDateTime(transaction["Transaction Date"]);
+    document.getElementById('statusDisplay').innerHTML = `
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(transaction["Status"])}">
+        ${transaction["Status"].replace('_', ' ')}
+        </span>
+    `;
+
+    // Optimized: Show both main and return remarks in one section
+    let html = '';
+    html += (!transaction["Remarks"] || transaction["Remarks"] === '') // Check if remarks is not empty
+        ? '<div class="italic text-gray-400">No remarks</div>'
+        : `<div>${transaction["Remarks"]}</div>`;
+    
+    let returnRemarks = itemsTransacted
+    .filter(item => item["Remarks"] != null && item["Remarks"] != '')
+    .map(item => `<li><span class='font-semibold text-gray-800'>${item["Item Name"]}:</span> <span class='text-gray-700'>${item["Remarks"]}</span></li>`)
+    .join('');
+
+    if (returnRemarks) 
+        html += `<div class='mt-2'><span class='font-semibold'>Return Remarks:</span><ul class='list-disc ml-6 mt-1'>${returnRemarks}</ul></div>`;
+    document.getElementById('remarksDisplay').innerHTML = html;
+
+    // Populate items table with correct columns
+    const itemsTable = document.getElementById('transactionItemsTable');
+    if (itemsTable) {
+      itemsTable.innerHTML = itemsTransacted.map(item => {
+      const returnedQuantity = (item["Initial Borrowed Quantity"] - item["Current Borrowed Quantity"]) || 0;
+      const remainingQuantity = item["Current Borrowed Quantity"] || 0;
+      const isConsumable = (!item["Item Type"] && item['Item Type'] !== 'Chemicals' && item["Item Type"] !== 'Consumable Items')? false : true
+      return `
+          <tr data-name-tr="${item["Item Name"]}" data-name-id="${transaction["Transaction ID"]}" ">
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">${item["Item Name"]}</td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
+                ${isConsumable ? `${returnedQuantity}/${item["Initial Borrowed Quantity"]} (${remainingQuantity} remaining)` : item["Initial Borrowed Quantity"]}
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
+                ${isConsumable ? 'Consumable' : 'Non-consumable'}
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm break-words">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusStyle(item["Status"])}">
+                ${item["Status"]}
+                </span>
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-gray-900 break-words">
+                ${isConsumable ? 'Yes' : 'No'}
+            </td>
+            <td class="px-6 py-4 align-middle whitespace-nowrap text-sm text-center break-words">
+                ${(item["Status"] !== 'Non Returnable' && item["Status"] !== 'Completed') ? `
+                <div class="flex flex-col items-center space-y-2">
+                  <div class="flex items-center space-x-2">
+                    <input type="number" 
+                        class="return-quantity w-20 rounded-md border border-gray-300 px-2 py-1"
+                        min="0"
+                        max="${remainingQuantity}"
+                        value="0"
+                        data-item="${item["Item Name"]}">
+                    <button data-item-button="${item["Item Name"]}"
+                        class="px-3 py-1 rounded-md bg-[#2dc653] text-white text-xs font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
+                        Return
+                    </button>
+                  </div>
+                  <textarea id='remark-${item["Item Name"]}' class="return-remark w-full rounded-md border border-gray-300 px-2 py-1 text-xs" placeholder="Describe the condition, issues, or notes (optional)" data-item-remark="${item["Item Name"]}"></textarea>
+                </div>
+                ` : ''}
+            </td>
+          </tr>
       `;
-    }).join('');
+      }).join('');
+    }
   }
+
+  document.querySelectorAll(`tr[data-name-tr]`)
+  .forEach(row => {
+    let itemName = row.getAttribute('data-name-tr')
+    let transactionId = row.getAttribute('data-name-id')
+    let button = row.querySelector(`button[data-item-button="${itemName}"]`)
+    if (!button) return;
+
+    button.addEventListener("click", async (e) => {
+      e.preventDefault();
+      await processReturn(transactionId, itemName)
+    });
+  })
+
 
   // Show the modal
   showModal('transactionDetailsModal');
 };
 
 // TODO: What does this do?
-window.processReturn = async function (transactionId, itemName) {
+// RETURNS an item
+async function processReturn (transactionId, itemName) {
+  console.log("I work :>");
+  console.log(transactionId, itemName);
+  return;
+
+  // Temporarily used dead code before we connect it to the database
   const quantityInput = document.querySelector(`input[data-item="${itemName}"]`);
   if (!quantityInput) return;
   const remarkInput = document.querySelector(`textarea[data-item-remark="${itemName}"]`);
@@ -688,159 +701,7 @@ window.processReturn = async function (transactionId, itemName) {
   }
 };
 
-// Verify admin credentials using mock data for testing
-async function verifyAdmin(adminId, password) {
-  try {
-
-    // Keep for now for the presentation
-    var adminExists = mockAdmins.some(admin =>
-      admin.admin_id === adminId && admin.password === password
-    );
-
-    if (adminExists === false)
-      adminExists = await dbhandler.adminExists(adminId, password);
-
-    if (adminExists) {
-      currentAdminId = adminId;
-      return true;
-    }
-    return false;
-  } catch (error) {
-    console.error('Error verifying admin:', error);
-    return false;
-  }
-}
-
-// Update item quantity in the selectedItems array
-function updateItemQuantity(itemName, newQuantity) {
-  const index = selectedItems.findIndex(item => item.itemName === itemName);
-
-  console.log(index)
-  if (index !== -1) {
-    const inventoryItem = itemData.find(item => itemName.includes(item["Name"]) && itemName.includes(item["Brand"]));
-    const maxQuantity = inventoryItem ? inventoryItem["Remaining Quantity"] : 1;
-
-
-    newQuantity = Math.min(Math.max(1, parseFloat(newQuantity) || 1), maxQuantity);
-    selectedItems[index].quantity = newQuantity;
-
-    const input = document.querySelector(`input[data-item="${itemName}"]`);
-    if (input) {
-      console.log(newQuantity);
-      input.value = newQuantity;
-    }
-  }
-}
-
-// Add item to the selected items table
-function addItemToTable(itemName) {
-  const selectedItemsTable = document.getElementById('selectedItemsTable');
-  const noItemsRow = document.getElementById('noItemsRow');
-
-  if (!selectedItemsTable) return;
-
-  if (selectedItems.some(item => item.itemName.includes(itemName))) {
-    showToast('Item already added to the list');
-    return;
-  }
-
-  const inventoryItem = itemData.find(item => itemName.includes(item["Name"]) && itemName.includes(item["Brand"]));
-  if (!inventoryItem) {
-    showToast('Item not found in inventory');
-    return;
-  }
-
-  if (noItemsRow) {
-    noItemsRow.style.display = 'none';
-  }
-
-  let isConsumable = (inventoryItem["Item Type"].includes('Chemicals') || inventoryItem["Item Type"].includes('Consumable Items')) ? true : false;
-  const row = document.createElement('tr');
-  row.innerHTML = `
-    <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-      ${isConsumable ? '<span class="text-[#2ca14a] font-medium">*</span>' : ''}${itemName}
-    </td>
-    <td class="px-6 py-4 whitespace-nowrap text-gray-900 text-center">${inventoryItem["Remaining Quantity"]}</td>
-    <td class="px-6 py-4 whitespace-nowrap text-gray-900">
-      <div class="flex items-center justify-center w-full space-x-2">
-        <button type="button" 
-          class="w-8 h-8 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-          onclick="updateItemQuantity('${itemName}', (parseInt(document.querySelector('input[data-item=\\'${itemName}\\']').value) || 1) - 1)">
-          <i class="fas fa-minus text-gray-600"></i>
-        </button>
-        <input 
-          type="number" 
-          value="1"
-          min="1"
-          max="${inventoryItem["Remaining Quantity"]}"
-          data-item="${itemName}"
-          class="w-16 text-center rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          onchange="updateItemQuantity('${itemName}', this.value)"
-        >
-        <button type="button"
-          class="w-8 h-8 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-          onclick="updateItemQuantity('${itemName}', (parseInt(document.querySelector('input[data-item=\\'${itemName}\\']').value) || 1) + 1)">
-          <i class="fas fa-plus text-gray-600"></i>
-        </button>
-      </div>
-    </td>
-    <td class="px-6 py-4 whitespace-nowrap text-center">
-      <div class="flex justify-center">
-        <button type="button" 
-          class="w-8 h-8 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#2ca14a]" 
-          onclick="removeItem('${itemName}')"
-          title="Remove item"
-        >
-          <i class="fas fa-trash-alt text-red-600"></i>
-        </button>
-      </div>
-    </td>
-  `;
-
-  selectedItemsTable.appendChild(row);
-  selectedItems.push({ itemName, quantity: 1 });
-}
-
-// Remove item from the selected items table
-function removeItem(itemName) {
-  selectedItems = selectedItems.filter(item => item.itemName === itemName);
-
-  const selectedItemsTable = document.getElementById('selectedItemsTable');
-  if (!selectedItemsTable) return;
-
-  const rows = selectedItemsTable.getElementsByTagName('tr');
-
-  for (let row of rows) {
-    const cellText = row.cells[0].textContent.trim().replace('*', '');
-    if (cellText === itemName) {
-      row.remove();
-      break;
-    }
-  }
-
-  const noItemsRow = document.getElementById('noItemsRow');
-  if (selectedItems.length === 0 && noItemsRow) {
-    noItemsRow.style.display = '';
-  }
-}
-
-// Clear the items table and reset state
-function clearItemsTable() {
-  selectedItems = [];
-  const selectedItemsTable = document.getElementById('selectedItemsTable');
-  if (!selectedItemsTable) return;
-
-  while (selectedItemsTable.children.length > 1) {
-    selectedItemsTable.removeChild(selectedItemsTable.lastChild);
-  }
-
-  const noItemsRow = document.getElementById('noItemsRow');
-  if (noItemsRow) {
-    noItemsRow.style.display = '';
-  }
-}
-
-// Return functionality
+// This is called after returning an item.
 async function loadBorrowedItems() {
   const borrowedItemsTable = document.getElementById('borrowedItemsTable');
 
@@ -907,6 +768,7 @@ async function loadBorrowedItems() {
   }
 }
 
+// Handle return
 async function handleReturnItems() {
   const checkedItems = document.querySelectorAll('.return-item-checkbox:checked');
   const returnNotes = document.getElementById('returnNotes')?.value.trim() || '';
@@ -1018,63 +880,24 @@ function closeReturnModal() {
 }
 
 // Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // Initialize the page when the DOM is loaded
-  initializePage();
+  showLoading();
+  useMockData = false;
+  setupEventListeners();
+  await initializeTransactionData();
+  await initializeItemsTransacted();
+  await loadTransactionHistory(); // For returning
 
-  // Get all modal elements
+  // Get all modal elements (Transactions)
   const returnItemsModal = document.getElementById('returnItemsModal');
 
-  // Get all form elements
-  const verifyAdminForm = document.getElementById('verifyAdminForm');
-  const borrowItemsForm = document.getElementById('borrowItemsForm');
-
-  // Get all button elements
-  const addTransactionBtn = document.getElementById('addTransactionBtn');
-  const cancelVerifyBtn = document.getElementById('cancelVerifyBtn');
-  const borrowBtn = document.getElementById('borrowBtn');
+  // Transaction history
   const returnBtn = document.getElementById('returnBtn');
-  const addItemBtn = document.getElementById('addItemBtn');
-  const cancelBorrowBtn = document.getElementById('cancelBorrowBtn');
   const cancelReturnBtn = document.getElementById('cancelReturnBtn');
-  const cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
-  const confirmTransactionBtn = document.getElementById('confirmTransactionBtn');
   const confirmReturnBtn = document.getElementById('confirmReturnBtn');
   const selectAllItems = document.getElementById('selectAllItems');
   const returnSearchInput = document.getElementById('returnSearchInput');
-
-  // Event listeners for transaction type
-  if (addTransactionBtn) {
-    addTransactionBtn.addEventListener('click', () => showModal('verifyAdminModal'));
-  }
-
-  verifyAdminForm?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const adminId = document.getElementById('verifyAdminId').value;
-    const password = document.getElementById('verifyAdminPassword').value;
-
-    const isVerified = await verifyAdmin(adminId, password);
-    if (isVerified) {
-      hideModal('verifyAdminModal');
-      // Directly show borrow items modal, skip transaction type modal
-      showModal('borrowItemsModal');
-      initializeItemsList();
-      await dbhandler.prepareUser();
-      verifyAdminForm.reset();
-    } else {
-      const errorDiv = document.getElementById('verifyAdminError');
-      if (errorDiv) {
-        errorDiv.textContent = 'Invalid credentials. Please try again.';
-        errorDiv.classList.remove('hidden');
-      }
-    }
-  });
-
-  borrowBtn?.addEventListener('click', () => {
-    hideModal('transactionTypeModal');
-    showModal('borrowItemsModal');
-    // initializeItemsList();
-  });
 
   returnBtn?.addEventListener('click', () => {
     hideModal('transactionTypeModal');
@@ -1104,71 +927,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Other event listeners
-  addItemBtn?.addEventListener('click', () => {
-    const itemSearch = document.getElementById('itemSearch');
-    if (itemSearch?.value) {
-      addItemToTable(itemSearch.value);
-      itemSearch.value = '';
-    }
-  });
-
-  borrowItemsForm?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (selectedItems.length > 0) {
-
-      hideModal('borrowItemsModal');
-      showModal('confirmationModal');
-    } else {
-      showToast('Please add at least one item');
-    }
-  });
-
-  // TODO: ADD transaction
-  confirmTransactionBtn?.addEventListener('click', async () => {
-    hideModal('confirmationModal');
-
-    let itemIdArray = Array();
-    let borrowQuantityArray = Array();
-
-    // selected items (itemName, quantity)
-    // itemName consists of : Name (Brand)
-    selectedItems.forEach((item) => {
-      var tempItem = itemData.find(tempItemData => item.itemName.includes(tempItemData["Name"]) == true && item.itemName.includes(tempItemData["Brand"]) == true)
-
-      itemIdArray.push(tempItem["Item ID"]);
-      borrowQuantityArray.push(item.quantity);
-      console.log(tempItem["Item ID"], " ", item.quantity)
-    });
-
-    let result = await dbhandler.addTransactionRecord(currentAdminId, borrowRemarks.value.trim(), itemIdArray, borrowQuantityArray);
-
-    if (result.includes("ERROR")) {
-      showToast(result, true)
-    } else {
-      showToast('Transaction completed successfully!', false);
-      clearItemsTable();
-      const borrowRemarks = document.getElementById('borrowRemarks');
-      if (borrowRemarks) borrowRemarks.value = '';
-    }
-  });
-
-  cancelVerifyBtn?.addEventListener('click', () => {
-    hideModal('verifyAdminModal');
-    verifyAdminForm?.reset();
-  });
-
-  cancelBorrowBtn?.addEventListener('click', () => {
-    hideModal('borrowItemsModal');
-    selectedItems = [];
-    clearItemsTable();
-    document.getElementById('borrowRemarks').value = '';
-    const selectedItemsTable = document.getElementById('selectedItemsTable');
-    if (selectedItemsTable) selectedItemsTable.innerHTML = '';
-  });
-
-  cancelConfirmBtn?.addEventListener('click', () => hideModal('confirmationModal'));
-
   // Add event listeners for closing the transaction details modal
   const closeBtn = document.getElementById('closeDetailsBtn');
   const closeModalBtn = document.getElementById('closeDetailsModalBtn');
@@ -1180,55 +938,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (closeModalBtn) {
     closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
   }
+
+  hideLoading();
 });
 
-// Make functions available globally
-window.removeItem = removeItem;
-window.updateItemQuantity = updateItemQuantity;
-window.initializeItemsList = initializeItemsList;
-
-function showModal(modalId) {
-  console.log(modalId)
-  const modal = document.getElementById(modalId);
-  if (!modal) {
-    console.error(`Modal with ID ${modalId} not found`);
-    return;
-  }
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-}
-
-function hideModal(modalId) {
-  const modal = document.getElementById(modalId);
-  if (!modal) {
-    console.error(`Modal with ID ${modalId} not found`);
-    return;
-  }
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-}
-
-// Initialize the page when the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize the page
-  initializePage();
-
-  // Add event listeners for closing the transaction details modal
-  const closeBtn = document.getElementById('closeDetailsBtn');
-  const closeModalBtn = document.getElementById('closeDetailsModalBtn');
-
-  if (closeBtn) {
-    closeBtn.onclick = () => hideModal('transactionDetailsModal');
-  }
-
-  if (closeModalBtn) {
-    closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
-  }
-});
-
-// This is after adding a new transaction
-
-// Add a new transaction and refresh the transaction history table
+// Updates Transaction history. (For the transaction table)
 window.addNewTransaction = function (newTransaction) {
   const transactions = mockTransactionHistory || [];
   transactions.push(newTransaction);
@@ -1238,122 +952,54 @@ window.addNewTransaction = function (newTransaction) {
   }
 };
 
-// Function to validate login
-async function validateLogin(event) {
-  event.preventDefault();
+// ===============================================================================
+// Frontend Manipulating Methods
 
-  const adminId = document.getElementById('adminId').value;
-  const password = document.getElementById('password').value;
-  const adminIdField = document.getElementById('adminId');
-  const passwordField = document.getElementById('password');
-  const adminIdError = document.getElementById('adminIdError');
-  const passwordError = document.getElementById('passwordError');
+// TODO: Dave there is an error regarding the tableLoadingState lines that are commented. 
 
-  // Reset previous error states
-  adminIdField.classList.remove('border-red-500', 'focus:ring-red-500');
-  passwordField.classList.remove('border-red-500', 'focus:ring-red-500');
-  adminIdError.classList.add('hidden');
-  passwordError.classList.add('hidden');
+// Helper Functions
+function showLoading() {
+  const loadingSpinner = document.getElementById('loadingSpinner');
+  const tableLoadingState = document.getElementById('tableLoadingState');
 
-  let result = await dbhandler.adminExists(adminId, password);
-  console.log(result);
+  if (loadingSpinner) {
+    loadingSpinner.style.display = 'flex';
+  }
 
-  // Validate credentials
-  if (result === true) {
-    // Successful login
-    showNotification('Login successful! Redirecting...', 'success');
-    localStorage.setItem("loggedInAdmin", adminId)
-    // Show loading spinner
-    showLoading();
-    const path = '/Frontend_Code/html/dashboard.html';
-    window.location.href = window.location.origin + path;
-
-    // Use a real network request to measure actual connectivity
-    // await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
-    //   .then(response => response.json())
-    //   .catch(() => { }) // Ignore errors, just for timing
-    //   .finally(async () => {
-    //     hideLoading();
-        
-    //   });
-  } else {
-    // Failed login
-    if (adminId !== mockAdmin.id) {
-      adminIdField.classList.add('border-red-500', 'focus:ring-red-500');
-      adminIdError.textContent = 'Invalid ID number';
-      adminIdError.classList.remove('hidden');
-    }
-    if (password !== mockAdmin.password) {
-      passwordField.classList.add('border-red-500', 'focus:ring-red-500');
-      passwordError.textContent = 'Invalid password';
-      passwordError.classList.remove('hidden');
-    }
+  if (tableLoadingState) {
+    tableLoadingState.style.display = 'block';
   }
 }
 
-/**
- * Registration handler for testing (no backend/database yet)
- * - Validates the registration form fields
- * - Shows a success alert
- * - Redirects to dashboard.html after successful registration
- * - No backend/database call is made
- *
- * To enable backend integration later, replace this logic with a call to your backend handler.
- */
-async function validateSignIn(event) {
-  event.preventDefault();
+function hideLoading() {
+  const loadingSpinner = document.getElementById('loadingSpinner');
+  const tableLoadingState = document.getElementById('tableLoadingState');
 
-  const adminId = document.getElementById('adminId').value.trim();
-  const firstName = document.getElementById('firstName').value.trim();
-  const middleName = document.getElementById('middleName').value.trim();
-  const lastName = document.getElementById('lastName').value.trim();
-  const password = document.getElementById('password').value;
-
-  const adminIdField = document.getElementById('adminId');
-  const passwordField = document.getElementById('password');
-  const adminIdError = document.getElementById('adminIdError');
-  const passwordError = document.getElementById('passwordError');
-
-  // Reset previous error states
-  adminIdField.classList.remove('border-red-500', 'focus:ring-red-500');
-  passwordField.classList.remove('border-red-500', 'focus:ring-red-500');
-  adminIdError.classList.add('hidden');
-  passwordError.classList.add('hidden');
-
-  // Basic validation
-  if (!adminId || !firstName || !middleName || !lastName || !password) {
-    showToast('Please fill in all required fields', true);
-    console.log("Entry error")
-    return;
-  } else if (password.length < 8) {
-    passwordField.classList.add('border-red-500', 'focus:ring-red-500');
-    passwordError.textContent = 'Kindly use a longer password';
-    passwordError.classList.remove('hidden');
-    console.log("Password Length Error")
-    return;
+  if (loadingSpinner) {
+    loadingSpinner.style.display = 'none';
   }
 
-  let result = await dbhandler.addAdminRecord(adminId, firstName, middleName, lastName, password)
-  console.log(result);
-
-  if (!result || result.includes("ERROR")) {
-    adminIdField.classList.add('border-red-500', 'focus:ring-red-500');
-    adminIdError.textContent = 'ID number is already used.';
-    adminIdError.classList.remove('hidden');
-  } else {
-    // Show toast notification
-    showNotification('Registration successful! Redirecting...', 'success');
-    localStorage.setItem('loggedInAdmin', adminId)
-    window.location.href = window.location.origin + '/Frontend_Code/html/dashboard.html';
-
-    // Use a real network request to measure actual connectivity
-    // await fetch('https://jsonplaceholder.typicode.com/posts/1', { cache: 'no-store' })
-    //   .then(response => response.json())
-    //   .catch(() => { }) // Ignore errors, just for timing
-    //   .finally(async () => {
-    //     window.location.href = window.location.origin + '/Frontend_Code/html/dashboard.html';
-    // });
+  if (tableLoadingState) {
+    tableLoadingState.style.display = 'none';
   }
+}
+
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toastNotification');
+  const toastMessage = document.getElementById('toastMessage');
+
+  if (!toast || !toastMessage) return;
+
+  toastMessage.textContent = message;
+  toast.classList.remove('hidden');
+  toast.classList.add('flex');
+
+  toast.style.backgroundColor = isError ? 'rgba(220, 38, 38, 0.95)' : 'rgba(44, 161, 74, 0.95)';
+
+  setTimeout(() => {
+    toast.classList.add('hidden');
+    toast.classList.remove('flex');
+  }, isError ? 4000 : 3000);
 }
 
 // Function to show notifications
@@ -1379,140 +1025,96 @@ function showNotification(message, type) {
   }, 3000);
 }
 
-// Add event listener to login form
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('signInForm');
-    const regForm = document.getElementById('signIn');
-
-  if (loginForm) {
-    loginForm.addEventListener('submit', validateLogin);
-  } else if (regForm) {
-    console.log("REgister")
-    regForm.addEventListener('submit', validateSignIn);
+function showModal(modalId) {
+  console.log(modalId)
+  const modal = document.getElementById(modalId);
+  if (!modal) {
+    console.error(`Modal with ID ${modalId} not found`);
+    return;
   }
-});
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
 
-// REGISTER.HTML REGISTRATION LOGIC
-document.addEventListener('DOMContentLoaded', () => {
-  // Terms Modal
-  const termsModal = document.getElementById('termsModal');
-  const privacyModal = document.getElementById('privacyModal');
-  const openTermsModal = document.getElementById('openTermsModal');
-  const openPrivacyModal = document.getElementById('openPrivacyModal');
-  const closeTermsModal = document.getElementById('closeTermsModal');
-  const closePrivacyModal = document.getElementById('closePrivacyModal');
-
-  // Modal handling
-  if (openTermsModal) {
-    openTermsModal.addEventListener('click', function (e) {
-      e.preventDefault();
-      termsModal.classList.remove('hidden');
-      termsModal.classList.add('flex');
-    });
+function hideModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) {
+    console.error(`Modal with ID ${modalId} not found`);
+    return;
   }
-
-  if (openPrivacyModal) {
-    openPrivacyModal.addEventListener('click', function (e) {
-      e.preventDefault();
-      privacyModal.classList.remove('hidden');
-      privacyModal.classList.add('flex');
-    });
-  }
-
-  if (closeTermsModal) {
-    closeTermsModal.addEventListener('click', function () {
-      termsModal.classList.add('hidden');
-      termsModal.classList.remove('flex');
-    });
-  }
-
-  if (closePrivacyModal) {
-    closePrivacyModal.addEventListener('click', function () {
-      privacyModal.classList.add('hidden');
-      privacyModal.classList.remove('flex');
-    });
-  }
-
-  // Close modals when clicking outside
-  window.addEventListener('click', function (e) {
-    if (e.target === termsModal) {
-      termsModal.classList.add('hidden');
-      termsModal.classList.remove('flex');
-    }
-    if (e.target === privacyModal) {
-      privacyModal.classList.add('hidden');
-      privacyModal.classList.remove('flex');
-    }
-  });
-});
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
 
 // ================================================================
-// Backend Methods
+// Helper Methods
 
-async function initializeItemsList() {
-  try {
-    itemData = await dbhandler.getAllItemMasterListNameBrandRecords();
+function formatDateTime(dateString) {
+  return new Date(dateString).toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
 
-    if (itemData.length == 0) {
-      console.error("Item Master List table has no records.");
-      return;
-    }
+function getStatusStyle(status) {
+  switch (status) {
+    case 'completed':
+    case 'Completed':
+    case 'not_returnable':
+    case 'Non Returnable':
+      return 'bg-green-100 text-green-800';
 
-    const itemsList = document.getElementById('itemsList');
-    if (!itemsList) return;
+    case 'pending_return':
+    case 'Pending Return':
+      return 'bg-yellow-100 text-yellow-800';
 
-    // Clear existing options
-    itemsList.innerHTML = '';
-    console.log(itemsList);
+    case 'partially_returned':
+    case 'Partially Returned':
+      return 'bg-orange-100 text-orange-800';
 
-    // Commented for the mean time (Not fully implemented yet.)
-    itemData.forEach((item) => {
-      if (Number(item["Remaining Quantity"]) == 0)
-        return;
+    // case 'not_returnable':
+    // case 'Non Returnable':
+    //   return 'bg-red-100 text-red-800';
 
-      const option = document.createElement('option');
-      option.value = item["Name"] + " (" + item["Brand"] + ")";
-      option.textContent = `${item["Remaining Quantity"]} ${item["Unit Type"]} available`;
-      itemsList.appendChild(option);
-    })
-
-    // Add items from mock inventory
-    // mockInventory.forEach(item => {
-    //   const option = document.createElement('option');
-    //   option.value = item.item_name;
-    //   option.textContent = `${item.item_name} (${item.available_quantity} available)`;
-    //   itemsList.appendChild(option);
-    // });
-
-  } catch (generalError) {
-    console.error(generalError);
-  } finally {
-    hideLoading();
+    default:
+      return 'bg-gray-100 text-gray-800';
   }
 }
 
-// Password visibility toggle
-document.addEventListener('DOMContentLoaded', function () {
-  const togglePassword = document.getElementById('togglePassword');
-  const passwordInput = document.getElementById('password');
+// =================================================================
+// Backend Methods
 
-  if (togglePassword && passwordInput) {
-    togglePassword.addEventListener('click', function () {
-      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      passwordInput.setAttribute('type', type);
+async function initializeTransactionData(){
+  try{
+    transactionData = await dbhandler.getAllTransactionRecords();
 
-      // Toggle eye icon
-      const eyeIcon = this.querySelector('svg');
-      if (type === 'text') {
-        eyeIcon.innerHTML = `
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        `;
-      } else {
-        eyeIcon.innerHTML = `
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        `;
-      }
-    });
+    if (!transactionData)
+      console.log("Transaction Data is null")
+    else if (transactionData.length == 0)
+      console.log('Transaction Data is empty')
+    else
+      console.log('Loaded transaction data successfully!')
+
+  } catch (error){
+    console.log(error);
   }
-});
+}
+
+async function initializeItemsTransacted(){
+  try{
+    itemsTransactedData = await dbhandler.getAllItemsTransactedRecords();
+
+    if (!itemsTransactedData)
+      console.log("Items Transacted Data is null")
+    else if (itemsTransactedData.length == 0)
+      console.log('Items Transacted Data is empty')
+    else
+      console.log('Loaded Items Transacted data successfully!')
+
+  } catch (error){
+    console.log(error);
+  }
+}
