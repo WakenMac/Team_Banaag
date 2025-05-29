@@ -127,9 +127,10 @@ export async function addAdminRecord(adminId, fName, mName, lName, adminPassword
         })
         
         if (supabaseError){
-            console.error(`Supabase Error:`, error.message);
+            console.error(`Supabase Error:`, supabaseError.message);
             return null;
         }   else {
+            console.log("Added admin auccessfully")
             return data;
         }
         
