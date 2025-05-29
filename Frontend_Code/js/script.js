@@ -208,9 +208,9 @@ const dashboardRecentTransactions = [
     id: 'TRX-200',
     admin: 'Admin User',
     dateTime: '2024-06-09 10:15',
-    type: 'Return',
-    status: 'Returned',
-    remarks: 'Returned all items in good condition.'
+    type: 'Borrow',
+    status: 'Pending',
+    remarks: 'For Chem Lab 2'
   },
   {
     id: 'TRX-199',
@@ -218,7 +218,7 @@ const dashboardRecentTransactions = [
     dateTime: '2024-06-08 16:45',
     type: 'Borrow',
     status: 'Pending',
-    remarks: 'Pending approval.'
+    remarks: 'For LE 1'
   }
 ];
 
@@ -268,22 +268,25 @@ function renderDashboardSummaryRow() {
   const soonToExpireCount = (dashboardMockData.chemicals.soonToExpire?.length || 0) + (dashboardMockData.items.soonToExpire?.length || 0);
   const currentlyBorrowedCount = (dashboardMockData.apparatus.currentlyBorrowed?.length || 0) + (dashboardMockData.glassware.currentlyBorrowed?.length || 0) + (dashboardMockData.equipment.currentlyBorrowed?.length || 0);
   const totalItems = totalConsumed + totalBorrowed;
+  const totalRequests = dashboardMockData.pendingReturns?.length || 0;
   summaryRow.innerHTML = `
-    <div class="bg-white rounded-xl shadow flex flex-col items-center justify-center p-4">
-      <div class="text-sm text-gray-500 mb-1">Total Items</div>
-      <div class="text-3xl font-extrabold text-gray-900">${totalItems}</div>
-    </div>
-    <div class="bg-green-50 rounded-xl shadow flex flex-col items-center justify-center p-4">
-      <div class="text-sm text-gray-500 mb-1">Total Consumables</div>
-      <div class="text-3xl font-extrabold text-green-600">${totalConsumed}</div>
-    </div>
-    <div class="bg-blue-50 rounded-xl shadow flex flex-col items-center justify-center p-4">
-      <div class="text-sm text-gray-500 mb-1">Total Non-Consumables</div>
-      <div class="text-3xl font-extrabold text-blue-600">${totalBorrowed}</div>
-    </div>
-    <div class="bg-purple-50 rounded-xl shadow flex flex-col items-center justify-center p-4">
-      <div class="text-sm text-gray-500 mb-1">Total Requests</div>
-      <div class="text-3xl font-extrabold text-purple-600">42</div>
+    <div class="grid grid-cols-4 gap-4">
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <div class="text-sm text-gray-500">Total Items</div>
+        <div class="text-2xl font-bold text-gray-800">${totalItems}</div>
+      </div>
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <div class="text-sm text-gray-500">Total Consumables</div>
+        <div class="text-2xl font-bold text-green-600">${totalConsumed}</div>
+      </div>
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <div class="text-sm text-gray-500">Total Non-consumables</div>
+        <div class="text-2xl font-bold text-blue-600">${totalBorrowed}</div>
+      </div>
+      <div class="bg-white rounded-lg p-4 shadow-sm">
+        <div class="text-sm text-gray-500">Total Requests</div>
+        <div class="text-2xl font-bold text-purple-600">${totalRequests}</div>
+      </div>
     </div>
   `;
 }
@@ -300,13 +303,13 @@ function renderConsumptionTrendChart() {
       datasets: [{
         label: 'Items',
         data: [65, 59, 80, 81, 56, 55],
-        borderColor: '#2ca14a',
+        borderColor: '#4ade80',
         tension: 0.4,
         fill: false
       }, {
         label: 'Chemicals',
         data: [28, 48, 40, 19, 86, 27],
-        borderColor: '#3b82f6',
+        borderColor: '#16a34a',
         tension: 0.4,
         fill: false
       }]
@@ -339,7 +342,7 @@ function renderMonthlyStatsChart() {
       datasets: [{
         label: 'Transactions',
         data: [12, 19, 15, 17, 22, 25],
-        borderColor: '#8b5cf6',
+        borderColor: '#1d4ed8',
         tension: 0.4,
         fill: false
       }]
@@ -478,13 +481,15 @@ function renderBorrowedDoughnutChart() {
     badge.innerHTML = `<i class='fas fa-pie-chart mr-1'></i>Borrowed: <span class='bg-purple-100 px-2 py-1 rounded'>${borrowed}</span> &nbsp; Available: <span class='bg-green-100 px-2 py-1 rounded'>${available}</span>`;
     parent.insertBefore(badge, ctx.parentElement);
   }
+  // Add margin to move the chart slightly to the right
+  ctx.parentElement.style.marginLeft = '60px';
   new Chart(ctx, {
     type: 'doughnut',
     data: {
       labels: ['Borrowed', 'Available'],
       datasets: [{
         data: [borrowed, available],
-        backgroundColor: ['#fb923c', '#22c55e'],
+        backgroundColor: ['#3b82f6', '#9ca3af'],
         borderWidth: 2
       }]
     },
@@ -508,8 +513,8 @@ function renderBorrowingTrendChart() {
       datasets: [{
         label: 'Borrowed',
         data: [28, 48, 40, 19, 86, 27],
-        borderColor: '#f59e42',
-        backgroundColor: 'rgba(245,158,66,0.1)',
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
         tension: 0.4,
         fill: true
       }]
@@ -694,9 +699,9 @@ function renderDashboardSections() {
   const currentlyBorrowedList = document.getElementById('dashboardCurrentlyBorrowed');
   if (currentlyBorrowedList) {
     currentlyBorrowedList.innerHTML = currentlyBorrowed.map(item => `
-      <li class="flex justify-between items-center px-2 py-1 bg-purple-50 rounded">
+      <li class="flex justify-between items-center px-2 py-1 bg-blue-50 rounded">
         <span>${item.name}</span>
-        <span class="text-purple-700 font-semibold">${item.borrower} <span class='text-xs text-gray-500'>(Due: ${item.dueDate})</span></span>
+        <span class="text-blue-700 font-semibold">${item.borrower} <span class='text-xs text-gray-500'>(Due: ${item.dueDate})</span></span>
       </li>
     `).join('');
   }
@@ -737,8 +742,8 @@ function renderDashboardSections() {
           <span class="text-xs text-gray-500">${tx.type}</span>
         </div>
         <div class="flex items-center gap-2 mt-1 md:mt-0">
-          <span class="px-2 py-1 rounded text-xs font-semibold ${tx.status === 'Completed' ? 'bg-green-100 text-green-700' : tx.status === 'Returned' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}">${tx.status}</span>
           <span class="text-xs text-gray-600">${tx.remarks}</span>
+          <span class="px-2 py-1 rounded text-xs font-semibold ${tx.status === 'Completed' ? 'bg-green-100 text-green-700' : tx.status === 'Restocked' ? 'bg-purple-100 text-purple-700' : 'bg-yellow-100 text-yellow-700'}">${tx.status}</span>
         </div>
       </div>
     `).join('');

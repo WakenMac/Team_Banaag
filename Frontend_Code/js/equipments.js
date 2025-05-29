@@ -6,11 +6,14 @@
  */
 
 import * as dbhandler from "../../Backend_Code/mainHandler.js";
+import { generateInventoryPdfReport } from '/Frontend_Code/js/pdfReport.js';
+import '/Frontend_Code/js/font/Old London-normal.js';
 
 // Global Variables and Element References
 let tbody = null;
 let equipmentRowToDelete = null;
 let equipmentRowToEdit = null;
+let equipmentData = [];
 
 // DOM Elements
 const editEquipmentLocation = document.getElementById("editEquipmentLocation");
@@ -722,7 +725,7 @@ function initializeInfoHovers() {
 
     const tooltip = document.createElement("div");
     tooltip.className =
-      "custom-tooltip absolute z-50 bg-gray-800 text-white text-xs rounded shadow-lg";
+      "absolute z-50 text-xs text-white bg-gray-800 rounded shadow-lg custom-tooltip";
     tooltip.style.position = "absolute";
     tooltip.style.pointerEvents = "none";
     tooltip.innerHTML = tooltipContent;
@@ -730,12 +733,11 @@ function initializeInfoHovers() {
     document.body.appendChild(tooltip);
 
     const btnRect = infoBtn.getBoundingClientRect();
-    tooltip.style.left = `${
-      btnRect.left +
+    tooltip.style.left = `${btnRect.left +
       window.scrollX +
       btnRect.width / 2 -
       tooltip.offsetWidth / 2
-    }px`;
+      }px`;
     tooltip.style.top = `${btnRect.bottom + window.scrollY + 8}px`;
 
     // Remove tooltip on mouseout
@@ -826,12 +828,8 @@ searchInput.addEventListener("input", searchEquipment);
 async function initializeLabEquipmentsTable() {
   try {
     let data = await dbhandler.getAllLabEquipmentsRecords();
-
-    if (data.length == 0) {
-      console.error("Lab Equipments table has no records.");
-      return;
-    }
-
+    equipmentData = data;
+    if (data.length == 0) return;
     for (let i = 0; i < data.length; i++) {
       await createNewEquipmentRow(
         data[i]["Item ID"],
@@ -839,17 +837,11 @@ async function initializeLabEquipmentsTable() {
         data[i]["Unit"],
         data[i]["Location"],
         data[i]["Brand"],
-        data[i]["Quantity"],
-        data[i]["Serial No"],
-        data[i]["Calibration Date"],
-        data[i]["Frequency of Calibration"]
+        data[i]["Quantity"]
       );
-
       await createNewRemarks(data[i]["Remarks"], data[i]["Item ID"]);
     }
-  } catch (generalError) {
-    console.error(generalError);
-  }
+  } catch (e) { console.error(e); }
 }
 
 /**
@@ -895,3 +887,126 @@ async function initializeLocationDropdown() {
     console.error(generalError);
   }
 }
+
+async function prepareEquipmentsTable() {
+  try {
+    let data = await dbhandler.getAllEquipmentsRecords();
+    equipmentData = data;
+    if (data.length == 0) return;
+    for (let i = 0; i < data.length; i++) {
+      await createNewEquipmentRow(
+        data[i]["Item ID"],
+        data[i]["Name"],
+        data[i]["Unit"],
+        data[i]["Location"],
+        data[i]["Brand"],
+        data[i]["Quantity"]
+      );
+      await createNewRemarks(data[i]["Remarks"], data[i]["Item ID"]);
+    }
+  } catch (e) { console.error(e); }
+}
+
+
+// ===================== PDF REPORT GENERATION =====================
+
+const dateModal = document.getElementById('dateInputModal');
+const dateForm = document.getElementById('dateInputForm');
+const dateFields = document.getElementById('dateFields');
+const addDateBtn = document.getElementById('addDateField');
+const removeDateBtn = document.getElementById('removeDateField');
+const cancelDateBtn = document.getElementById('cancelDateInput');
+
+// Always open the modal when Download PDF is clicked
+if (downloadPdfBtn) {
+  downloadPdfBtn.addEventListener('click', () => {
+    dateModal.classList.remove('hidden');
+    dateModal.classList.add('flex');
+  });
+}
+// Add date field
+addDateBtn.addEventListener('click', () => {
+  const idx = dateFields.children.length;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'flex items-center gap-2';
+  const label = document.createElement('label');
+  label.className = 'block font-medium text-gray-700';
+  label.textContent = `Date ${idx + 1}:`;
+  label.setAttribute('for', `dateField${idx}`);
+  const input = document.createElement('input');
+  input.type = 'date';
+  input.id = `dateField${idx}`;
+  input.className = 'flex-1 px-3 py-2 border rounded date-input';
+  input.required = true;
+  wrapper.appendChild(label);
+  wrapper.appendChild(input);
+  dateFields.appendChild(wrapper);
+});
+// Remove date field
+removeDateBtn.addEventListener('click', () => {
+  if (dateFields.children.length > 1) {
+    dateFields.removeChild(dateFields.lastElementChild);
+  }
+});
+// Cancel modal
+cancelDateBtn.addEventListener('click', () => {
+  dateModal.classList.add('hidden');
+  dateModal.classList.remove('flex');
+});
+// Format date as 'Month DD, YYYY'
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: '2-digit' });
+}
+// Handle form submit
+dateForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const dates = Array.from(dateFields.querySelectorAll('input')).map(input => formatDate(input.value)).filter(Boolean);
+  dateModal.classList.add('hidden');
+  dateModal.classList.remove('flex');
+  const pdfRows = Array.from(document.querySelectorAll('#equipmentsTableBody tr')).map(row => {
+    const tds = row.querySelectorAll('td');
+    const infoBtn = row.querySelector('button[aria-label="Info"]');
+    // Get values from the info button's data attributes
+    const csn = infoBtn ? infoBtn.getAttribute('data-csn') || '' : '';
+    const cbd = infoBtn ? infoBtn.getAttribute('data-cbd') || '' : '';
+    const fcb = infoBtn ? infoBtn.getAttribute('data-fcb') || '' : '';
+    // Get remarks from the remarks button
+    const remarksBtn = row.querySelector('button[aria-label="Add remarks"]');
+    const remarks = remarksBtn ? remarksBtn.getAttribute('data-remarks') || '' : '';
+    // Build the row - ORDER MATTERS HERE: columns data, then remarks, then date columns
+    const base = [
+      tds[0]?.innerText || '', // Item ID
+      tds[1]?.innerText || '', // Name
+      tds[3]?.innerText || '', // Location
+      tds[4]?.innerText || '', // Brand
+      csn,
+      cbd,
+      fcb,
+      remarks
+    ];
+
+    if (dates && dates.length > 0) {
+      dates.forEach(() => base.push(tds[5]?.innerText || ''));
+    }
+    return base;
+  });
+
+  const columns = [
+    { header: 'ITEM ID', dataKey: 'id' },
+    { header: 'NAME', dataKey: 'name' },
+    { header: 'LOCATION', dataKey: 'location' },
+    { header: 'BRAND', dataKey: 'brand' },
+    { header: 'COMPRESSED SERIAL NO.', dataKey: 'csn' },
+    { header: 'CALIBRATION DATE', dataKey: 'cbd' },
+    { header: 'FREQUENCY OF CALIBRATION', dataKey: 'fcb' }
+  ];
+  await generateInventoryPdfReport({
+    title: 'LABORATORY EQUIPMENT',
+    columns,
+    filename: 'equipment_inventory_report.pdf',
+    dateColumns: dates,
+    data: pdfRows 
+  });
+});

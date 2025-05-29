@@ -4,7 +4,7 @@ const sectionColors = {
   items: 'yellow',
   apparatus: 'blue',
   glassware: 'purple',
-  equipment: 'red'
+  equipment: 'orange'
 };
 const sectionIcons = {
   chemicals: 'fa-vial',
@@ -244,10 +244,10 @@ function renderStatisticsCards() {
     'top10Equipment',
     mockData.equipment.topBorrowed,
     'times',
-    'red'
+    'orange'
   );
   document.getElementById('equipmentBorrowedCount').textContent = mockData.equipment.totalBorrowed;
-  renderCurrentlyBorrowedList('equipmentBorrowedList', mockData.equipment.currentlyBorrowed, 'red');
+  renderCurrentlyBorrowedList('equipmentBorrowedList', mockData.equipment.currentlyBorrowed, 'orange');
 }
 
 function renderTop10List(listId, data, valueKey, color) {
@@ -403,8 +403,8 @@ function initializeCharts() {
           {
             label: 'Equipment',
             data: mockChartData.borrowingTrend.equipment,
-            borderColor: 'rgba(239, 68, 68, 1)',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
             tension: 0.4
           }
         ]

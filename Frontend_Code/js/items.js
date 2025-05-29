@@ -3,10 +3,13 @@
 //
 
 import * as dbhandler from "../../Backend_Code/mainHandler.js";
+import { generateInventoryPdfReport } from '/Frontend_Code/js/pdfReport.js';
+import '/Frontend_Code/js/font/Old London-normal.js';
 
 let tbody = null;
 let consumableItemRowToDelete = null;
 let consumableItemRowToEdit = null;
+let itemsData = [];
 
 // DOM Elements
 const editConsumableItemsLocation = document.getElementById(
@@ -124,7 +127,7 @@ function hideTableLoading() {
     // Fade out loading state
     loadingState.style.transition = 'opacity 0.3s ease-in-out';
     loadingState.style.opacity = '0';
-    
+
     setTimeout(() => {
       loadingState.classList.add('hidden');
       // Fade in table body
@@ -563,18 +566,18 @@ function handleTableButtonClicks(e) {
 async function initializePage() {
   try {
     showPageLoading();
-    
+
     // Initialize basic UI elements
     tbody = document.querySelector("#consumableItemsTableBody");
     setupDropdownElements();
-    
+
     if (!initializeConsumableItems()) {
       throw new Error("Could not initialize consumable items table");
     }
 
     // Show table loading state while fetching data
     showTableLoading();
-    
+
     // Initialize all data-dependent components
     await Promise.all([
       initializeConsumableItemsTable(),
@@ -585,11 +588,11 @@ async function initializePage() {
     // Setup event listeners after data is loaded
     setupEventListeners();
     initializeRemarksListeners();
-    
+
     // Hide all loading states
     hideTableLoading();
     hidePageLoading();
-    
+
     showToast('Page loaded successfully!');
   } catch (error) {
     console.error('Error initializing page:', error);
@@ -715,22 +718,22 @@ function showToast(message, isError = false, time = 3000) {
     toast.style.transform = "translateY(20px)";
     toast.style.transition = "all 0.3s ease-in-out";
     toast.style.zIndex = "9999";
-    
+
     // Add icon container
     const iconContainer = document.createElement("div");
     iconContainer.style.display = "flex";
     iconContainer.style.alignItems = "center";
     iconContainer.style.gap = "12px";
-    
+
     // Add icon
     const icon = document.createElement("i");
     icon.className = isError ? "fas fa-exclamation-circle" : "fas fa-check-circle";
     icon.style.fontSize = "20px";
-    
+
     iconContainer.appendChild(icon);
     iconContainer.appendChild(document.createTextNode(message));
     toast.appendChild(iconContainer);
-    
+
     document.body.appendChild(toast);
   } else {
     const icon = toast.querySelector("i");
@@ -739,17 +742,17 @@ function showToast(message, isError = false, time = 3000) {
     }
     toast.textContent = message;
   }
-  
+
   toast.style.background = isError
     ? "rgba(220, 38, 38, 0.95)"
     : "rgba(44, 161, 74, 0.95)";
-  
+
   // Animate in
   setTimeout(() => {
     toast.style.opacity = "1";
     toast.style.transform = "translateY(0)";
   }, 0);
-  
+
   // Animate out
   setTimeout(() => {
     toast.style.opacity = "0";
@@ -832,12 +835,8 @@ searchInput.addEventListener("input", searchConsumableItem);
 async function initializeConsumableItemsTable() {
   try {
     let data = await dbhandler.getAllConsumableItemsRecords();
-
-    if (data.length == 0) {
-      console.error("Lab Equipments table has no records.");
-      return;
-    }
-
+    itemsData = data;
+    if (data.length == 0) return;
     for (let i = 0; i < data.length; i++) {
       await createNewConsumableItemsRow(
         data[i]["Item ID"],
@@ -847,12 +846,9 @@ async function initializeConsumableItemsTable() {
         data[i]["Brand"],
         data[i]["Quantity"]
       );
-
       await createNewRemarks(data[i]["Remarks"], data[i]["Item ID"]);
     }
-  } catch (generalError) {
-    console.error(generalError);
-  }
+  } catch (e) { console.error(e); }
 }
 
 /**
@@ -898,3 +894,111 @@ async function initializeLocationDropdown() {
     console.error(generalError);
   }
 }
+
+async function prepareItemsTable() {
+  try {
+    let data = await dbhandler.getAllItemsRecords();
+    itemsData = data;
+    if (data.length == 0) return;
+    for (let i = 0; i < data.length; i++) {
+      await createNewItemsRow(
+        data[i]["Item ID"],
+        data[i]["Name"],
+        data[i]["Unit"],
+        data[i]["Location"],
+        data[i]["Brand"],
+        data[i]["Quantity"]
+      );
+      await createNewRemarks(data[i]["Remarks"], data[i]["Item ID"]);
+    }
+  } catch (e) { console.error(e); }
+}
+
+// ===================== PDF REPORT GENERATION =====================
+
+const dateModal = document.getElementById('dateInputModal');
+const dateForm = document.getElementById('dateInputForm');
+const dateFields = document.getElementById('dateFields');
+const addDateBtn = document.getElementById('addDateField');
+const removeDateBtn = document.getElementById('removeDateField');
+const cancelDateBtn = document.getElementById('cancelDateInput');
+
+// Always open the modal when Download PDF is clicked
+if (downloadPdfBtn) {
+  downloadPdfBtn.addEventListener('click', () => {
+    dateModal.classList.remove('hidden');
+    dateModal.classList.add('flex');
+  });
+}
+// Add date field
+addDateBtn.addEventListener('click', () => {
+  const idx = dateFields.children.length;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'flex items-center gap-2';
+  const label = document.createElement('label');
+  label.className = 'block text-gray-700 font-medium';
+  label.textContent = `Date ${idx + 1}:`;
+  label.setAttribute('for', `dateField${idx}`);
+  const input = document.createElement('input');
+  input.type = 'date';
+  input.id = `dateField${idx}`;
+  input.className = 'date-input flex-1 border rounded px-3 py-2';
+  input.required = true;
+  wrapper.appendChild(label);
+  wrapper.appendChild(input);
+  dateFields.appendChild(wrapper);
+});
+// Remove date field
+removeDateBtn.addEventListener('click', () => {
+  if (dateFields.children.length > 1) {
+    dateFields.removeChild(dateFields.lastElementChild);
+  }
+});
+// Cancel modal
+cancelDateBtn.addEventListener('click', () => {
+  dateModal.classList.add('hidden');
+  dateModal.classList.remove('flex');
+});
+// Format date as 'Month DD, YYYY'
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: '2-digit' });
+}
+// Handle form submit
+dateForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const dates = Array.from(dateFields.querySelectorAll('input')).map(input => formatDate(input.value)).filter(Boolean);
+  dateModal.classList.add('hidden');
+  dateModal.classList.remove('flex');
+  const pdfRows = itemsData.map(item => {
+    const base = [
+      item["Item ID"],
+      item["Name"],
+      item["Location"],
+      item["Brand"],
+      // item["Quantity"],
+      item["Remarks"] || ''
+    ];
+    if (dates && dates.length > 0) {
+      dates.forEach(() => base.push(item["Quantity"]));
+    }
+    return base;
+  });
+  const columns = [
+    { header: 'ITEM ID', dataKey: 'id' },
+    { header: 'NAME', dataKey: 'name' },
+    { header: 'LOCATION', dataKey: 'location' },
+    { header: 'BRAND', dataKey: 'brand' },
+    // { header: 'QUANTITY', dataKey: 'qty' },
+    // { header: 'REMARKS', dataKey: 'remarks' }
+  ];
+  await generateInventoryPdfReport({
+    title: 'LABORATORY ITEMS',
+    columns,
+    filename: 'items_inventory_report.pdf',
+    dateColumns: dates,
+    data: pdfRows
+  });
+});
+

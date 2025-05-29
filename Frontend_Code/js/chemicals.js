@@ -16,6 +16,8 @@
  */
 import * as dbhandler from "../../Backend_Code/mainHandler.js";
 import { showPageLoading, hidePageLoading, showTableLoading, hideTableLoading, initializeCommonUI } from "./common.js";
+import { generateInventoryPdfReport } from '/Frontend_Code/js/pdfReport.js';
+import '/Frontend_Code/js/font/Old London-normal.js';
 
 // Initialize Components
 const addChemicalLocation = document.getElementById("chemicalLocation");
@@ -27,6 +29,7 @@ const chemicalsTableBody = document.getElementById("chemicalsTableBody");
 
 let chemicalRowToDelete = null;
 let initialQuantity = 0; // Variable used to change the initial quantity of Chemical records (For updates)
+let chemicalsData = [];
 
 // Initialize the tables
 document.addEventListener('DOMContentLoaded', initializePage);
@@ -35,7 +38,7 @@ async function initializePage() {
   try {
     // Initialize common UI elements first
     initializeCommonUI();
-    
+
     showPageLoading('Loading Chemicals Management...');
 
     // Remove local dropdown setup since it's handled by initializeCommonUI
@@ -482,9 +485,8 @@ chemicalsTableBody.addEventListener("mouseover", function (e) {
 
   // Position the tooltip
   const rect = btn.getBoundingClientRect();
-  tooltip.style.left = `${
-    rect.left + window.scrollX + rect.width / 2 - tooltip.offsetWidth / 2
-  }px`;
+  tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - tooltip.offsetWidth / 2
+    }px`;
   tooltip.style.top = `${rect.bottom + window.scrollY + 8}px`;
 
   // Remove tooltip on mouseout
@@ -731,14 +733,9 @@ function updateChemicalTable(
 async function prepareChemicalsTable() {
   try {
     let data = await dbhandler.getAllChemicalRecords();
-
-    console.log("Number of records: ", data.length);
-
-    if (data.length == 0) {
-      console.error("Chemical table has no records.");
-      return;
-    }
-
+    chemicalsData = data;
+    if (data.length == 0) return;
+    console.log("Chemical record fields:", data[0]); // Log the first record's fields
     for (let i = 0; i < data.length; i++) {
       await createNewChemicalRow(
         data[i]["Item ID"],
@@ -753,12 +750,9 @@ async function prepareChemicalsTable() {
         data[i]["MSDS"] || "N/A",
         data[i]["Barcode"] || "N/A"
       );
-
       await createNewRemarks(data[i]["Remarks"], data[i]["Item ID"]);
     }
-  } catch (generalError) {
-    console.error(generalError);
-  }
+  } catch (e) { console.error(e); }
 }
 
 /**
@@ -894,3 +888,98 @@ function searchChemicalsTable() {
 
 // Add event listener for search input
 searchInput.addEventListener("input", searchChemicalsTable);
+
+
+// ===================== PDF REPORT GENERATION =====================
+
+const dateModal = document.getElementById('dateInputModal');
+const dateForm = document.getElementById('dateInputForm');
+const dateFields = document.getElementById('dateFields');
+const addDateBtn = document.getElementById('addDateField');
+const removeDateBtn = document.getElementById('removeDateField');
+const cancelDateBtn = document.getElementById('cancelDateInput');
+
+// Always open the modal when Download PDF is clicked
+if (downloadPdfBtn) {
+  downloadPdfBtn.addEventListener('click', () => {
+    dateModal.classList.remove('hidden');
+    dateModal.classList.add('flex');
+  });
+}
+// Add date field
+addDateBtn.addEventListener('click', () => {
+  const idx = dateFields.children.length;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'flex items-center gap-2';
+  const label = document.createElement('label');
+  label.className = 'block text-gray-700 font-medium';
+  label.textContent = `Date ${idx + 1}:`;
+  label.setAttribute('for', `dateField${idx}`);
+  const input = document.createElement('input');
+  input.type = 'date';
+  input.id = `dateField${idx}`;
+  input.className = 'date-input flex-1 border rounded px-3 py-2';
+  input.required = true;
+  wrapper.appendChild(label);
+  wrapper.appendChild(input);
+  dateFields.appendChild(wrapper);
+});
+// Remove date field
+removeDateBtn.addEventListener('click', () => {
+  if (dateFields.children.length > 1) {
+    dateFields.removeChild(dateFields.lastElementChild);
+  }
+});
+// Cancel modal
+cancelDateBtn.addEventListener('click', () => {
+  dateModal.classList.add('hidden');
+  dateModal.classList.remove('flex');
+});
+// Format date as 'Month DD, YYYY'
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: '2-digit' });
+}
+// Handle form submit
+dateForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const dates = Array.from(dateFields.querySelectorAll('input')).map(input => formatDate(input.value)).filter(Boolean);
+  dateModal.classList.add('hidden');
+  dateModal.classList.remove('flex');
+
+  // Build rows for PDF from chemicalsData
+  const pdfRows = chemicalsData.map(item => {
+    const base = [
+      item["Item ID"],
+      item["Name"],
+      item["Location"],
+      item["Brand"],
+      item["Initial Qty."],
+      item["Container Size"],
+      item["Remarks"] || ''
+    ];
+    // Add the remaining quantity for each date column
+    if (dates && dates.length > 0) {
+      dates.forEach(() => base.push(item["Remaining Qty."]));
+    }
+    return base;
+  });
+
+  const columns = [
+    { header: 'ITEM ID', dataKey: 'id' },
+    { header: 'NAME', dataKey: 'name' },
+    { header: 'LOCATION', dataKey: 'location' },
+    { header: 'BRAND', dataKey: 'brand' },
+    { header: 'INITIAL QUANTITY (Per Bottle)', dataKey: 'bottle_count' },
+    { header: 'CONTAINER SIZE', dataKey: 'container_size' },
+  ];
+
+  await generateInventoryPdfReport({
+    title: 'LABORATORY CHEMICALS',
+    columns,
+    filename: 'chemicals_inventory_report.pdf',
+    dateColumns: dates,
+    data: pdfRows
+  });
+});

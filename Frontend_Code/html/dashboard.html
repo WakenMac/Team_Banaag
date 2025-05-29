@@ -138,7 +138,7 @@
       </li>
       <li>
         <a class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]"
-          href="/Frontend_Code/html/components/transactions.html">Transactions</a>
+          href="/Frontend_Code/html/components/transactions.html">Request History</a>
       </li>
       <li>
         <a class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]"
@@ -152,7 +152,7 @@
       <h1 class="text-3xl font-extrabold text-gray-800">Dashboard</h1>
       <button aria-controls="verifyAdminModal" aria-haspopup="dialog" class="custom-btn" id="addTransactionBtn"
         type="button">
-        New Transaction
+        New Request
       </button>
     </div>
 
@@ -201,18 +201,18 @@
       <!-- Visualization Row -->
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <div class="flex flex-col justify-between p-6 bg-white shadow rounded-xl">
-          <h3 class="flex items-center gap-2 mb-2 text-base font-semibold text-green-700"><i
-              class="fas fa-chart-line"></i> Consumption Trend</h3>
+          <h3 class="flex items-center gap-2 mb-2 text-base font-semibold text-gray-800"><i
+              class="fas fa-chart-line text-green-700"></i> Consumption Trend</h3>
           <div class="h-48"><canvas id="consumptionTrendChart"></canvas></div>
         </div>
         <div class="flex flex-col justify-between p-6 bg-white shadow rounded-xl">
-          <h3 class="flex items-center gap-2 mb-2 text-base font-semibold text-blue-700"><i
-              class="fas fa-chart-area"></i> Borrowing Trend</h3>
+          <h3 class="flex items-center gap-2 mb-2 text-base font-semibold text-gray-800"><i
+              class="fas fa-chart-area text-blue-700"></i> Borrowing Trend</h3>
           <div class="h-48"><canvas id="borrowingTrendChart"></canvas></div>
         </div>
         <div class="p-6 bg-white shadow rounded-xl">
-          <h3 class="flex items-center gap-2 mb-4 text-base font-semibold text-purple-700">
-            <i class="fas fa-chart-pie"></i> Borrowed vs. Available
+          <h3 class="flex items-center gap-2 mb-4 text-base font-semibold text-gray-800">
+            <i class="fas fa-chart-pie text-purple-700"></i> Borrowed vs. Available
           </h3>
           <div class="flex items-center justify-between">
             <!-- Chart -->
@@ -222,8 +222,8 @@
 
             <!-- Stats -->
             <div class="flex flex-col items-center gap-2 text-base font-semibold">
-              <div class="text-orange-600">
-                Borrowed: <span class="px-3 py-1 text-orange-700 bg-orange-100 rounded-lg shadow-inner">681</span>
+              <div class="text-blue-600">
+                Borrowed: <span class="px-3 py-1 text-blue-700 bg-blue-100 rounded-lg shadow-inner">681</span>
               </div>
               <div class="text-green-700">
                 Available: <span class="px-3 py-1 text-green-800 bg-green-100 rounded-lg shadow-inner">319</span>
@@ -242,15 +242,15 @@
         </div>
         <div class="flex flex-col justify-between p-6 shadow bg-blue-50 rounded-xl">
           <h3 class="flex items-center gap-2 mb-2 text-base font-semibold text-blue-700"><i class="fas fa-bolt"></i> Top
-            10 Frequently Borrowed Nonconsumables</h3>
+            10 Most Borrowed Non-consumables</h3>
           <div class="h-72"><canvas id="topNonconsumablesBarChart"></canvas></div>
         </div>
       </div>
 
       <!-- Data Lists Row -->
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <div class="flex flex-col p-6 shadow bg-purple-50 rounded-xl h-72">
-          <h3 class="flex items-center gap-2 mb-2 text-base font-semibold text-purple-700"><i
+        <div class="flex flex-col p-6 shadow bg-blue-50 rounded-xl h-72">
+          <h3 class="flex items-center gap-2 mb-2 text-base font-semibold text-blue-700"><i
               class="fas fa-hand-holding"></i> Currently Borrowed Items</h3>
           <ul id="dashboardCurrentlyBorrowed" class="flex-1 pr-2 space-y-2 overflow-y-auto"></ul>
         </div>
@@ -284,7 +284,7 @@
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
           <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="object-contain w-12 h-12" />
-          <span class="text-3xl font-black text-black">New Transaction</span>
+          <span class="text-3xl font-black text-black">New Request</span>
         </div>
       </div>
       <form class="space-y-4" id="addAdminForm">
