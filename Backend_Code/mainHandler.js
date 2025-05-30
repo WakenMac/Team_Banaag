@@ -9,7 +9,7 @@ const supabaseClient = supabase.createClient(url, key);
  * Method used to test if we can access the mainHandler javascript file.
  */
 export async function testPresence(){
-    console.log("Main Handler is alive.");
+    console.log("Buhi pako.");
 }
 
 // ======================================================================================================================================
@@ -2854,6 +2854,27 @@ export async function prepareUser(){
 
 /**
  * Method to get all of the records on the Transactions table
+ * @returns The next ID of the transaction ID in the sequence
+ */
+export async function getNextTransactionId(){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_next_transaction_id');
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to get all of the records on the Transactions table
  * @returns A record consisting of 5 columns (Transaction ID, Admin Name, Transaction Date, Status, Remarks)
  */
 export async function getAllTransactionRecords(){
@@ -2909,11 +2930,43 @@ export async function addTransactionRecord(
 /**
  * @description Method to get all of the records on the Transactions table
  * @returns A record consisting of 10 columns: (Transaction ID, Item ID, Item Name, Initial Borrow Quantity, Current Borrow Quantity, Unit Type, Item Type, Status, Returnable, Remarks)
- */
+*/
 export async function getAllItemsTransactedRecords(){
     try{
         await prepareUser();
         const {data, error: supabaseError} = await supabaseClient.rpc('get_all_items_transacted_records');
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to add a new Transaction
+ * @param {int} transactionId         Transaction where the item was borrowed
+ * @param {int} itemId                ID of the item to be returned
+ * @param {float4} returnQuantity     Amount to return
+ * @param {string} remarks            Remark to the returned item
+ */
+export async function returnItemTransacted(
+    transactionId, itemId, returnQuantity, remarks
+){
+    try{
+        await prepareUser();
+        const {data, error: supabaseError} = await supabaseClient.rpc('main_return_item', {
+            input_transaction_id : transactionId,
+            input_item_id : itemId,
+            return_quantity : Number(returnQuantity),
+            input_remarks : remarks
+        });
         
         if (supabaseError){
             console.error(`Supabase Error:`, supabaseError.message);
@@ -2940,9 +2993,6 @@ export function converter(condition = '', ...objectArray){
     if (!condition === 'string' || !condition === 'int' || !condition === 'bigint' || !condition === 'float'){
         throw new Error('Kindly specify the condition for this method')
     }
-
-    // TODO: Remove once everything is implemented.
-    console.log(objectArray);
 
     let newArray = new Array(objectArray.length);
 

@@ -201,8 +201,6 @@ async function loadTransactionHistory() {
   
   try {
     showTableLoading();
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
     const searchTerm = document.getElementById('transactionSearch')?.value.toLowerCase() || '';
     const status = document.getElementById('transactionFilter')?.value || 'all';
     const startDate = document.getElementById('startDate')?.value;
@@ -249,7 +247,7 @@ async function loadTransactionHistory() {
         }
           return `
             <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" 
-                name = "${transaction.transaction_id}"
+                id = "${transaction.transaction_id}"
                 data-transaction-id="${transaction.transaction_id}">
               <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
                 ${transaction.transaction_id || ''}
@@ -306,7 +304,6 @@ async function loadTransactionHistory() {
       }
 
       table.innerHTML = filteredTransactions.map(transaction => {
-        console.log(transaction);
         // Truncate remarks if too long
         const maxRemarkLength = 40;
         let displayRemark = (!transaction["Remarks"] || transaction["Remarks"] == "")? '' : transaction["Remarks"];
@@ -317,7 +314,7 @@ async function loadTransactionHistory() {
         }
           return `
             <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" 
-                id = "${transaction["Transaction ID"]}" "
+                id = "${transaction["Transaction ID"]}"
                 data-transaction-id="${transaction["Transaction ID"]}">
               <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
                 ${transaction["Transaction ID"] || ''}
@@ -344,8 +341,8 @@ async function loadTransactionHistory() {
     
     // Adds the "click" event listener to prepare and view the transactionDetailsModal
     filteredTransactions.map(transaction => {
-      let row = document.getElementById(transaction["Transaction ID"]);
-      if(!row) return;
+      let row = document.getElementById(transaction["Transaction ID"]) || document.getElementById(transaction.transaction_id);
+      if (!row) return;
       row.addEventListener('click', (e) => {
         showTransactionDetails(row.children[0].textContent.trim())
       })
@@ -536,7 +533,7 @@ function showTransactionDetails (transactionId) {
                       max="${remainingQuantity}"
                       value="0"
                       data-item="${item.name}">
-                    <button data-item-button="${item["Item Name"]}"
+                    <button data-item-button="${item.name}"
                       class="px-3 py-1 rounded-md bg-[#2dc653] text-white text-xs font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
                       Return
                     </button>
@@ -638,12 +635,23 @@ function showTransactionDetails (transactionId) {
     let itemName = row.getAttribute('data-name-tr')
     let transactionId = row.getAttribute('data-name-id')
     let button = row.querySelector(`button[data-item-button="${itemName}"]`)
-    if (!button) return;
+    let input = document.querySelector(`input[data-item="${itemName}"]`);
 
-    button.addEventListener("click", async (e) => {
+    // Listener for the return button's functionality
+    if (!button) return;
+    button.addEventListener("click", async function handleReturn(e){
       e.preventDefault();
       await processReturn(transactionId, itemName)
     });
+
+    // Adds key listener in inputs (To limit the max number of items to return)
+    if (!input) return;
+    input.addEventListener('keyup', function inputListener(e){
+      e.preventDefault();
+      let value = Number(input.value);
+      if (value > input.max)
+        input.value = input.max;
+    })
   })
 
 
@@ -651,233 +659,52 @@ function showTransactionDetails (transactionId) {
   showModal('transactionDetailsModal');
 };
 
-// TODO: What does this do?
-// RETURNS an item
+// Returns an item
 async function processReturn (transactionId, itemName) {
-  console.log("I work :>");
-  console.log(transactionId, itemName);
-  return;
-
   // Temporarily used dead code before we connect it to the database
   const quantityInput = document.querySelector(`input[data-item="${itemName}"]`);
   if (!quantityInput) return;
-  const remarkInput = document.querySelector(`textarea[data-item-remark="${itemName}"]`);
-  const returnRemark = remarkInput ? remarkInput.value.trim() : '';
-  const returnQuantity = parseInt(quantityInput.value);
+  const returnQuantity = parseFloat(quantityInput.value);
   if (isNaN(returnQuantity) || returnQuantity < 1) {
     showToast('Please enter a valid return quantity', true);
     return;
   }
 
+  // Checks the remarks
+  const remarkInput = document.querySelector(`textarea[data-item-remark="${itemName}"]`);
+  const returnRemark = remarkInput ? remarkInput.value.trim() : '';
+
+  // Gets the index for the details in each dataset.
+  let transactionIndex = filteredTransactions.findIndex(t => { return t["Transaction ID"] === Number(transactionId) })
+  let itemIndex = itemsTransactedData.findIndex(i => { return i["Item Name"] === itemName && i["Transaction ID"] === Number(transactionId) })
+
   try {
-    // Update transaction status and item data in mockTransactionHistory
-    const transaction = mockTransactionHistory.find(t => t.transaction_id === transactionId);
-    if (transaction) {
-      const item = transaction.items.find(i => i.name === itemName);
-      if (item) {
-        item.returned_quantity = (item.returned_quantity || 0) + returnQuantity;
-        if (returnRemark) {
-          item.return_remark = returnRemark;
-        }
-        // Check if all non-consumable items are returned
-        const allNonConsumablesReturned = transaction.items
-          .filter(i => !i.is_consumable)
-          .every(i => (i.returned_quantity || 0) >= i.quantity);
-        if (allNonConsumablesReturned) {
-          transaction.status = 'completed';
-        } else {
-          transaction.status = 'partially_returned';
-        }
-      }
+    let queryResult = await dbhandler.returnItemTransacted(
+      transactionId, itemsTransactedData[itemIndex]["Item ID"], returnQuantity, returnRemark);
+    
+    if (!queryResult || queryResult.includes('ERROR')){
+      throw queryResult;
+    } else {
+      let transactionStatus = queryResult.slice(47, queryResult.length); // Gets the transaction status (Part of the query's return statement)
+      
+      // Update the content within each data.
+      transactionData[transactionIndex]["Status"] = transactionStatus;
+      itemsTransactedData[itemIndex]["Current Borrowed Quantity"] = parseFloat(itemsTransactedData[itemIndex]["Current Borrowed Quantity"]) - parseFloat(returnQuantity);
+      itemsTransactedData[itemIndex]["Status"] = (itemsTransactedData[itemIndex]["Current Borrowed Quantity"] == 0)?
+        "Completed" : "Partially Returned";
+      itemsTransactedData[itemIndex]["Remarks"] = (returnRemark === '')? itemsTransactedData[itemIndex]["Remarks"] : returnRemark;
+
+      showToast('Item returned successfully');
+      await loadTransactionHistory(); // Refresh the main table
+      showTransactionDetails(transactionId); // Force refresh modal content
+      if (remarkInput) remarkInput.value = '';
     }
 
-    showToast('Item returned successfully');
-    await loadTransactionHistory(); // Refresh the main table
-    window.showTransactionDetails(transactionId); // Force refresh modal content
-    if (remarkInput) remarkInput.value = '';
   } catch (error) {
     console.error('Error processing return:', error);
     showToast('Error processing return. Please try again.', true);
   }
 };
-
-// This is called after returning an item.
-async function loadBorrowedItems() {
-  const borrowedItemsTable = document.getElementById('borrowedItemsTable');
-
-  if (!borrowedItemsTable) {
-    console.error('Borrowed items table not found');
-    return;
-  }
-
-  // Show loading state
-  borrowedItemsTable.innerHTML = `
-    <tr class="loading-row h-[250px] text-center text-gray-500 italic">
-      <td colspan="6" class="align-middle">Loading borrowed items...</td>
-    </tr>
-  `;
-
-  try {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Filter out consumable items from mock data
-    const nonConsumableItems = mockBorrowedItems.filter(item => !item.items?.is_consumable);
-
-    if (nonConsumableItems.length === 0) {
-      borrowedItemsTable.innerHTML = `
-        <tr class="h-[250px] text-center text-gray-500 italic">
-          <td colspan="6" class="align-middle">No items available for return</td>
-        </tr>
-      `;
-      return;
-    }
-
-    // Populate table with borrowed items
-    borrowedItemsTable.innerHTML = nonConsumableItems.map(item => {
-      const remainingQuantity = item.quantity - (item.returned_quantity || 0);
-      return `
-        <tr class="hover:bg-gray-50">
-          <td class="px-6 py-4">
-            <input type="checkbox" 
-              class="return-item-checkbox rounded border-gray-300 text-[#2ca14a] focus:ring-[#2ca14a]"
-              data-item-id="${item.id}">
-          </td>
-          <td class="px-6 py-4">${item.id}</td>
-          <td class="px-6 py-4">${item.items?.name || 'Unknown Item'}</td>
-          <td class="px-6 py-4">${item.quantity}</td>
-          <td class="px-6 py-4">${new Date(item.transaction_date).toLocaleDateString()}</td>
-          <td class="px-6 py-4">
-            <input type="number" 
-              class="return-quantity w-20 rounded-md border border-gray-300 px-2 py-1"
-              min="1"
-              max="${remainingQuantity}"
-              value="${remainingQuantity}">
-          </td>
-        </tr>
-      `;
-    }).join('');
-  } catch (error) {
-    console.error('Error displaying borrowed items:', error);
-    borrowedItemsTable.innerHTML = `
-      <tr class="h-[250px] text-center text-gray-500 italic">
-        <td colspan="6" class="align-middle">Error loading items. Please try again.</td>
-      </tr>
-    `;
-    showToast('Error loading borrowed items', true);
-  }
-}
-
-// Handle return
-async function handleReturnItems() {
-  const checkedItems = document.querySelectorAll('.return-item-checkbox:checked');
-  const returnNotes = document.getElementById('returnNotes')?.value.trim() || '';
-
-  if (checkedItems.length === 0) {
-    showToast('Please select items to return', true);
-    return;
-  }
-
-  // Show loading state
-  const confirmReturnBtn = document.getElementById('confirmReturnBtn');
-  if (confirmReturnBtn) {
-    confirmReturnBtn.disabled = true;
-    confirmReturnBtn.innerHTML = `
-      <div class="flex items-center">
-        <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-        Processing...
-      </div>
-    `;
-  }
-
-  try {
-    const itemsToReturn = [];
-
-    // Validate all items first
-    for (const checkbox of checkedItems) {
-      const row = checkbox.closest('tr');
-      if (!row) continue;
-
-      const transactionId = checkbox.dataset.itemId;
-      const returnQuantityInput = row.querySelector('.return-quantity');
-      const returnQuantity = parseInt(returnQuantityInput?.value);
-      const maxQuantity = parseInt(returnQuantityInput?.getAttribute('max'));
-
-      // Debug logging
-      console.log(`Transaction ${transactionId}:`, {
-        returnQuantity,
-        maxQuantity,
-        comparison: returnQuantity > maxQuantity
-      });
-
-      // Validate return quantity
-      if (!returnQuantity || isNaN(returnQuantity) || returnQuantity < 1) {
-        throw new Error(`Invalid return quantity for transaction ${transactionId}`);
-      }
-
-      if (returnQuantity > maxQuantity) {
-        throw new Error(`Cannot return more items than borrowed for transaction ${transactionId}`);
-      }
-
-      itemsToReturn.push({ transactionId, returnQuantity });
-    }
-
-    // Process returns using mock data
-    for (const item of itemsToReturn) {
-      const borrowedItem = mockBorrowedItems.find(mock => mock.id === item.transactionId);
-      if (!borrowedItem) {
-        throw new Error(`Transaction ${item.transactionId} not found`);
-      }
-
-      // Update mock data
-      borrowedItem.returned_quantity = (borrowedItem.returned_quantity || 0) + item.returnQuantity;
-
-      // If all items are returned, mark as fully returned
-      if (borrowedItem.returned_quantity >= borrowedItem.quantity) {
-        borrowedItem.is_returned = true;
-      }
-
-      // Update inventory mock data
-      const inventoryItem = mockInventory.find(inv => inv.item_name === borrowedItem.items.name);
-      if (inventoryItem) {
-        inventoryItem.available_quantity += item.returnQuantity;
-      }
-    }
-
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    showToast('Items returned successfully');
-    closeReturnModal();
-
-    // Refresh the borrowed items list
-    await loadBorrowedItems();
-
-  } catch (error) {
-    console.error('Error processing returns:', error);
-    showToast(error.message || 'Error processing returns. Please try again.', true);
-  } finally {
-    // Reset button state
-    if (confirmReturnBtn) {
-      confirmReturnBtn.disabled = false;
-      confirmReturnBtn.innerHTML = 'Return Selected Items';
-    }
-  }
-}
-
-function closeReturnModal() {
-  const returnItemsModal = document.getElementById('returnItemsModal');
-  if (!returnItemsModal) return;
-
-  hideModal('returnItemsModal');
-  const returnNotes = document.getElementById('returnNotes');
-  const returnSearchInput = document.getElementById('returnSearchInput');
-  const selectAllItems = document.getElementById('selectAllItems');
-
-  if (returnNotes) returnNotes.value = '';
-  if (returnSearchInput) returnSearchInput.value = '';
-  if (selectAllItems) selectAllItems.checked = false;
-}
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', async () => {
@@ -889,55 +716,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   await initializeItemsTransacted();
   await loadTransactionHistory(); // For returning
 
-  // Get all modal elements (Transactions)
-  const returnItemsModal = document.getElementById('returnItemsModal');
-
-  // Transaction history
-  const returnBtn = document.getElementById('returnBtn');
-  const cancelReturnBtn = document.getElementById('cancelReturnBtn');
-  const confirmReturnBtn = document.getElementById('confirmReturnBtn');
-  const selectAllItems = document.getElementById('selectAllItems');
-  const returnSearchInput = document.getElementById('returnSearchInput');
-
-  returnBtn?.addEventListener('click', () => {
-    hideModal('transactionTypeModal');
-    loadBorrowedItems();
-    showModal('returnItemsModal');
-  });
-
-  // Return functionality event listeners
-  cancelReturnBtn?.addEventListener('click', () => hideModal('returnItemsModal'));
-  confirmReturnBtn?.addEventListener('click', handleReturnItems);
-
-  returnItemsModal?.addEventListener('click', (e) => {
-    if (e.target === returnItemsModal) hideModal('returnItemsModal');
-  });
-
-  selectAllItems?.addEventListener('change', (e) => {
-    const checkboxes = document.querySelectorAll('.return-item-checkbox');
-    checkboxes.forEach(checkbox => checkbox.checked = e.target.checked);
-  });
-
-  returnSearchInput?.addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    const rows = document.querySelectorAll('#borrowedItemsTable tr:not(.loading-row)');
-    rows.forEach(row => {
-      const text = row.textContent.toLowerCase();
-      row.style.display = text.includes(searchTerm) ? '' : 'none';
-    });
-  });
-
   // Add event listeners for closing the transaction details modal
   const closeBtn = document.getElementById('closeDetailsBtn');
   const closeModalBtn = document.getElementById('closeDetailsModalBtn');
 
-  if (closeBtn) {
+  if (closeBtn)
     closeBtn.onclick = () => hideModal('transactionDetailsModal');
-  }
-
-  if (closeModalBtn) {
+  if (closeModalBtn) 
     closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
-  }
 
   hideLoading();
 });
@@ -999,7 +785,7 @@ function showToast(message, isError = false) {
   setTimeout(() => {
     toast.classList.add('hidden');
     toast.classList.remove('flex');
-  }, isError ? 4000 : 3000);
+  }, isError ? 3000 : 4000);
 }
 
 // Function to show notifications
