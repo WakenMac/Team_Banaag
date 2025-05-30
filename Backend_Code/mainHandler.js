@@ -9,7 +9,7 @@ const supabaseClient = supabase.createClient(url, key);
  * Method used to test if we can access the mainHandler javascript file.
  */
 export async function testPresence(){
-    console.log("Main Handler is alive.");
+    console.log("Buhi pako.");
 }
 
 // ======================================================================================================================================

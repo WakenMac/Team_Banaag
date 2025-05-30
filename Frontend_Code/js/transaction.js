@@ -249,7 +249,7 @@ async function loadTransactionHistory() {
         }
           return `
             <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" 
-                name = "${transaction.transaction_id}"
+                id = "${transaction.transaction_id}"
                 data-transaction-id="${transaction.transaction_id}">
               <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
                 ${transaction.transaction_id || ''}
@@ -316,7 +316,7 @@ async function loadTransactionHistory() {
         }
           return `
             <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-150" 
-                id = "${transaction["Transaction ID"]}" "
+                id = "${transaction["Transaction ID"]}"
                 data-transaction-id="${transaction["Transaction ID"]}">
               <td class="px-6 py-4 text-left whitespace-nowrap text-sm text-gray-900">
                 ${transaction["Transaction ID"] || ''}
@@ -343,8 +343,8 @@ async function loadTransactionHistory() {
     
     // Adds the "click" event listener to prepare and view the transactionDetailsModal
     filteredTransactions.map(transaction => {
-      let row = document.getElementById(transaction["Transaction ID"]);
-      if(!row) return;
+      let row = document.getElementById(transaction["Transaction ID"]) || document.getElementById(transaction.transaction_id);
+      if (!row) return;
       row.addEventListener('click', (e) => {
         showTransactionDetails(row.children[0].textContent.trim())
       })
@@ -535,7 +535,7 @@ function showTransactionDetails (transactionId) {
                       max="${remainingQuantity}"
                       value="0"
                       data-item="${item.name}">
-                    <button data-item-button="${item["Item Name"]}"
+                    <button data-item-button="${item.name}"
                       class="px-3 py-1 rounded-md bg-[#2dc653] text-white text-xs font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
                       Return
                     </button>
@@ -637,12 +637,23 @@ function showTransactionDetails (transactionId) {
     let itemName = row.getAttribute('data-name-tr')
     let transactionId = row.getAttribute('data-name-id')
     let button = row.querySelector(`button[data-item-button="${itemName}"]`)
-    if (!button) return;
+    let input = document.querySelector(`input[data-item="${itemName}"]`);
 
-    button.addEventListener("click", async (e) => {
+    // Listener for the return button's functionality
+    if (!button) return;
+    button.addEventListener("click", async function handleReturn(e){
       e.preventDefault();
       await processReturn(transactionId, itemName)
     });
+
+    // Adds key listener in inputs (To limit the max number of items to return)
+    if (!input) return;
+    input.addEventListener('keyup', function inputListener(e){
+      e.preventDefault();
+      let value = Number(input.value);
+      if (value > input.max)
+        input.value = input.max;
+    })
   })
 
 
