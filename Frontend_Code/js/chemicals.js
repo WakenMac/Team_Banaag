@@ -476,7 +476,7 @@ chemicalsTableBody.addEventListener("mouseover", function (e) {
 
   const tooltip = document.createElement("div"); // div ang butngan sa information
   tooltip.className =
-    "custom-tooltip absolute z-50 bg-gray-800 text-white text-xs rounded shadow-lg";
+    "absolute z-50 text-xs text-white bg-gray-800 rounded shadow-lg custom-tooltip";
   tooltip.style.position = "absolute";
   tooltip.style.pointerEvents = "none";
   tooltip.innerHTML = tooltipContent;
@@ -853,14 +853,14 @@ function searchChemicalsTable() {
     const itemName = row.children[1].textContent.toLowerCase();
     const itemLocation = row.children[3].textContent.toLowerCase();
     const itemBrand = row.children[4].textContent.toLowerCase();
+    const itemUnit = row.children[2].textContent.toLowerCase();
     const showRow =
       !searchValue ||
       itemName.includes(searchValue) ||
       itemName.startsWith(searchValue) ||
       itemLocation.includes(searchValue) ||
-      itemLocation.startsWith(searchValue) ||
       itemBrand.includes(searchValue) ||
-      itemBrand.startsWith(searchValue);
+      itemUnit.includes(searchValue);
 
     row.style.display = showRow ? "" : "none";
     if (showRow) {
@@ -912,13 +912,13 @@ addDateBtn.addEventListener('click', () => {
   const wrapper = document.createElement('div');
   wrapper.className = 'flex items-center gap-2';
   const label = document.createElement('label');
-  label.className = 'block text-gray-700 font-medium';
+  label.className = 'block font-medium text-gray-700';
   label.textContent = `Date ${idx + 1}:`;
   label.setAttribute('for', `dateField${idx}`);
   const input = document.createElement('input');
   input.type = 'date';
   input.id = `dateField${idx}`;
-  input.className = 'date-input flex-1 border rounded px-3 py-2';
+  input.className = 'flex-1 px-3 py-2 border rounded date-input';
   input.required = true;
   wrapper.appendChild(label);
   wrapper.appendChild(input);

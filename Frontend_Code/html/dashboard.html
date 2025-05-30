@@ -369,9 +369,9 @@
           <input type="password" id="password" name="verifyAdminPassword" required
             class="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent"
             placeholder="Enter your password" />
-          <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
-            <svg class="w-5 h-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor"
-              viewBox="0 0 24 24">
+          <button type="button" id="togglePassword" class="absolute right-0 top-2.5 h-full flex items-center pr-3">
+            <svg class="w-5 h-5 text-gray-400 hover:text-gray-600 pointer-events-none mt-0.5" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -519,9 +519,14 @@
   </div>
 
   <!-- Toast Notification -->
-  <div id="toastNotification" class="fixed z-50 hidden bottom-4 right-4">
-    <div class="bg-[#2dc653] text-white px-6 py-3 rounded-lg shadow-lg">
-      <p id="toastMessage">Transaction successful!</p>
+  <div id="toastNotification" class="fixed z-50 hidden left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+    <div class="w-48 h-48 bg-white flex flex-col items-center justify-center rounded-2xl shadow-2xl">
+      <div id="toastIcon" class="flex items-center justify-center w-16 h-16 rounded-full mb-4 bg-green-100">
+        <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <p id="toastMessage" class="text-lg font-semibold text-gray-800 text-center">Transaction successful!</p>
     </div>
   </div>
 
@@ -699,6 +704,37 @@
     </svg>
   </button>
 
+  <!-- Borrow Receipt Modal -->
+  <div id="borrowReceiptModal" class="fixed inset-0 z-50 items-center justify-center hidden" role="dialog"
+    aria-labelledby="borrowReceiptTitle" aria-modal="true">
+    <div class="fixed inset-0 bg-black opacity-50 modal-backdrop"></div>
+    <div class="relative z-50 w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <img src="/Frontend_Code/images/cas_logo.png" alt="CARES logo" class="object-contain w-12 h-12" />
+          <span class="text-2xl font-black text-black" id="borrowReceiptTitle">Borrow Receipt</span>
+        </div>
+      </div>
+      <div id="borrowReceiptContent" class="space-y-4">
+        <!-- Populated by JS -->
+      </div>
+      <div class="flex justify-end pt-4 space-x-3">
+        <button type="button" id="printBorrowReceiptBtn"
+          class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]">
+          Print
+        </button>
+        <button type="button" id="cancelBorrowReceiptBtn"
+          class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]">
+          Cancel
+        </button>
+        <button type="button" id="confirmBorrowReceiptBtn"
+          class="px-4 py-2 rounded-md bg-[#2dc653] text-white font-semibold hover:bg-[#27b04a] focus:outline-none focus:ring-2 focus:ring-[#27b04a]">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Script to access the supabase API -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -706,6 +742,8 @@
   <script type="module" src="/Frontend_Code/js/script.js"></script>
   <script type="module" src="/Frontend_Code/js/dashboardRequests.js"></script>
   <script type="module" src="/Frontend_Code/js/statistics.js"></script>
+
+
 </body>
 
 </html>

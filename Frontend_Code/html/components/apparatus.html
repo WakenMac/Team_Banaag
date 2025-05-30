@@ -165,8 +165,8 @@
     <div class="flex flex-col items-center justify-between w-full gap-3 sm:flex-row sm:gap-0">
       <div class="flex flex-col items-center w-full gap-3 sm:flex-row sm:gap-4 sm:w-auto">
         <input id="searchInput" aria-label="Search"
-          class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-64"
-          placeholder="Search..." type="search" />
+        class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-lg w-full sm:w-96"
+        placeholder="Search by name, unit, location, or brand..." type="search" />
       </div>
       <button aria-controls="addApparatusModal" aria-haspopup="dialog" class="custom-btn" id="addApparatusBtn"
         type="button">
@@ -433,19 +433,19 @@
   <!-- End of Add Remarks Modal -->
 
   <!-- Date Input Modal for PDF -->
-  <div id="dateInputModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30 hidden">
-    <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
-      <h3 class="text-xl font-bold mb-4 text-center text-green-700">Inventory Report Dates</h3>
+  <div id="dateInputModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-30">
+    <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+      <h3 class="mb-4 text-xl font-bold text-center text-green-700">Inventory Report Dates</h3>
       <form id="dateInputForm" class="space-y-4">
         <div id="dateFields" class="space-y-3">
           <div class="flex items-center gap-2">
-            <label class="block text-gray-700 font-medium" for="dateField0">Date 1:</label>
-            <input type="date" id="dateField0" class="date-input flex-1 border rounded px-3 py-2" required />
+            <label class="block font-medium text-gray-700" for="dateField0">Date 1:</label>
+            <input type="date" id="dateField0" class="flex-1 px-3 py-2 border rounded date-input" required />
           </div>
         </div>
         <div class="flex justify-between mt-2">
-          <button type="button" id="addDateField" class="text-green-700 font-semibold">+ Add Date</button>
-          <button type="button" id="removeDateField" class="text-red-600 font-semibold">- Remove</button>
+          <button type="button" id="addDateField" class="font-semibold text-green-700">+ Add Date</button>
+          <button type="button" id="removeDateField" class="font-semibold text-red-600">- Remove</button>
         </div>
         <div class="flex justify-end gap-2 mt-4">
           <button type="button" id="cancelDateInput"

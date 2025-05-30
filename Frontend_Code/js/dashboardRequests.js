@@ -2,9 +2,11 @@
 import * as dbhandler from "../../Backend_Code/mainHandler.js";
 import * as login from "./login.js";
 
+
 // Global data
 var itemData;
 let currentAdminId = null;
+let currentAdminName = null;
 let selectedItems = [];
 
 
@@ -25,9 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const returnSearchInput = document.getElementById('returnSearchInput');
 
   returnBtn?.addEventListener('click', () => {
-      hideModal('transactionTypeModal');
-      loadBorrowedItems();
-      showModal('returnItemsModal');
+    hideModal('transactionTypeModal');
+    loadBorrowedItems();
+    showModal('returnItemsModal');
   });
 
   // Return functionality event listeners
@@ -35,21 +37,21 @@ document.addEventListener('DOMContentLoaded', () => {
   confirmReturnBtn?.addEventListener('click', handleReturnItems);
 
   returnItemsModal?.addEventListener('click', (e) => {
-      if (e.target === returnItemsModal) hideModal('returnItemsModal');
+    if (e.target === returnItemsModal) hideModal('returnItemsModal');
   });
 
   selectAllItems?.addEventListener('change', (e) => {
-      const checkboxes = document.querySelectorAll('.return-item-checkbox');
-      checkboxes.forEach(checkbox => checkbox.checked = e.target.checked);
+    const checkboxes = document.querySelectorAll('.return-item-checkbox');
+    checkboxes.forEach(checkbox => checkbox.checked = e.target.checked);
   });
 
   returnSearchInput?.addEventListener('input', (e) => {
-      const searchTerm = e.target.value.toLowerCase();
-      const rows = document.querySelectorAll('#borrowedItemsTable tr:not(.loading-row)');
-      rows.forEach(row => {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#borrowedItemsTable tr:not(.loading-row)');
+    rows.forEach(row => {
       const text = row.textContent.toLowerCase();
       row.style.display = text.includes(searchTerm) ? '' : 'none';
-      });
+    });
   });
 
   // Add event listeners for closing the transaction details modal
@@ -57,11 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeModalBtn = document.getElementById('closeDetailsModalBtn');
 
   if (closeBtn) {
-      closeBtn.onclick = () => hideModal('transactionDetailsModal');
+    closeBtn.onclick = () => hideModal('transactionDetailsModal');
   }
 
   if (closeModalBtn) {
-      closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
+    closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
   }
 
   hideLoading();
@@ -238,14 +240,32 @@ function hideLoading() {
 function showToast(message, isError = false) {
   const toast = document.getElementById('toastNotification');
   const toastMessage = document.getElementById('toastMessage');
+  const toastIcon = document.getElementById('toastIcon');
 
-  if (!toast || !toastMessage) return;
+  if (!toast || !toastMessage || !toastIcon) return;
 
   toastMessage.textContent = message;
+
+  // Set icon and color
+  if (isError) {
+    toastIcon.innerHTML = `
+      <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 8l8 8M16 8l-8 8" />
+      </svg>
+    `;
+    toastIcon.className = "flex items-center justify-center w-16 h-16 rounded-full mb-4 bg-red-100";
+  } else {
+    toastIcon.innerHTML = `
+      <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+    `;
+    toastIcon.className = "flex items-center justify-center w-16 h-16 rounded-full mb-4 bg-green-100";
+  }
+
   toast.classList.remove('hidden');
   toast.classList.add('flex');
-
-  toast.style.backgroundColor = isError ? 'rgba(220, 38, 38, 0.95)' : 'rgba(44, 161, 74, 0.95)';
 
   setTimeout(() => {
     toast.classList.add('hidden');
@@ -322,7 +342,7 @@ async function verifyAdmin(adminId, password) {
   }
 }
 
-async function initializeNewRequest(){
+async function initializeNewRequest() {
   // Get all form elements (Dashboard)
   const verifyAdminForm = document.getElementById('verifyAdminForm');
   const borrowItemsForm = document.getElementById('borrowItemsForm');
@@ -348,6 +368,20 @@ async function initializeNewRequest(){
 
     const isVerified = await verifyAdmin(adminId, password);
     if (isVerified == true) {
+      // Fetch admin record only if adminId is numeric
+      const isNumericId = /^\d+$/.test(adminId);
+      if (isNumericId) {
+        const adminRecord = await dbhandler.getAdminRecordByAdminID(adminId);
+        if (adminRecord && adminRecord.length > 0) {
+          const { "First Name": firstName, "Middle Name": middleName, "Last Name": lastName } = adminRecord[0];
+          currentAdminName = [firstName, middleName, lastName].filter(Boolean).join(' ');
+        } else {
+          currentAdminName = adminId; // fallback
+        }
+      } else {
+        currentAdminName = adminId; // fallback for non-numeric IDs
+      }
+      currentAdminId = adminId;
       hideModal('verifyAdminModal');
       showModal('borrowItemsModal');
       await initializeItemsList();
@@ -366,7 +400,7 @@ async function initializeNewRequest(){
     showModal('borrowItemsModal');
   });
 
-    // Other event listeners
+  // Other event listeners
   addItemBtn?.addEventListener('click', () => {
     const itemSearch = document.getElementById('itemSearch');
     if (itemSearch?.value) {
@@ -378,11 +412,35 @@ async function initializeNewRequest(){
   borrowItemsForm?.addEventListener('submit', (e) => {
     e.preventDefault();
     if (selectedItems.length > 0) {
-
       hideModal('borrowItemsModal');
-      showModal('confirmationModal');
+      // Gather transaction data for the receipt
+      const adminId = currentAdminId;
+      const adminName = currentAdminName;
+      const date = new Date().toLocaleString();
+      const items = selectedItems.map(item => ({
+        name: item.itemName,
+        quantity: item.quantity
+      }));
+      const borrowRemarks = document.getElementById('borrowRemarks').value.trim();
+      showBorrowReceipt({
+        transactionId: '', // Set after transaction if needed
+        adminId,
+        adminName,
+        date,
+        items,
+        remarks: borrowRemarks,
+        onConfirm: async () => {
+          await addTransaction();
+        },
+        onCancel: () => {
+          // Optionally reset forms or UI
+          selectedItems = [];
+          clearItemsTable();
+          document.getElementById('borrowRemarks').value = '';
+        }
+      });
     } else {
-      showToast('Please add at least one item');
+      showToast('Please add at least one item', true);
     }
   });
 
@@ -450,7 +508,7 @@ async function initializeItemsList() {
 }
 
 // Adds a transaction
-async function addTransaction(){
+async function addTransaction() {
   hideModal('confirmationModal');
 
   let itemIdArray = Array();
@@ -469,14 +527,27 @@ async function addTransaction(){
 
   let result = await dbhandler.addTransactionRecord(currentAdminId, borrowRemarks.value.trim(), itemIdArray, borrowQuantityArray);
 
-  if (result.includes("ERROR")) {
-    showToast(result, true)
+  if (!result || (typeof result === 'string' && result.includes("ERROR"))) {
+    showToast(result || "Transaction failed", true);
   } else {
+    // result should be an array/object with the new transaction, e.g. [{ "Transaction ID": ... }]
+    let transactionId = '';
+    if (Array.isArray(result) && result[0] && result[0]['Transaction ID']) {
+      transactionId = result[0]['Transaction ID'];
+    } else if (typeof result === 'object' && result['Transaction ID']) {
+      transactionId = result['Transaction ID'];
+    } else if (typeof result === 'string') {
+      transactionId = result; // fallback
+    }
+    // Update the receipt modal with the transaction ID
+    const receiptContent = document.getElementById('borrowReceiptContent');
+    if (receiptContent) {
+      const idSpan = receiptContent.querySelector('.text-sm span');
+      if (idSpan) idSpan.textContent = transactionId;
+    }
     showToast('Transaction completed successfully!', false);
     clearItemsTable();
     const borrowRemarks = document.getElementById('borrowRemarks');
     if (borrowRemarks) borrowRemarks.value = '';
   }
 }
-
-

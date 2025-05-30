@@ -762,3 +762,83 @@ window.addEventListener('DOMContentLoaded', function () {
   renderDashboardSummaryRow();
   renderDashboardSections();
 });
+
+// --- Borrow Receipt Modal Logic ---
+function showBorrowReceipt({ transactionId, adminId, adminName, date, items, remarks, onConfirm, onCancel }) {
+  const modal = document.getElementById('borrowReceiptModal');
+  const content = document.getElementById('borrowReceiptContent');
+  const printBtn = document.getElementById('printBorrowReceiptBtn');
+  const cancelBtn = document.getElementById('cancelBorrowReceiptBtn');
+  const confirmBtn = document.getElementById('confirmBorrowReceiptBtn');
+
+  // Build the receipt HTML
+  content.innerHTML = `
+    <div>
+      <div class="text-sm text-gray-600 mb-1">Transaction ID: <span class="font-semibold text-gray-800">${transactionId || '-'}</span></div>
+      <div class="text-sm text-gray-600 mb-1">Admin: <span class="font-semibold text-gray-800">${adminName || adminId || '-'}</span></div>
+      <div class="text-sm text-gray-600 mb-1">Date: <span class="font-semibold text-gray-800">${date || new Date().toLocaleString()}</span></div>
+    </div>
+    <div>
+      <div class="font-semibold text-gray-700 mb-2">Borrowed Items:</div>
+      <table class="min-w-full text-sm border border-gray-200 rounded">
+        <thead>
+          <tr class="bg-gray-50">
+            <th class="px-3 py-1 border-b text-left">Item Name</th>
+            <th class="px-3 py-1 border-b text-center">Quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${items.map(item => `
+            <tr>
+              <td class="px-3 py-1 border-b">${item.name}</td>
+              <td class="px-3 py-1 border-b text-center">${item.quantity}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="font-semibold text-gray-700 mb-1">Remarks:</div>
+      <div class="text-gray-800 bg-gray-50 rounded p-2">${remarks || '<span class="italic text-gray-400">None</span>'}</div>
+    </div>
+  `;
+
+  // Show modal
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+
+  // Print handler
+  printBtn.onclick = function () {
+    const printContents = content.innerHTML;
+    const win = window.open('', '', 'width=700,height=900');
+    win.document.write(`
+      <html>
+        <head>
+          <title>Borrow Receipt</title>
+          <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+          <style>body{font-family:sans-serif;padding:2rem;}</style>
+        </head>
+        <body>${printContents}</body>
+      </html>
+    `);
+    win.document.close();
+    win.focus();
+    win.print();
+    win.close();
+  };
+
+  // Cancel handler
+  cancelBtn.onclick = function () {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    if (typeof onCancel === 'function') onCancel();
+  };
+
+  // Confirm handler
+  confirmBtn.onclick = function () {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    if (typeof onConfirm === 'function') onConfirm();
+  };
+}
+window.showBorrowReceipt = showBorrowReceipt;
