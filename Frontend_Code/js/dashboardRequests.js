@@ -8,12 +8,19 @@ var itemData;
 let currentAdminId = null;
 let currentAdminName = null;
 let selectedItems = [];
+var nextTransactionId;
+var mod;
 
 
 // Loads the entire document
 document.addEventListener('DOMContentLoaded', () => {
+  mod = false;
+  if (mod === true)
+    currentAdminId = '2023-00570';
+
   showLoading();
   initializeNewRequest();
+  initializeNextTransactionId();
   login.initializePasswordToggle();
 
   // Get all modal elements (Transactions)
@@ -72,25 +79,19 @@ document.addEventListener('DOMContentLoaded', () => {
 //================================================================
 // Methods for the borrow requests
 
-// Lets the methods be available in the window
-window.updateItemQuantity = updateItemQuantity;
-window.removeItem = removeItem;
-
 // Update item quantity in the selectedItems array
 function updateItemQuantity(itemName, newQuantity) {
   const index = selectedItems.findIndex(item => item.itemName === itemName);
-
   console.log(index)
   if (index !== -1) {
     const inventoryItem = itemData.find(item => itemName.includes(item["Name"]) && itemName.includes(item["Brand"]));
     const maxQuantity = inventoryItem ? inventoryItem["Remaining Quantity"] : 1;
 
-
     newQuantity = Math.min(Math.max(1, parseFloat(newQuantity) || 1), maxQuantity);
     selectedItems[index].quantity = newQuantity;
 
-    const input = document.querySelector(`input[data-item="${itemName}"]`);
-    if (input) {
+    const input = document.querySelector(`input[data-input="inputQuantity_${itemName}"]`);
+    if (input) {  
       console.log(newQuantity);
       input.value = newQuantity;
     }
@@ -128,9 +129,8 @@ function addItemToTable(itemName) {
     <td class="px-6 py-4 whitespace-nowrap text-gray-900 text-center">${inventoryItem["Remaining Quantity"]}</td>
     <td class="px-6 py-4 whitespace-nowrap text-gray-900">
       <div class="flex items-center justify-center w-full space-x-2">
-        <button type="button" 
-          class="w-8 h-8 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-          onclick="updateItemQuantity('${itemName}', (parseInt(document.querySelector('input[data-item=\\'${itemName}\\']').value) || 1) - 1)">
+        <button type="button" data-item-button="decrementButton_${itemName}"
+          class="w-8 h-8 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#2ca14a]">
           <i class="fas fa-minus text-gray-600"></i>
         </button>
         <input 
@@ -138,20 +138,19 @@ function addItemToTable(itemName) {
           value="1"
           min="1"
           max="${inventoryItem["Remaining Quantity"]}"
-          data-item="${itemName}"
+          name="inputQuantity_${itemName}"
+          data-input="inputQuantity_${itemName}"
           class="w-16 text-center rounded-md border border-gray-300 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent text-gray-900 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          onchange="updateItemQuantity('${itemName}', this.value)"
         >
-        <button type="button"
-          class="w-8 h-8 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#2ca14a]"
-          onclick="updateItemQuantity('${itemName}', (parseInt(document.querySelector('input[data-item=\\'${itemName}\\']').value) || 1) + 1)">
+        <button type="button" data-item-button="incrementButton_${itemName}"
+          class="w-8 h-8 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#2ca14a]">
           <i class="fas fa-plus text-gray-600"></i>
         </button>
       </div>
     </td>
     <td class="px-6 py-4 whitespace-nowrap text-center">
       <div class="flex justify-center">
-        <button type="button" 
+        <button type="button" data-item-button="removeButton_${itemName}"
           class="w-8 h-8 rounded-md bg-gray-100 hover:bg-gray-200 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#2ca14a]" 
           onclick="removeItem('${itemName}')"
           title="Remove item"
@@ -161,6 +160,34 @@ function addItemToTable(itemName) {
       </div>
     </td>
   `;
+
+  let input = row.querySelector(`input[data-input="inputQuantity_${itemName}"]`)
+  let incrementButton = row.querySelector(`button[data-item-button="incrementButton_${itemName}"]`)
+  let decrementButton = row.querySelector(`button[data-item-button="decrementButton_${itemName}"]`)
+  let removeButton = row.querySelector(`button[data-item-button="removeButton_${itemName}"]`)
+
+  input.addEventListener('keyup', async function handleIncrement(e) {
+    e.preventDefault();
+    let value = row.querySelector(`input[data-input="inputQuantity_${itemName}"]`).value
+    updateItemQuantity(itemName, Number(value))
+  })
+
+  incrementButton.addEventListener('click', async function handleIncrement(e) {
+    e.preventDefault();
+    let value = row.querySelector(`input[data-input="inputQuantity_${itemName}"]`).value
+    updateItemQuantity(itemName, Number(value) + 1)
+  })
+
+  decrementButton.addEventListener('click', async function handleDecrement(e) {
+    e.preventDefault();
+    let value = row.querySelector(`input[data-input="inputQuantity_${itemName}"]`).value
+    updateItemQuantity(itemName, value - 1)
+  })
+
+  removeButton.addEventListener('click', async function handleRemove(e) {
+    e.preventDefault();
+    removeItem(itemName)
+  })
 
   selectedItemsTable.appendChild(row);
   selectedItems.push({ itemName, quantity: 1 });
@@ -358,16 +385,24 @@ async function initializeNewRequest() {
 
   // Event listeners for transaction type
   if (addTransactionBtn) {
-    addTransactionBtn.addEventListener('click', () => showModal('verifyAdminModal'));
+    if (mod == false)
+      addTransactionBtn.addEventListener('click', () => showModal('verifyAdminModal'));
+    else 
+      addTransactionBtn.addEventListener('click', async () => {
+        await initializeItemsList();
+        showModal('borrowItemsModal')
+      });
   }
 
   verifyAdminForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
+
     const adminId = document.getElementById('verifyAdminId').value;
     const password = document.getElementById('password').value;
 
     const isVerified = await verifyAdmin(adminId, password);
     if (isVerified == true) {
+      await dbhandler.prepareUser(); // Prepares the user for transactions
       // Fetch admin record only if adminId is numeric
       const isNumericId = /^\d+$/.test(adminId);
       if (isNumericId) {
@@ -382,9 +417,9 @@ async function initializeNewRequest() {
         currentAdminName = adminId; // fallback for non-numeric IDs
       }
       currentAdminId = adminId;
+      await initializeItemsList();
       hideModal('verifyAdminModal');
       showModal('borrowItemsModal');
-      await initializeItemsList();
       verifyAdminForm.reset();
     } else {
       const errorDiv = document.getElementById('verifyAdminError');
@@ -401,7 +436,7 @@ async function initializeNewRequest() {
   });
 
   // Other event listeners
-  addItemBtn?.addEventListener('click', () => {
+  addItemBtn.addEventListener('click', () => {
     const itemSearch = document.getElementById('itemSearch');
     if (itemSearch?.value) {
       addItemToTable(itemSearch.value);
@@ -409,10 +444,13 @@ async function initializeNewRequest() {
     }
   });
 
-  borrowItemsForm?.addEventListener('submit', (e) => {
+  // If press enter, it causes the receipt to pop up, without any back button may cause additional errors
+  borrowItemsForm.addEventListener('submit', (e) => {
     e.preventDefault();
+
     if (selectedItems.length > 0) {
       hideModal('borrowItemsModal');
+
       // Gather transaction data for the receipt
       const adminId = currentAdminId;
       const adminName = currentAdminName;
@@ -421,9 +459,10 @@ async function initializeNewRequest() {
         name: item.itemName,
         quantity: item.quantity
       }));
+
       const borrowRemarks = document.getElementById('borrowRemarks').value.trim();
       showBorrowReceipt({
-        transactionId: '', // Set after transaction if needed
+        transactionId: nextTransactionId,
         adminId,
         adminName,
         date,
@@ -432,11 +471,19 @@ async function initializeNewRequest() {
         onConfirm: async () => {
           await addTransaction();
         },
-        onCancel: () => {
-          // Optionally reset forms or UI
-          selectedItems = [];
-          clearItemsTable();
-          document.getElementById('borrowRemarks').value = '';
+        // I've commented this for now, may mga times kasi na if mag transaction tas mag press ng "Enter"
+        // accidentally, diretso na tayong reciept, so hindi na makabalik, mawawala pa progress :<
+        // So, gi-comment ko muna for now hehe -Waks
+
+        // onCancel: () => {
+        //   // Optionally reset forms or UI
+        //   selectedItems = [];
+        //   clearItemsTable();
+        //   document.getElementById('borrowRemarks').value = '';
+        // }
+        onCancel: () => { // Temporarily makes this a back button
+          hideModal('borrowReceiptModal')
+          showModal('borrowItemsModal')
         }
       });
     } else {
@@ -479,9 +526,7 @@ async function initializeItemsList() {
 
     // Clear existing options
     itemsList.innerHTML = '';
-    console.log(itemsList);
 
-    // Commented for the mean time (Not fully implemented yet.)
     itemData.forEach((item) => {
       if (Number(item["Remaining Quantity"]) == 0)
         return;
@@ -492,13 +537,21 @@ async function initializeItemsList() {
       itemsList.appendChild(option);
     })
 
-    // Add items from mock inventory
-    // mockInventory.forEach(item => {
-    //   const option = document.createElement('option');
-    //   option.value = item.item_name;
-    //   option.textContent = `${item.item_name} (${item.available_quantity} available)`;
-    //   itemsList.appendChild(option);
-    // });
+  } catch (generalError) {
+    console.error(generalError);
+  } finally {
+    hideLoading();
+  }
+}
+
+async function initializeNextTransactionId() {
+  try {
+    nextTransactionId = await dbhandler.getNextTransactionId();
+
+    if (nextTransactionId < 0) {
+      console.error("The Next Transaction ID cannot be found.");
+      nextTransactionId = 20;
+    }
 
   } catch (generalError) {
     console.error(generalError);
@@ -547,7 +600,9 @@ async function addTransaction() {
     }
     showToast('Transaction completed successfully!', false);
     clearItemsTable();
+    selectedItems = [];
     const borrowRemarks = document.getElementById('borrowRemarks');
     if (borrowRemarks) borrowRemarks.value = '';
+    nextTransactionId++;
   }
 }

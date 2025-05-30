@@ -2854,6 +2854,27 @@ export async function prepareUser(){
 
 /**
  * Method to get all of the records on the Transactions table
+ * @returns The next ID of the transaction ID in the sequence
+ */
+export async function getNextTransactionId(){
+    try{
+        const {data, error: supabaseError} = await supabaseClient.rpc('get_next_transaction_id');
+        
+        if (supabaseError){
+            console.error(`Supabase Error:`, supabaseError.message);
+            return null;
+        }
+        
+        return data;
+        
+    } catch (generalError) {
+        console.error("General error", generalError)
+        return null;
+    }
+}
+
+/**
+ * Method to get all of the records on the Transactions table
  * @returns A record consisting of 5 columns (Transaction ID, Admin Name, Transaction Date, Status, Remarks)
  */
 export async function getAllTransactionRecords(){
@@ -2972,9 +2993,6 @@ export function converter(condition = '', ...objectArray){
     if (!condition === 'string' || !condition === 'int' || !condition === 'bigint' || !condition === 'float'){
         throw new Error('Kindly specify the condition for this method')
     }
-
-    // TODO: Remove once everything is implemented.
-    console.log(objectArray);
 
     let newArray = new Array(objectArray.length);
 

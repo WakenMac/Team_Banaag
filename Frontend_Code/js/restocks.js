@@ -539,6 +539,7 @@ async function handleAddRestockSubmit(e) {
         currentQuantity = 0;
     }
 
+    resetBrandOption();
     closeAddModal();
     showToast("Restock added successfully");
   } else {
@@ -552,6 +553,7 @@ async function handleAddRestockSubmit(e) {
         restockDate,
         restockExpirationDate
       );
+    resetBrandOption();
     closeAddModal();
     showToast("Restock added successfully");
   }
