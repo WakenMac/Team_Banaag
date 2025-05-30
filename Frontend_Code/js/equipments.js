@@ -793,10 +793,15 @@ function searchEquipment() {
   rows.forEach((row) => {
     const itemName = row.children[1].textContent.toLowerCase();
     const itemBrand = row.children[4].textContent.toLowerCase();
+    const itemUnit = row.children[2].textContent.toLowerCase();
+    const itemLocation = row.children[3].textContent.toLowerCase();
     const showRow =
       !searchValue ||
       itemName.includes(searchValue) ||
-      itemBrand.includes(searchValue);
+      itemName.startsWith(searchValue) ||
+      itemBrand.includes(searchValue) ||
+      itemUnit.includes(searchValue) ||
+      itemLocation.includes(searchValue);
     row.style.display = showRow ? "" : "none";
     if (showRow) hasResult = true;
   });

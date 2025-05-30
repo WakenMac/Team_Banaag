@@ -580,10 +580,15 @@ function searchApparatus() {
   rows.forEach((row) => {
     const itemName = row.children[1].textContent.toLowerCase();
     const itemBrand = row.children[4].textContent.toLowerCase();
+    const itemUnit = row.children[2].textContent.toLowerCase();
+    const itemLocation = row.children[3].textContent.toLowerCase();
     const showRow =
       !searchValue ||
       itemName.includes(searchValue) ||
-      itemBrand.includes(searchValue);
+      itemName.startsWith(searchValue) ||
+      itemBrand.includes(searchValue) ||
+      itemUnit.includes(searchValue) ||
+      itemLocation.includes(searchValue);
     row.style.display = showRow ? "" : "none";
     if (showRow) hasResult = true;
   });
@@ -698,13 +703,13 @@ addDateBtn.addEventListener('click', () => {
   const wrapper = document.createElement('div');
   wrapper.className = 'flex items-center gap-2';
   const label = document.createElement('label');
-  label.className = 'block text-gray-700 font-medium';
+  label.className = 'block font-medium text-gray-700';
   label.textContent = `Date ${idx + 1}:`;
   label.setAttribute('for', `dateField${idx}`);
   const input = document.createElement('input');
   input.type = 'date';
   input.id = `dateField${idx}`;
-  input.className = 'date-input flex-1 border rounded px-3 py-2';
+  input.className = 'flex-1 px-3 py-2 border rounded date-input';
   input.required = true;
   wrapper.appendChild(label);
   wrapper.appendChild(input);

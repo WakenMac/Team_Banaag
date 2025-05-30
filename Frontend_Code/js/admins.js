@@ -225,20 +225,19 @@ function closeEditAdminModal() {
 // Password toggle functionality
 document.querySelectorAll('.password-toggle').forEach(button => {
   button.addEventListener('click', () => {
-    const input = document.getElementById(button.dataset.passwordInput)
-    const icon = button.querySelector('i')
-    
+    const input = document.getElementById(button.dataset.passwordInput);
+    const icon = button.querySelector('i');
     if (input.type === 'password') {
-      input.type = 'text'
-      icon.classList.remove('fa-eye')
-      icon.classList.add('fa-eye-slash')
+      input.type = 'text';
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
     } else {
-      input.type = 'password'
-      icon.classList.remove('fa-eye-slash')
-      icon.classList.add('fa-eye')
+      input.type = 'password';
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
     }
-  })
-})
+  });
+});
 
 // Edit form submission handler
 editAdminForm.addEventListener('submit', async (e) => {
@@ -541,16 +540,16 @@ document
 // =====================================================================================================
 // BACKEND-RELATED METHODS
 
-async function prepareAdminTable(){
+async function prepareAdminTable() {
   try {
     let data = await dbhandler.getAllAdmins();
 
-    if (data.length == 0){
+    if (data.length == 0) {
       console.log("Admins table has no records.");
       return;
     }
 
-    for (let i = 0; i < data.length; i++){
+    for (let i = 0; i < data.length; i++) {
       createNewAdminRow(
         data[i]['Admin ID'],
         data[i]['First Name'],
@@ -559,7 +558,7 @@ async function prepareAdminTable(){
       );
     }
 
-  } catch (error){
-      console.error(error);
+  } catch (error) {
+    console.error(error);
   }
 }
