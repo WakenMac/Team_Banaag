@@ -201,8 +201,6 @@ async function loadTransactionHistory() {
   
   try {
     showTableLoading();
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
     const searchTerm = document.getElementById('transactionSearch')?.value.toLowerCase() || '';
     const status = document.getElementById('transactionFilter')?.value || 'all';
     const startDate = document.getElementById('startDate')?.value;
@@ -664,47 +662,45 @@ function showTransactionDetails (transactionId) {
 // TODO: What does this do?
 // RETURNS an item
 async function processReturn (transactionId, itemName) {
-  console.log("I work :>");
-  console.log(transactionId, itemName);
-  return;
-
   // Temporarily used dead code before we connect it to the database
   const quantityInput = document.querySelector(`input[data-item="${itemName}"]`);
   if (!quantityInput) return;
-  const remarkInput = document.querySelector(`textarea[data-item-remark="${itemName}"]`);
-  const returnRemark = remarkInput ? remarkInput.value.trim() : '';
-  const returnQuantity = parseInt(quantityInput.value);
+  const returnQuantity = parseFloat(quantityInput.value);
   if (isNaN(returnQuantity) || returnQuantity < 1) {
     showToast('Please enter a valid return quantity', true);
     return;
   }
 
+  // Checks the remarks
+  const remarkInput = document.querySelector(`textarea[data-item-remark="${itemName}"]`);
+  const returnRemark = remarkInput ? remarkInput.value.trim() : '';
+
+  // Gets the index for the details in each dataset.
+  let transactionIndex = filteredTransactions.findIndex(t => { return t["Transaction ID"] === Number(transactionId) })
+  let itemIndex = itemsTransactedData.findIndex(i => { return i["Item Name"] === itemName && i["Transaction ID"] === Number(transactionId) })
+
   try {
-    // Update transaction status and item data in mockTransactionHistory
-    const transaction = mockTransactionHistory.find(t => t.transaction_id === transactionId);
-    if (transaction) {
-      const item = transaction.items.find(i => i.name === itemName);
-      if (item) {
-        item.returned_quantity = (item.returned_quantity || 0) + returnQuantity;
-        if (returnRemark) {
-          item.return_remark = returnRemark;
-        }
-        // Check if all non-consumable items are returned
-        const allNonConsumablesReturned = transaction.items
-          .filter(i => !i.is_consumable)
-          .every(i => (i.returned_quantity || 0) >= i.quantity);
-        if (allNonConsumablesReturned) {
-          transaction.status = 'completed';
-        } else {
-          transaction.status = 'partially_returned';
-        }
-      }
+    let queryResult = await dbhandler.returnItemTransacted(
+      transactionId, itemsTransactedData[itemIndex]["Item ID"], returnQuantity, returnRemark);
+    
+    if (!queryResult || queryResult.includes('ERROR')){
+      throw queryResult;
+    } else {
+      let transactionStatus = queryResult.slice(47, queryResult.length); // Gets the transaction status (Part of the query's return statement)
+      
+      // Update the content within each data.
+      transactionData[transactionIndex]["Status"] = transactionStatus;
+      itemsTransactedData[itemIndex]["Current Borrowed Quantity"] = parseFloat(itemsTransactedData[itemIndex]["Current Borrowed Quantity"]) - parseFloat(returnQuantity);
+      itemsTransactedData[itemIndex]["Status"] = (itemsTransactedData[itemIndex]["Current Borrowed Quantity"] == 0)?
+        "Completed" : "Partially Returned";
+      itemsTransactedData[itemIndex]["Remarks"] = (returnRemark === '')? itemsTransactedData[itemIndex]["Remarks"] : returnRemark;
+
+      showToast('Item returned successfully');
+      await loadTransactionHistory(); // Refresh the main table
+      showTransactionDetails(transactionId); // Force refresh modal content
+      if (remarkInput) remarkInput.value = '';
     }
 
-    showToast('Item returned successfully');
-    await loadTransactionHistory(); // Refresh the main table
-    window.showTransactionDetails(transactionId); // Force refresh modal content
-    if (remarkInput) remarkInput.value = '';
   } catch (error) {
     console.error('Error processing return:', error);
     showToast('Error processing return. Please try again.', true);
@@ -899,55 +895,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   await initializeItemsTransacted();
   await loadTransactionHistory(); // For returning
 
-  // Get all modal elements (Transactions)
-  const returnItemsModal = document.getElementById('returnItemsModal');
-
-  // Transaction history
-  const returnBtn = document.getElementById('returnBtn');
-  const cancelReturnBtn = document.getElementById('cancelReturnBtn');
-  const confirmReturnBtn = document.getElementById('confirmReturnBtn');
-  const selectAllItems = document.getElementById('selectAllItems');
-  const returnSearchInput = document.getElementById('returnSearchInput');
-
-  returnBtn?.addEventListener('click', () => {
-    hideModal('transactionTypeModal');
-    loadBorrowedItems();
-    showModal('returnItemsModal');
-  });
-
-  // Return functionality event listeners
-  cancelReturnBtn?.addEventListener('click', () => hideModal('returnItemsModal'));
-  confirmReturnBtn?.addEventListener('click', handleReturnItems);
-
-  returnItemsModal?.addEventListener('click', (e) => {
-    if (e.target === returnItemsModal) hideModal('returnItemsModal');
-  });
-
-  selectAllItems?.addEventListener('change', (e) => {
-    const checkboxes = document.querySelectorAll('.return-item-checkbox');
-    checkboxes.forEach(checkbox => checkbox.checked = e.target.checked);
-  });
-
-  returnSearchInput?.addEventListener('input', (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    const rows = document.querySelectorAll('#borrowedItemsTable tr:not(.loading-row)');
-    rows.forEach(row => {
-      const text = row.textContent.toLowerCase();
-      row.style.display = text.includes(searchTerm) ? '' : 'none';
-    });
-  });
-
   // Add event listeners for closing the transaction details modal
   const closeBtn = document.getElementById('closeDetailsBtn');
   const closeModalBtn = document.getElementById('closeDetailsModalBtn');
 
-  if (closeBtn) {
+  if (closeBtn)
     closeBtn.onclick = () => hideModal('transactionDetailsModal');
-  }
-
-  if (closeModalBtn) {
+  if (closeModalBtn) 
     closeModalBtn.onclick = () => hideModal('transactionDetailsModal');
-  }
 
   hideLoading();
 });
@@ -1009,7 +964,7 @@ function showToast(message, isError = false) {
   setTimeout(() => {
     toast.classList.add('hidden');
     toast.classList.remove('flex');
-  }, isError ? 4000 : 3000);
+  }, isError ? 3000 : 4000);
 }
 
 // Function to show notifications
