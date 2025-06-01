@@ -1,7 +1,7 @@
 {
   "name": "banaag_website",
   "version": "1.0.0",
-  "type" : "module",
+  "type": "module",
   "main": "Backend_Code/server.js",
   "scripts": {
     "start": "node Backend_Code/server.js",
@@ -10,10 +10,12 @@
   "keywords": [],
   "author": "Waken Maclang, Dave Shanna Gigawin, Allan Tagle, & Jeff Ronyl Pausal",
   "license": "ISC",
-  "description": "",
+  "description": "1) Paste the .env file to your root folder (Banaag_Website)\r 2) Head to the Banaag_Website directory in your terminal \r 3) Run \"npm start\"\r 4) Copy and paste the local host link provided to your browser.",
   "dependencies": {
     "@supabase/supabase-js": "^2.49.8",
     "dotenv": "^16.5.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10",
+    "supabase": "^2.23.4"
   }
 }
