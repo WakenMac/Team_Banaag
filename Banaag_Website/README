@@ -1,4 +1,10 @@
-1) Paste the .env file to your root folder (Banaag_Website)
-2) Head to the Banaag_Website directory in your terminal 
-3) Run "npm start"
-4) Copy and paste the local host link provided to your browser.
+1) Head to your terminal and set your current directory to the path to the Banaag_Website foldler
+2) Run the following in the terminal in this order:
+   npm install express
+   npm install nodemon
+   npm install supabase
+   npm install dotenv
+3) Find the commit titled "Deleted 
+4) Paste the .env file to your root folder (Banaag_Website)
+4) Run "npm start"
+5) Copy and paste the local host link provided to your browser.
