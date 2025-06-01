@@ -91,10 +91,8 @@ function updateItemQuantity(itemName, newQuantity) {
     selectedItems[index].quantity = newQuantity;
 
     const input = document.querySelector(`input[data-input="inputQuantity_${itemName}"]`);
-    if (input) {  
-      console.log(newQuantity);
+    if (input) 
       input.value = newQuantity;
-    }
   }
 }
 
@@ -584,14 +582,16 @@ async function addTransaction() {
     showToast(result || "Transaction failed", true);
   } else {
     // result should be an array/object with the new transaction, e.g. [{ "Transaction ID": ... }]
-    let transactionId = '';
-    if (Array.isArray(result) && result[0] && result[0]['Transaction ID']) {
-      transactionId = result[0]['Transaction ID'];
-    } else if (typeof result === 'object' && result['Transaction ID']) {
-      transactionId = result['Transaction ID'];
-    } else if (typeof result === 'string') {
-      transactionId = result; // fallback
-    }
+    let transactionId = nextTransactionId;
+    
+    // if (Array.isArray(result) && result[0] && result[0]['Transaction ID']) {
+    //   transactionId = result[0]['Transaction ID'];
+    // } else if (typeof result === 'object' && result['Transaction ID']) {
+    //   transactionId = result['Transaction ID'];
+    // } else if (typeof result === 'string') {
+    //   transactionId = result; // fallback
+    // }
+
     // Update the receipt modal with the transaction ID
     const receiptContent = document.getElementById('borrowReceiptContent');
     if (receiptContent) {

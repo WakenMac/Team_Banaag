@@ -1,0 +1,19 @@
+{
+  "name": "banaag_website",
+  "version": "1.0.0",
+  "type" : "module",
+  "main": "Backend_Code/server.js",
+  "scripts": {
+    "start": "node Backend_Code/server.js",
+    "dev": "nodemon Backend_Code/server.js"
+  },
+  "keywords": [],
+  "author": "Waken Maclang, Dave Shanna Gigawin, Allan Tagle, & Jeff Ronyl Pausal",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.8",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  }
+}
