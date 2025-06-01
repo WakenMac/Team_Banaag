@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>CARES | Transaction History</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/admin.css" />
+  </head>
+  <body class="bg-[#f3f7f7] min-h-screen">
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="fixed inset-0 z-50 flex items-center justify-center bg-[#f3f7f7]">
+      <div class="flex flex-col items-center bg-white p-8 rounded-lg shadow-lg">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#2ca14a]"></div>
+        <p class="mt-4 text-gray-700 text-lg font-medium">Loading CARES System</p>
+        <p class="mt-2 text-gray-500 text-sm">Please wait while we prepare everything for you...</p>
+      </div>
+    </div>
+    
+    <!-- Table Loading State -->
+    <div id="tableLoadingState" class="hidden">
+      <div class="animate-pulse space-y-4 p-4">
+        <!-- Header shimmer -->
+        <div class="h-8 bg-gray-200 rounded w-1/4"></div>
+        <!-- Table header shimmer -->
+        <div class="h-12 bg-gray-200 rounded mb-4"></div>
+        <!-- Table rows shimmer -->
+        <div class="space-y-3">
+          <div class="h-10 bg-gray-200 rounded"></div>
+          <div class="h-10 bg-gray-200 rounded opacity-75"></div>
+          <div class="h-10 bg-gray-200 rounded opacity-50"></div>
+          <div class="h-10 bg-gray-200 rounded opacity-75"></div>
+          <div class="h-10 bg-gray-200 rounded opacity-50"></div>
+        </div>
+        <!-- Loading message -->
+        <div class="flex items-center justify-center mt-6">
+          <p class="text-gray-500 text-sm">Loading transactions data...</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Navigation Bar -->
+    <nav class="flex items-center justify-between px-4 md:px-8 lg:px-12 h-20 border-b border-gray-300 bg-[#f3f7f7]">
+      <!-- Left side: Logo and Title -->
+      <a href="/dashboard" class="flex items-center space-x-3 group">
+        <img
+          alt="CAS Lab logo"
+          class="w-12 h-12 object-contain transition-transform"
+          src="/images/cas_logo.png"
+        />
+        <div class="flex flex-col leading-tight">
+          <span class="font-semibold text-black text-sm">CARES.</span>
+          <span class="text-[9px] font-semibold text-black/80 tracking-tight">
+            CENTRALIZED RESOURCE
+          </span>
+          <span class="text-[9px] font-semibold text-black/80 tracking-tight">
+            AND EQUIPMENT SYSTEM
+          </span>
+        </div>
+        <div class="border-l border-black/40 h-10 ml-4"></div>
+      </a>
+
+      <!-- Right side: Navigation Links -->
+      <ul class="flex space-x-8 text-[13px] font-normal text-black">
+        <li>
+          <a class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]" 
+             href="/dashboard">Dashboard</a>
+        </li>
+        <li class="relative">
+          <button class="inline-flex items-center cursor-pointer select-none focus:outline-none" 
+                  id="masterlistBtn"
+                  type="button"
+                  aria-expanded="false"
+                  aria-haspopup="true">
+            Masterlist
+            <i class="fas fa-chevron-down ml-1 text-black text-xs"></i>
+          </button>
+          <ul class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10" 
+              id="masterlistMenu"
+              role="menu"
+              aria-labelledby="masterlistBtn">
+            <li role="none">
+              <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white" 
+                 href="/admins"
+                 role="menuitem"
+                 tabindex="-1">Admins</a>
+            </li>
+            <li role="none">
+              <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white" 
+                 href="/inventory"
+                 role="menuitem"
+                 tabindex="-1">Inventory</a>
+            </li>
+          </ul>
+        </li>
+        <li class="relative">
+          <button class="inline-flex items-center cursor-pointer select-none focus:outline-none" 
+                  id="consumablesBtn"
+                  type="button"
+                  aria-expanded="false"
+                  aria-haspopup="true">
+            Consumables
+            <i class="fas fa-chevron-down ml-1 text-black text-xs"></i>
+          </button>
+          <ul class="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10" 
+              id="consumablesMenu"
+              role="menu"
+              aria-labelledby="consumablesBtn">
+            <li role="none">
+              <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white" 
+                 href="/chemicals"
+                 role="menuitem"
+                 tabindex="-1">Chemicals</a>
+            </li>
+            <li role="none">
+              <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white" 
+                 href="/items"
+                 role="menuitem"
+                 tabindex="-1">Items</a>
+            </li>
+          </ul>
+        </li>
+        <li class="relative">
+          <button class="inline-flex items-center cursor-pointer select-none focus:outline-none" 
+                  id="nonconsumablesBtn"
+                  type="button"
+                  aria-expanded="false"
+                  aria-haspopup="true">
+            Non-consumables
+            <i class="fas fa-chevron-down ml-1 text-black text-xs"></i>
+          </button>
+          <ul class="absolute left-0 top-full mt-1 w-44 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10" 
+              id="nonconsumablesMenu"
+              role="menu"
+              aria-labelledby="nonconsumablesBtn">
+            <li role="none">
+              <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white" 
+                 href="/equipments"
+                 role="menuitem"
+                 tabindex="-1">Equipment</a>
+            </li>
+            <li role="none">
+              <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white" 
+                 href="/apparatus"
+                 role="menuitem"
+                 tabindex="-1">Apparatus</a>
+            </li>
+            <li role="none">
+              <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white" 
+                 href="/glassware"
+                 role="menuitem"
+                 tabindex="-1">Glassware</a>
+            </li>
+          </ul>
+        </li>
+        <li class="relative">
+          <button class="inline-flex items-center cursor-pointer select-none focus:outline-none" 
+                  id="propertiesBtn"
+                  type="button"
+                  aria-expanded="false"
+                  aria-haspopup="true">
+            Properties
+            <i class="fas fa-chevron-down ml-1 text-black text-xs"></i>
+          </button>
+          <ul class="absolute left-0 top-full mt-1 w-40 bg-white border border-gray-300 rounded shadow-md opacity-0 invisible transition-opacity z-10" 
+              id="propertiesMenu"
+              role="menu"
+              aria-labelledby="propertiesBtn">
+            <li role="none">
+              <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white" 
+                 href="/location"
+                 role="menuitem"
+                 tabindex="-1">Location</a>
+            </li>
+            <li role="none">
+              <a class="block px-4 py-2 text-sm text-black hover:bg-[#2ca14a] hover:text-white" 
+                 href="/unitType"
+                 role="menuitem"
+                 tabindex="-1">Unit Type</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]" 
+             href="/restocks">Restocks</a>
+        </li>
+        <li>
+          <a class="inline-flex items-center font-semibold pb-1 border-b-2 border-[#2ca14a] text-[#2ca14a] cursor-pointer select-none focus:outline-none" 
+             href="/transactions">Request History</a>
+        </li>
+        <li>
+          <a class="pb-1 border-b-2 border-transparent hover:border-[#2ca14a] hover:text-[#2ca14a]" 
+             href="/statistics">Statistics</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-full mx-auto px-4 sm:px-6 lg:px-12 mt-6">
+      <div class="flex flex-col sm:flex-row justify-between items-center w-full gap-3 sm:gap-0">
+        <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
+          <!-- Search Box -->
+          <input
+            type="search"
+            id="transactionSearch"
+            placeholder="Search transactions..."
+            class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-64"
+          />
+
+          <!-- Transaction Type Filter -->
+          <select
+            id="transactionFilter"
+            class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-48"
+          >
+            <option value="all">All Status</option>
+            <option value="completed">Completed</option>
+            <option value="pending_return">Pending Return</option>
+            <option value="partially_returned">Partially Returned</option>
+            <option value="not_returnable">Not Returnable</option>
+          </select>
+
+          <!-- Date Range Filters -->
+          <input
+            type="date"
+            id="startDate"
+            class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-40"
+          />
+          <input
+            type="date"
+            id="endDate"
+            class="rounded-md border border-gray-300 bg-white py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2ca14a] focus:border-transparent max-w-xs w-full sm:w-40"
+          />
+        </div>
+      </div>
+
+      <h2 class="font-semibold text-gray-900 text-sm mb-3 mt-4">
+        Transaction History
+      </h2>
+
+      <!-- Transaction Table -->
+      <div class="overflow-x-auto border-gray-100 rounded-md bg-white">
+        <div class="max-h-[70vh] overflow-y-auto">
+          <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-gray-50 sticky top-0 z-10">
+              <tr>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Transaction ID</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Date & Time</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Admin Name</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Status</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Remarks</th>
+              </tr>
+            </thead>
+            <tbody id="transactionHistoryTable" class="bg-white divide-y divide-gray-200">
+              <!-- Transaction rows will be dynamically populated here -->
+              <tr class="h-[250px] text-center text-gray-500 italic">
+                <td colspan="5" class="align-middle">
+                  Loading transactions...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Transaction Details Modal -->
+    <div id="transactionDetailsModal" class="fixed inset-0 z-50 hidden items-center justify-center p-2 sm:p-4" role="dialog" aria-labelledby="transactionDetailsTitle" aria-modal="true">
+      <div class="modal-backdrop fixed inset-0 bg-black opacity-50"></div>
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl sm:max-w-3xl md:max-w-4xl lg:max-w-5xl z-50 p-2 sm:p-4 md:p-6 relative overflow-visible">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <img src="/images/cas_logo.png" alt="CARES logo" class="w-12 h-12 object-contain" />
+            <div>
+              <span class="font-black text-2xl text-black">Transaction Details</span>
+              <p class="text-sm text-gray-600" id="transactionIdDisplay"></p>
+            </div>
+          </div>
+          <button id="closeDetailsBtn" class="text-gray-400 hover:text-gray-600">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <!-- Transaction Info -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div>
+            <p class="text-sm text-gray-600">Admin</p>
+            <p class="font-medium" id="adminInfoDisplay"></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Date & Time</p>
+            <p class="font-medium" id="dateTimeDisplay"></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Type</p>
+            <p class="font-medium" id="typeDisplay"></p>
+          </div>
+          <div>
+            <p class="text-sm text-gray-600">Status</p>
+            <p class="font-medium" id="statusDisplay"></p>
+          </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="overflow-x-auto w-full max-w-full border border-gray-100 rounded-md bg-white">
+          <table class="min-w-[600px] sm:min-w-[700px] md:min-w-[900px] w-full divide-y divide-gray-200 text-sm">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Item Name</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Quantity</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Type</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Return Status</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Returnable</th>
+                <th class="px-6 py-3 text-left font-semibold text-gray-900 border-b border-gray-200">Action</th>
+              </tr>
+            </thead>
+            <tbody id="transactionItemsTable" class="bg-white divide-y divide-gray-200">
+              <!-- Items will be populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Remarks -->
+        <div class="mb-6">
+          <h3 class="font-semibold text-gray-900 mb-2">Remarks</h3>
+          <p id="remarksDisplay" class="text-gray-600 bg-gray-50 p-3 rounded-md"></p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end space-x-3">
+          <button type="button" id="closeDetailsModalBtn"
+            class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#2ca14a]">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastNotification" class="fixed bottom-4 right-4 z-50 hidden">
+      <div class="bg-[#2dc653] text-white px-6 py-3 rounded-lg shadow-lg">
+        <p id="toastMessage"></p>
+      </div>
+    </div>
+
+    <!-- Script to access the supabase API -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="/js/script.js"></script>
+    <script type="module" src="/js/transaction.js"></script>
+  </body>
+</html>
