@@ -12,7 +12,7 @@ Else, you can proceed to step 5.
 
    (After installing these, you shall see an new folder called node_modules under the Banaag_Website)
 
-3) Find the commit titled "Delete Banaag_Website/.env" press "Load Diff" then copy the contents 
+3) Head to the repository's commit history and find the commit titled "Delete Banaag_Website/.env", head to the .env file and press "Load Diff" then copy its contents 
 4) On the root folder (Banaag_Website), create a new file named ".env"
 4) Paste the contents of the "Delete Banaag_Website/.env" commit to the .env file
 5) Run "npm start"
