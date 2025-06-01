@@ -1,10 +1,24 @@
-1) Head to your terminal and set your current directory to the path to the Banaag_Website foldler
+**HOW TO SET UP AND RUN THE WEB APPLICATION**
+
+For first timers (without node_modules folder), start at step 1
+Else, you can proceed to step 5.
+
+1) Head to your terminal and set your current directory to the path to the Banaag_Website folder, this will be your root folder
 2) Run the following in the terminal in this order:
    npm install express
    npm install nodemon
    npm install supabase
    npm install dotenv
-3) Find the commit titled "Deleted 
-4) Paste the .env file to your root folder (Banaag_Website)
-4) Run "npm start"
-5) Copy and paste the local host link provided to your browser.
+
+   (After installing these, you shall see an new folder called node_modules under the Banaag_Website)
+
+3) Find the commit titled "Delete Banaag_Website/.env" press "Load Diff" then copy the contents 
+4) On the root folder (Banaag_Website), create a new file named ".env"
+4) Paste the contents of the "Delete Banaag_Website/.env" commit to the .env file
+5) Run "npm start"
+6) Copy the local host link provided in the terminal, and paste it to your browser.
+
+Note:
+In the login page, you can use the credentials below, and be careful of the spelling.
+Username: 2023-00570
+Password: Wakster2112
